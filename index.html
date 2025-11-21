@@ -202,7 +202,7 @@
         .btn-capture {
             background: #10b981;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            font-size: 19px;
+            font-size: 18px;
             padding: 20px;
         }
 
@@ -440,7 +440,7 @@
                 </div>
 
                 <div class="tip-box">
-                    💡 <strong>Tip:</strong> Si no detecta el RUT, podrás ingresarlo manualmente después.
+                    💡 <strong>Tip:</strong> Usa "Tomar Foto" para mejor calidad. Si no detecta, ingresa el RUT manualmente.
                 </div>
 
                 <div class="camera-section">
@@ -450,11 +450,11 @@
                 </div>
 
                 <div id="initialButtons">
-                    <button class="btn btn-capture" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Abrir Cámara
+                    <button class="btn btn-capture" id="galleryBtn">
+                        <span class="btn-icon">📸</span> Tomar Foto (Recomendado)
                     </button>
-                    <button class="btn btn-secondary" id="galleryBtn">
-                        <span class="btn-icon">🖼️</span> Seleccionar de Galería
+                    <button class="btn btn-secondary" id="cameraBtn">
+                        <span class="btn-icon">📷</span> Usar Cámara Web
                     </button>
                     <button class="btn btn-logout" id="logoutBtn">
                         <span class="btn-icon">🚪</span> Cerrar Sesión
@@ -843,14 +843,15 @@
             return `${rutFormateado}-${dv}`;
         }
 
-        // Cámara
+        // Cámara web mejorada
         async function abrirCamara() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
+                        width: { ideal: 3840, min: 1280 },
+                        height: { ideal: 2160, min: 720 },
+                        focusMode: 'continuous'
                     } 
                 });
                 video.srcObject = stream;
@@ -876,10 +877,16 @@
         }
 
         function capturarFoto() {
+            // Usar resolución completa del video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            
+            // Dibujar con mejor calidad
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(video, 0, 0);
             
+            // Convertir a blob con máxima calidad
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 imagePreview.src = url;
@@ -887,7 +894,7 @@
                 video.style.display = 'none';
                 cerrarCamara();
                 procesarImagen(url);
-            }, 'image/jpeg', 0.95);
+            }, 'image/jpeg', 1.0); // Calidad 100%
         }
 
         // Verificar TNE
@@ -964,8 +971,8 @@
         }
 
         // Event Listeners
-        cameraBtn.addEventListener('click', abrirCamara);
-        galleryBtn.addEventListener('click', () => fileInput.click());
+        galleryBtn.addEventListener('click', () => fileInput.click()); // Botón principal
+        cameraBtn.addEventListener('click', abrirCamara); // Botón secundario
         captureBtn.addEventListener('click', capturarFoto);
         cancelBtn.addEventListener('click', cerrarCamara);
         
