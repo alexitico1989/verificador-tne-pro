@@ -460,6 +460,33 @@
                     <div class="loading-text">Verificando TNE...</div>
                 </div>
 
+                <div id="rutManualSection" style="display: none; margin-top: 20px;">
+                    <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <p style="font-size: 14px; color: #92400e; margin-bottom: 10px;">
+                            <strong>⚠️ RUT no detectado automáticamente</strong>
+                        </p>
+                        <p style="font-size: 13px; color: #92400e;">
+                            Por favor, ingresa el RUT manualmente:
+                        </p>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">RUT del Estudiante:</label>
+                        <input 
+                            type="text" 
+                            id="rutManualInput" 
+                            class="input-field" 
+                            placeholder="12345678-9"
+                            maxlength="12"
+                        >
+                    </div>
+                    <button class="btn btn-capture" id="verificarManualBtn">
+                        <span class="btn-icon">✓</span> Verificar RUT
+                    </button>
+                    <button class="btn btn-cancel" id="cancelManualBtn">
+                        <span class="btn-icon">↩️</span> Tomar Otra Foto
+                    </button>
+                </div>
+
                 <div class="result" id="result">
                     <div class="result-icon" id="resultIcon"></div>
                     <div class="result-title" id="resultTitle"></div>
@@ -517,6 +544,10 @@
         const newScanBtn = document.getElementById('newScanBtn');
         const initialButtons = document.getElementById('initialButtons');
         const cameraButtons = document.getElementById('cameraButtons');
+        const rutManualSection = document.getElementById('rutManualSection');
+        const rutManualInput = document.getElementById('rutManualInput');
+        const verificarManualBtn = document.getElementById('verificarManualBtn');
+        const cancelManualBtn = document.getElementById('cancelManualBtn');
 
         // Al cargar, verificar si hay licencia guardada
         window.addEventListener('load', () => {
@@ -619,7 +650,7 @@
             }
         });
 
-        // Funciones de extracción y validación RUT (iguales que antes)
+        // Funciones de extracción y validación RUT
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
             const patrones = [
@@ -720,6 +751,7 @@
             errorMsg.style.display = 'none';
             initialButtons.style.display = 'none';
             cameraButtons.style.display = 'none';
+            rutManualSection.style.display = 'none';
             
             try {
                 // OCR
@@ -727,15 +759,37 @@
                 const { data: { text } } = await worker.recognize(imageUrl);
                 await worker.terminate();
                 
+                console.log('Texto OCR:', text);
+                
                 const rut = extraerRUT(text);
                 
                 if (!rut) {
-                    mostrarError('No se pudo detectar un RUT válido');
+                    // No se detectó RUT - mostrar input manual
                     loading.style.display = 'none';
-                    initialButtons.style.display = 'block';
+                    rutManualSection.style.display = 'block';
+                    rutManualInput.focus();
                     return;
                 }
                 
+                // RUT detectado - verificar automáticamente
+                await verificarTNE(rut);
+                
+            } catch (err) {
+                console.error('Error:', err);
+                mostrarError('Error al procesar: ' + err.message);
+                initialButtons.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Nueva función para verificar TNE
+        async function verificarTNE(rut) {
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            rutManualSection.style.display = 'none';
+            
+            try {
                 // Verificar con worker
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
@@ -827,8 +881,40 @@
             result.style.display = 'none';
             imagePreview.style.display = 'none';
             errorMsg.style.display = 'none';
+            rutManualSection.style.display = 'none';
             initialButtons.style.display = 'block';
             fileInput.value = '';
+        });
+
+        // Event listeners para RUT manual
+        verificarManualBtn.addEventListener('click', () => {
+            const rutIngresado = rutManualInput.value.trim();
+            if (!rutIngresado) {
+                mostrarError('Por favor ingresa un RUT');
+                return;
+            }
+            
+            // Validar formato básico
+            const rutLimpio = rutIngresado.replace(/[.\-]/g, '');
+            if (rutLimpio.length < 8 || rutLimpio.length > 9) {
+                mostrarError('RUT inválido. Formato: 12345678-9');
+                return;
+            }
+            
+            verificarTNE(rutIngresado);
+        });
+
+        cancelManualBtn.addEventListener('click', () => {
+            rutManualSection.style.display = 'none';
+            imagePreview.style.display = 'none';
+            initialButtons.style.display = 'block';
+            rutManualInput.value = '';
+        });
+
+        rutManualInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                verificarManualBtn.click();
+            }
         });
 
         // Limpiar stream al cerrar
