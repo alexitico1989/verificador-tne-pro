@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+    <title>Verificador TNE Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a56db;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
+            color: white;
+            padding: 25px 20px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .license-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Pantalla de Login */
+        .login-screen {
+            display: block;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #1a56db;
+        }
+
+        /* App Principal */
+        .app-screen {
+            display: none;
+        }
+
+        .app-screen.active {
+            display: block;
+        }
+
+        .instructions {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #1a56db;
+        }
+
+        .instructions-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .instructions p {
+            font-size: 13px;
+            color: #1e3a8a;
+            line-height: 1.5;
+        }
+
+        #videoPreview {
+            width: 100%;
+            border-radius: 15px;
+            display: none;
+            margin-bottom: 15px;
+            border: 3px solid #1a56db;
+            background: #000;
+        }
+
+        #imagePreview {
+            width: 100%;
+            border-radius: 15px;
+            display: none;
+            margin-bottom: 15px;
+            border: 3px solid #1a56db;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .btn {
+            background: #1a56db;
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 17px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin: 8px 0;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-capture {
+            background: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            font-size: 19px;
+            padding: 20px;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-cancel {
+            background: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-logout {
+            background: #f59e0b;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .camera-section {
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 5px solid #e5e7eb;
+            border-top: 5px solid #1a56db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .result {
+            display: none;
+            padding: 30px 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result.vigente {
+            background: #d1fae5;
+            border: 4px solid #10b981;
+        }
+
+        .result.no-vigente {
+            background: #fee2e2;
+            border: 4px solid #ef4444;
+        }
+
+        .result.warning {
+            background: #fef3c7;
+            border: 4px solid #f59e0b;
+        }
+
+        .result-icon {
+            font-size: 70px;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .result.vigente .result-title {
+            color: #065f46;
+        }
+
+        .result.no-vigente .result-title {
+            color: #991b1b;
+        }
+
+        .result.warning .result-title {
+            color: #92400e;
+        }
+
+        .result-details {
+            font-size: 15px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .result.vigente .result-details {
+            color: #047857;
+        }
+
+        .result.no-vigente .result-details {
+            color: #b91c1c;
+        }
+
+        .result.warning .result-details {
+            color: #b45309;
+        }
+
+        .rut-display {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 30px;
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            border-left: 4px solid #ef4444;
+        }
+
+        .btn-icon {
+            font-size: 24px;
+        }
+
+        .stats-bar {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Verificador TNE Pro</h1>
+            <p id="headerSubtitle">Sistema profesional de verificación</p>
+            <div class="license-badge" id="licenseBadge" style="display: none;"></div>
+        </div>
+
+        <!-- PANTALLA DE LOGIN -->
+        <div class="login-screen" id="loginScreen">
+            <div class="login-icon">🔐</div>
+            <div class="login-title">Acceso Restringido</div>
+            <div class="login-subtitle">Ingresa tu código de licencia para continuar</div>
+
+            <div class="input-group">
+                <label class="input-label">Código de Licencia:</label>
+                <input 
+                    type="text" 
+                    id="licenseInput" 
+                    class="input-field" 
+                    placeholder="DEMO-2025"
+                    maxlength="20"
+                >
+            </div>
+
+            <button class="btn" id="loginBtn">
+                <span class="btn-icon">✓</span> Validar Licencia
+            </button>
+
+            <div class="error-msg" id="loginError"></div>
+
+            <div class="footer" style="border-top: none; margin-top: 40px;">
+                <p style="color: #9ca3af;">Versión Pro 2.0</p>
+                <p style="margin-top: 5px; color: #9ca3af;">Desarrollado por Luis Monardes</p>
+            </div>
+        </div>
+
+        <!-- PANTALLA PRINCIPAL DE LA APP -->
+        <div class="app-screen" id="appScreen">
+            <div class="content">
+                <div class="stats-bar" id="statsBar"></div>
+
+                <div class="instructions">
+                    <div class="instructions-title">📸 Instrucciones:</div>
+                    <p>1. Toma una foto clara del pase escolar<br>
+                    2. Asegúrate que el RUT sea legible<br>
+                    3. La app verificará automáticamente</p>
+                </div>
+
+                <div class="camera-section">
+                    <video id="videoPreview" autoplay playsinline></video>
+                    <img id="imagePreview" alt="Foto capturada">
+                    <canvas id="canvas"></canvas>
+                </div>
+
+                <div id="initialButtons">
+                    <button class="btn btn-capture" id="cameraBtn">
+                        <span class="btn-icon">📷</span> Abrir Cámara
+                    </button>
+                    <button class="btn btn-secondary" id="galleryBtn">
+                        <span class="btn-icon">🖼️</span> Seleccionar de Galería
+                    </button>
+                    <button class="btn btn-logout" id="logoutBtn">
+                        <span class="btn-icon">🚪</span> Cerrar Sesión
+                    </button>
+                </div>
+
+                <div id="cameraButtons" style="display: none;">
+                    <button class="btn btn-capture" id="captureBtn">
+                        <span class="btn-icon">📸</span> Capturar Foto
+                    </button>
+                    <button class="btn btn-cancel" id="cancelBtn">
+                        <span class="btn-icon">❌</span> Cancelar
+                    </button>
+                </div>
+
+                <input type="file" id="fileInput" accept="image/*" capture="environment">
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Verificando TNE...</div>
+                </div>
+
+                <div class="result" id="result">
+                    <div class="result-icon" id="resultIcon"></div>
+                    <div class="result-title" id="resultTitle"></div>
+                    <div class="rut-display" id="rutDisplay"></div>
+                    <div class="result-details" id="resultDetails"></div>
+                    <button class="btn btn-secondary" id="newScanBtn" style="margin-top: 20px;">
+                        🔄 Nueva Verificación
+                    </button>
+                </div>
+
+                <div class="error-msg" id="errorMsg"></div>
+            </div>
+
+            <div class="footer">
+                <p>🚌 Sistema profesional para conductores</p>
+                <p style="margin-top: 5px;">Verificación en tiempo real con JUNAEB</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script>
+        // CONFIGURACIÓN - CAMBIA ESTA URL POR LA TUYA
+        const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
+
+        // Variables globales
+        let stream = null;
+        let licenciaActual = null;
+        let conductorNombre = null;
+        let verificacionesHoy = 0;
+
+        const video = document.getElementById('videoPreview');
+        const canvas = document.getElementById('canvas');
+        const imagePreview = document.getElementById('imagePreview');
+        const ctx = canvas.getContext('2d');
+
+        // Elementos del DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const appScreen = document.getElementById('appScreen');
+        const licenseInput = document.getElementById('licenseInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        const licenseBadge = document.getElementById('licenseBadge');
+        const statsBar = document.getElementById('statsBar');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        const cameraBtn = document.getElementById('cameraBtn');
+        const galleryBtn = document.getElementById('galleryBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const errorMsg = document.getElementById('errorMsg');
+        const newScanBtn = document.getElementById('newScanBtn');
+        const initialButtons = document.getElementById('initialButtons');
+        const cameraButtons = document.getElementById('cameraButtons');
+
+        // Al cargar, verificar si hay licencia guardada
+        window.addEventListener('load', () => {
+            const savedLicense = localStorage.getItem('tne_license');
+            if (savedLicense) {
+                validarLicencia(savedLicense, true);
+            }
+
+            const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
+            if (savedCount) {
+                verificacionesHoy = parseInt(savedCount);
+            }
+        });
+
+        // Login
+        loginBtn.addEventListener('click', () => {
+            const licencia = licenseInput.value.trim().toUpperCase();
+            if (!licencia) {
+                mostrarErrorLogin('Por favor ingresa un código de licencia');
+                return;
+            }
+            validarLicencia(licencia, false);
+        });
+
+        licenseInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+
+        async function validarLicencia(codigo, autoLogin) {
+            if (!autoLogin) {
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Validando...';
+            }
+
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        accion: 'validar_licencia',
+                        licencia: codigo
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.valida) {
+                    licenciaActual = codigo;
+                    conductorNombre = data.nombre;
+                    localStorage.setItem('tne_license', codigo);
+                    
+                    mostrarApp();
+                } else {
+                    if (!autoLogin) {
+                        mostrarErrorLogin(data.mensaje || 'Licencia inválida');
+                        licenseInput.value = '';
+                    } else {
+                        localStorage.removeItem('tne_license');
+                    }
+                }
+            } catch (error) {
+                if (!autoLogin) {
+                    mostrarErrorLogin('Error de conexión. Verifica tu internet.');
+                }
+            } finally {
+                if (!autoLogin) {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Validar Licencia';
+                }
+            }
+        }
+
+        function mostrarErrorLogin(mensaje) {
+            loginError.textContent = mensaje;
+            loginError.style.display = 'block';
+            setTimeout(() => {
+                loginError.style.display = 'none';
+            }, 5000);
+        }
+
+        function mostrarApp() {
+            loginScreen.classList.add('hidden');
+            appScreen.classList.add('active');
+            licenseBadge.textContent = `👤 ${conductorNombre}`;
+            licenseBadge.style.display = 'inline-block';
+            actualizarStats();
+        }
+
+        function actualizarStats() {
+            const hoy = new Date().toLocaleDateString('es-CL');
+            statsBar.textContent = `📊 Verificaciones hoy: ${verificacionesHoy} | 📅 ${hoy}`;
+        }
+
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('tne_license');
+                location.reload();
+            }
+        });
+
+        // Funciones de extracción y validación RUT (iguales que antes)
+        function extraerRUT(texto) {
+            texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
+            const patrones = [
+                /(\d{1,2}\.?\d{3}\.?\d{3}[-\s]?[0-9K])/g,
+                /(\d{7,8}[-\s]?[0-9K])/g,
+                /(\d{1,2}\.\d{3}\.\d{3}[-\s][0-9K])/g
+            ];
+            
+            for (const patron of patrones) {
+                const matches = texto.match(patron);
+                if (matches) {
+                    for (const match of matches) {
+                        const rutLimpio = match.replace(/[.\-\s]/g, '');
+                        if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
+                            const rut = rutLimpio.slice(0, -1);
+                            const dv = rutLimpio.slice(-1);
+                            if (validarRUT(rut, dv)) {
+                                return formatearRUT(rut, dv);
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        function validarRUT(rut, dv) {
+            let suma = 0;
+            let multiplicador = 2;
+            
+            for (let i = rut.length - 1; i >= 0; i--) {
+                suma += parseInt(rut[i]) * multiplicador;
+                multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+            }
+            
+            const dvCalculado = 11 - (suma % 11);
+            const dvFinal = dvCalculado === 11 ? '0' : dvCalculado === 10 ? 'K' : dvCalculado.toString();
+            
+            return dv === dvFinal;
+        }
+
+        function formatearRUT(rut, dv) {
+            const rutFormateado = rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return `${rutFormateado}-${dv}`;
+        }
+
+        // Cámara
+        async function abrirCamara() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    } 
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                imagePreview.style.display = 'none';
+                initialButtons.style.display = 'none';
+                cameraButtons.style.display = 'block';
+                result.style.display = 'none';
+                errorMsg.style.display = 'none';
+            } catch (err) {
+                mostrarError('No se pudo acceder a la cámara. Verifica los permisos.');
+            }
+        }
+
+        function cerrarCamara() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.style.display = 'none';
+            initialButtons.style.display = 'block';
+            cameraButtons.style.display = 'none';
+        }
+
+        function capturarFoto() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                imagePreview.src = url;
+                imagePreview.style.display = 'block';
+                video.style.display = 'none';
+                cerrarCamara();
+                procesarImagen(url);
+            }, 'image/jpeg', 0.95);
+        }
+
+        // Procesar imagen
+        async function procesarImagen(imageUrl) {
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            errorMsg.style.display = 'none';
+            initialButtons.style.display = 'none';
+            cameraButtons.style.display = 'none';
+            
+            try {
+                // OCR
+                const worker = await Tesseract.createWorker('spa');
+                const { data: { text } } = await worker.recognize(imageUrl);
+                await worker.terminate();
+                
+                const rut = extraerRUT(text);
+                
+                if (!rut) {
+                    mostrarError('No se pudo detectar un RUT válido');
+                    loading.style.display = 'none';
+                    initialButtons.style.display = 'block';
+                    return;
+                }
+                
+                // Verificar con worker
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        accion: 'verificar_tne',
+                        licencia: licenciaActual,
+                        rut: rut
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error en la verificación');
+                }
+                
+                const data = await response.json();
+                
+                const verificacion = {
+                    vigente: data.vigente,
+                    razon: data.estado,
+                    mensaje: data.mensaje,
+                    detalles: data.detalles
+                };
+                
+                mostrarResultado(rut, verificacion);
+                
+                // Incrementar contador
+                verificacionesHoy++;
+                localStorage.setItem('tne_count_' + new Date().toDateString(), verificacionesHoy);
+                actualizarStats();
+                
+            } catch (err) {
+                console.error('Error:', err);
+                mostrarError('Error al verificar: ' + err.message);
+                initialButtons.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Mostrar resultado
+        function mostrarResultado(rut, verificacion) {
+            result.style.display = 'block';
+            result.className = 'result';
+            
+            if (verificacion.vigente) {
+                result.classList.add('vigente');
+                document.getElementById('resultIcon').textContent = '✅';
+            } else {
+                result.classList.add('warning');
+                document.getElementById('resultIcon').textContent = '⚠️';
+            }
+            
+            document.getElementById('resultTitle').textContent = verificacion.razon;
+            document.getElementById('rutDisplay').textContent = `RUT: ${rut}`;
+            document.getElementById('resultDetails').innerHTML = `
+                <strong>${verificacion.mensaje}</strong><br><br>
+                ${verificacion.detalles}
+            `;
+        }
+
+        // Mostrar error
+        function mostrarError(mensaje) {
+            errorMsg.textContent = mensaje;
+            errorMsg.style.display = 'block';
+            setTimeout(() => {
+                errorMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        // Event Listeners
+        cameraBtn.addEventListener('click', abrirCamara);
+        galleryBtn.addEventListener('click', () => fileInput.click());
+        captureBtn.addEventListener('click', capturarFoto);
+        cancelBtn.addEventListener('click', cerrarCamara);
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                imagePreview.src = url;
+                imagePreview.style.display = 'block';
+                video.style.display = 'none';
+                procesarImagen(url);
+            }
+        });
+        
+        newScanBtn.addEventListener('click', () => {
+            result.style.display = 'none';
+            imagePreview.style.display = 'none';
+            errorMsg.style.display = 'none';
+            initialButtons.style.display = 'block';
+            fileInput.value = '';
+        });
+
+        // Limpiar stream al cerrar
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>
