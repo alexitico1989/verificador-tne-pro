@@ -132,7 +132,7 @@
             background: #eff6ff;
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-left: 4px solid #1a56db;
         }
 
@@ -146,7 +146,7 @@
         .instructions p {
             font-size: 13px;
             color: #1e3a8a;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         #videoPreview {
@@ -375,6 +375,15 @@
             font-size: 13px;
             color: #6b7280;
         }
+
+        .tip-box {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
@@ -420,10 +429,18 @@
                 <div class="stats-bar" id="statsBar"></div>
 
                 <div class="instructions">
-                    <div class="instructions-title">📸 Instrucciones:</div>
-                    <p>1. Toma una foto clara del pase escolar<br>
-                    2. Asegúrate que el RUT sea legible<br>
-                    3. La app verificará automáticamente</p>
+                    <div class="instructions-title">📸 Cómo tomar la foto:</div>
+                    <p>
+                    ✓ <strong>Buena iluminación</strong> (luz natural o LED)<br>
+                    ✓ <strong>Enfocar solo el RUT</strong> (acercar celular)<br>
+                    ✓ <strong>Foto horizontal</strong> y sin inclinación<br>
+                    ✓ <strong>Esperar que enfoque</strong> antes de capturar<br>
+                    ❌ NO usar flash (crea reflejos)
+                    </p>
+                </div>
+
+                <div class="tip-box">
+                    💡 <strong>Tip:</strong> Si no detecta el RUT, podrás ingresarlo manualmente después.
                 </div>
 
                 <div class="camera-section">
@@ -457,7 +474,7 @@
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Verificando TNE...</div>
+                    <div class="loading-text">Analizando imagen...</div>
                 </div>
 
                 <div id="rutManualSection" style="display: none; margin-top: 20px;">
@@ -509,7 +526,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
-        // CONFIGURACIÓN - CAMBIA ESTA URL POR LA TUYA
+        // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
 
         // Variables globales
@@ -549,7 +566,7 @@
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
 
-        // Al cargar, verificar si hay licencia guardada
+        // Al cargar
         window.addEventListener('load', () => {
             const savedLicense = localStorage.getItem('tne_license');
             if (savedLicense) {
@@ -650,30 +667,159 @@
             }
         });
 
-        // Funciones de extracción y validación RUT
+        // Preprocesar imagen para mejor OCR
+        function preprocesarImagen(imgElement) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Escalar 2x para mejor lectura
+            const scale = 2;
+            tempCanvas.width = imgElement.width * scale;
+            tempCanvas.height = imgElement.height * scale;
+            
+            tempCtx.drawImage(imgElement, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const data = imageData.data;
+            
+            // Convertir a escala de grises y aumentar contraste
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                
+                // Aumentar contraste
+                const contrast = 1.5;
+                const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+                let newValue = factor * (avg - 128) + 128;
+                
+                // Binarización
+                newValue = newValue > 128 ? 255 : 0;
+                
+                data[i] = newValue;
+                data[i + 1] = newValue;
+                data[i + 2] = newValue;
+            }
+            
+            tempCtx.putImageData(imageData, 0, 0);
+            return tempCanvas.toDataURL('image/png');
+        }
+
+        // Procesar imagen con OCR mejorado
+        async function procesarImagen(imageUrl) {
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            errorMsg.style.display = 'none';
+            initialButtons.style.display = 'none';
+            cameraButtons.style.display = 'none';
+            rutManualSection.style.display = 'none';
+            
+            try {
+                // Cargar imagen
+                const img = new Image();
+                img.src = imageUrl;
+                await new Promise(resolve => img.onload = resolve);
+                
+                // Preprocesar
+                const imagenProcesada = preprocesarImagen(img);
+                
+                // OCR mejorado
+                const worker = await Tesseract.createWorker('spa', 1, {
+                    logger: m => console.log(m)
+                });
+                
+                await worker.setParameters({
+                    tessedit_char_whitelist: '0123456789K-.',
+                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                });
+                
+                // Intento 1: Imagen procesada
+                let { data: { text } } = await worker.recognize(imagenProcesada);
+                console.log('OCR Procesada:', text);
+                
+                let rut = extraerRUT(text);
+                
+                // Intento 2: Imagen original
+                if (!rut) {
+                    console.log('Reintentando con original...');
+                    const resultado = await worker.recognize(imageUrl);
+                    text = resultado.data.text;
+                    console.log('OCR Original:', text);
+                    rut = extraerRUT(text);
+                }
+                
+                await worker.terminate();
+                
+                if (!rut) {
+                    loading.style.display = 'none';
+                    rutManualSection.style.display = 'block';
+                    rutManualInput.focus();
+                    return;
+                }
+                
+                await verificarTNE(rut);
+                
+            } catch (err) {
+                console.error('Error:', err);
+                mostrarError('Error al procesar: ' + err.message);
+                initialButtons.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Extraer RUT mejorado
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
+            console.log('Texto limpio:', texto);
+            
             const patrones = [
-                /(\d{1,2}\.?\d{3}\.?\d{3}[-\s]?[0-9K])/g,
-                /(\d{7,8}[-\s]?[0-9K])/g,
-                /(\d{1,2}\.\d{3}\.\d{3}[-\s][0-9K])/g
+                /(\d{1,2}\.\d{3}\.\d{3}[-\s]?[0-9K])/g,
+                /(\d{7,8}[-\s][0-9K])/g,
+                /(\d{7,8}[0-9K])/g,
+                /(\d{1,2}\s?\d{3}\s?\d{3}\s?[-]?\s?[0-9K])/g,
             ];
             
             for (const patron of patrones) {
                 const matches = texto.match(patron);
                 if (matches) {
+                    console.log('Matches:', matches);
                     for (const match of matches) {
                         const rutLimpio = match.replace(/[.\-\s]/g, '');
+                        console.log('Probando:', rutLimpio);
+                        
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
+                            
                             if (validarRUT(rut, dv)) {
-                                return formatearRUT(rut, dv);
+                                const rutFormateado = formatearRUT(rut, dv);
+                                console.log('✓ RUT válido:', rutFormateado);
+                                return rutFormateado;
+                            } else {
+                                console.log('✗ DV incorrecto:', rut + '-' + dv);
                             }
                         }
                     }
                 }
             }
+            
+            // Búsqueda exhaustiva
+            const numeros = texto.match(/\d{7,9}/g);
+            if (numeros) {
+                console.log('Búsqueda exhaustiva:', numeros);
+                for (const num of numeros) {
+                    if (num.length >= 8) {
+                        const rut = num.slice(0, -1);
+                        const dv = num.slice(-1);
+                        if (validarRUT(rut, dv)) {
+                            const rutFormateado = formatearRUT(rut, dv);
+                            console.log('✓ RUT (exhaustivo):', rutFormateado);
+                            return rutFormateado;
+                        }
+                    }
+                }
+            }
+            
+            console.log('✗ No se encontró RUT');
             return null;
         }
 
@@ -744,53 +890,13 @@
             }, 'image/jpeg', 0.95);
         }
 
-        // Procesar imagen
-        async function procesarImagen(imageUrl) {
-            loading.style.display = 'block';
-            result.style.display = 'none';
-            errorMsg.style.display = 'none';
-            initialButtons.style.display = 'none';
-            cameraButtons.style.display = 'none';
-            rutManualSection.style.display = 'none';
-            
-            try {
-                // OCR
-                const worker = await Tesseract.createWorker('spa');
-                const { data: { text } } = await worker.recognize(imageUrl);
-                await worker.terminate();
-                
-                console.log('Texto OCR:', text);
-                
-                const rut = extraerRUT(text);
-                
-                if (!rut) {
-                    // No se detectó RUT - mostrar input manual
-                    loading.style.display = 'none';
-                    rutManualSection.style.display = 'block';
-                    rutManualInput.focus();
-                    return;
-                }
-                
-                // RUT detectado - verificar automáticamente
-                await verificarTNE(rut);
-                
-            } catch (err) {
-                console.error('Error:', err);
-                mostrarError('Error al procesar: ' + err.message);
-                initialButtons.style.display = 'block';
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-
-        // Nueva función para verificar TNE
+        // Verificar TNE
         async function verificarTNE(rut) {
             loading.style.display = 'block';
             result.style.display = 'none';
             rutManualSection.style.display = 'none';
             
             try {
-                // Verificar con worker
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -816,7 +922,6 @@
                 
                 mostrarResultado(rut, verificacion);
                 
-                // Incrementar contador
                 verificacionesHoy++;
                 localStorage.setItem('tne_count_' + new Date().toDateString(), verificacionesHoy);
                 actualizarStats();
@@ -830,7 +935,6 @@
             }
         }
 
-        // Mostrar resultado
         function mostrarResultado(rut, verificacion) {
             result.style.display = 'block';
             result.className = 'result';
@@ -851,7 +955,6 @@
             `;
         }
 
-        // Mostrar error
         function mostrarError(mensaje) {
             errorMsg.textContent = mensaje;
             errorMsg.style.display = 'block';
@@ -886,7 +989,6 @@
             fileInput.value = '';
         });
 
-        // Event listeners para RUT manual
         verificarManualBtn.addEventListener('click', () => {
             const rutIngresado = rutManualInput.value.trim();
             if (!rutIngresado) {
@@ -894,7 +996,6 @@
                 return;
             }
             
-            // Validar formato básico
             const rutLimpio = rutIngresado.replace(/[.\-]/g, '');
             if (rutLimpio.length < 8 || rutLimpio.length > 9) {
                 mostrarError('RUT inválido. Formato: 12345678-9');
@@ -917,7 +1018,6 @@
             }
         });
 
-        // Limpiar stream al cerrar
         window.addEventListener('beforeunload', () => {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
