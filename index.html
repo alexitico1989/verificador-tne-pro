@@ -31,33 +31,33 @@
         .header {
             background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
             color: white;
-            padding: 25px 20px 20px;
+            padding: 20px 15px 15px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .header h1 {
-            font-size: 26px;
-            margin-bottom: 5px;
+            font-size: 22px;
+            margin-bottom: 3px;
             font-weight: 700;
         }
 
         .header p {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.9;
         }
 
         .license-badge {
             background: rgba(255,255,255,0.2);
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 12px;
-            margin-top: 10px;
+            font-size: 11px;
+            margin-top: 8px;
             display: inline-block;
         }
 
         .content {
-            padding: 20px;
+            padding: 15px;
         }
 
         /* Pantalla de Login */
@@ -72,25 +72,25 @@
         }
 
         .login-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 70px;
+            margin-bottom: 15px;
         }
 
         .login-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: #1e40af;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .login-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: #6b7280;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .input-label {
@@ -98,13 +98,13 @@
             text-align: left;
             font-weight: 600;
             color: #374151;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 13px;
         }
 
         .input-field {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
             font-size: 16px;
@@ -128,42 +128,139 @@
             display: block;
         }
 
-        .instructions {
+        /* Barra de consultas */
+        .quota-bar {
             background: #eff6ff;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-left: 4px solid #1a56db;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #1a56db;
         }
 
-        .instructions-title {
-            font-weight: 600;
+        .quota-text {
+            font-size: 12px;
             color: #1e40af;
-            margin-bottom: 8px;
-            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .instructions p {
-            font-size: 13px;
-            color: #1e3a8a;
-            line-height: 1.6;
+        .quota-progress {
+            background: #e5e7eb;
+            height: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .quota-progress-fill {
+            background: linear-gradient(90deg, #10b981, #1a56db);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .quota-progress-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+        }
+
+        /* Cámara */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 3px solid #1a56db;
         }
 
         #videoPreview {
             width: 100%;
-            border-radius: 15px;
+            height: 100%;
+            object-fit: cover;
             display: none;
-            margin-bottom: 15px;
-            border: 3px solid #1a56db;
-            background: #000;
         }
 
-        #imagePreview {
+        .camera-placeholder {
             width: 100%;
-            border-radius: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            background: #f3f4f6;
+        }
+
+        .camera-placeholder.hidden {
             display: none;
-            margin-bottom: 15px;
-            border: 3px solid #1a56db;
+        }
+
+        .camera-placeholder-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .camera-placeholder-text {
+            font-size: 14px;
+        }
+
+        /* Guía de enfoque */
+        .focus-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            height: 60px;
+            border: 3px dashed #10b981;
+            border-radius: 8px;
+            pointer-events: none;
+            display: none;
+        }
+
+        .focus-guide.active {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { border-color: #10b981; opacity: 1; }
+            50% { border-color: #1a56db; opacity: 0.7; }
+        }
+
+        .focus-guide-text {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* Estado de escaneo */
+        .scan-status {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .scan-status.active {
+            display: block;
+        }
+
+        .scan-status.found {
+            background: #10b981;
         }
 
         canvas {
@@ -174,19 +271,19 @@
             background: #1a56db;
             color: white;
             border: none;
-            padding: 18px;
-            font-size: 17px;
+            padding: 16px;
+            font-size: 16px;
             border-radius: 12px;
             cursor: pointer;
             width: 100%;
-            margin: 8px 0;
+            margin: 6px 0;
             font-weight: 600;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn:active {
@@ -202,13 +299,6 @@
         .btn-capture {
             background: #10b981;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            font-size: 18px;
-            padding: 20px;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
         }
 
         .btn-cancel {
@@ -217,34 +307,39 @@
         }
 
         .btn-logout {
-            background: #f59e0b;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            font-size: 14px;
+            background: #6b7280;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2);
+            font-size: 13px;
             padding: 12px;
         }
 
-        #fileInput {
-            display: none;
+        .btn-icon {
+            font-size: 20px;
         }
 
-        .camera-section {
-            margin-bottom: 15px;
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-row .btn {
+            flex: 1;
         }
 
         .loading {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
             display: none;
         }
 
         .spinner {
-            border: 5px solid #e5e7eb;
-            border-top: 5px solid #1a56db;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #1a56db;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
@@ -253,172 +348,116 @@
         }
 
         .loading-text {
-            font-size: 16px;
+            font-size: 15px;
             color: #374151;
             font-weight: 500;
         }
 
         .result {
             display: none;
-            padding: 30px 20px;
+            padding: 25px 15px;
             border-radius: 15px;
-            margin-top: 20px;
+            margin-top: 15px;
             text-align: center;
             animation: slideUp 0.4s ease;
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .result.vigente {
             background: #d1fae5;
-            border: 4px solid #10b981;
+            border: 3px solid #10b981;
         }
 
         .result.no-vigente {
             background: #fee2e2;
-            border: 4px solid #ef4444;
+            border: 3px solid #ef4444;
         }
 
         .result.warning {
             background: #fef3c7;
-            border: 4px solid #f59e0b;
+            border: 3px solid #f59e0b;
         }
 
         .result-icon {
-            font-size: 70px;
-            margin-bottom: 15px;
-        }
-
-        .result-title {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 60px;
             margin-bottom: 10px;
         }
 
-        .result.vigente .result-title {
-            color: #065f46;
+        .result-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .result.no-vigente .result-title {
-            color: #991b1b;
-        }
-
-        .result.warning .result-title {
-            color: #92400e;
-        }
+        .result.vigente .result-title { color: #065f46; }
+        .result.no-vigente .result-title { color: #991b1b; }
+        .result.warning .result-title { color: #92400e; }
 
         .result-details {
-            font-size: 15px;
-            margin-top: 15px;
-            line-height: 1.6;
+            font-size: 14px;
+            margin-top: 10px;
+            line-height: 1.5;
         }
 
-        .result.vigente .result-details {
-            color: #047857;
-        }
-
-        .result.no-vigente .result-details {
-            color: #b91c1c;
-        }
-
-        .result.warning .result-details {
-            color: #b45309;
-        }
+        .result.vigente .result-details { color: #047857; }
+        .result.no-vigente .result-details { color: #b91c1c; }
+        .result.warning .result-details { color: #b45309; }
 
         .rut-display {
             background: white;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
-            margin: 15px 0;
-            font-size: 18px;
+            margin: 12px 0;
+            font-size: 17px;
             font-weight: 700;
             letter-spacing: 1px;
         }
 
         .footer {
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #6b7280;
             border-top: 1px solid #e5e7eb;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .error-msg {
             background: #fee2e2;
             color: #991b1b;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
-            margin: 15px 0;
+            margin: 10px 0;
             display: none;
             border-left: 4px solid #ef4444;
-        }
-
-        .btn-icon {
-            font-size: 24px;
-        }
-
-        .stats-bar {
-            background: #f3f4f6;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 15px;
             font-size: 13px;
-            color: #6b7280;
         }
 
-        .tip-box {
+        /* RUT Manual */
+        .manual-section {
             background: #fef3c7;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            color: #92400e;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
         }
 
-        /* Barra de consultas restantes */
-        .quota-bar {
-            background: #eff6ff;
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #1a56db;
+        .manual-section.visible {
+            display: block;
         }
 
-        .quota-text {
-            font-size: 13px;
-            color: #1e40af;
+        .manual-title {
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 5px;
+            color: #92400e;
+            margin-bottom: 10px;
         }
 
-        .quota-progress {
-            background: #e5e7eb;
-            height: 8px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .quota-progress-fill {
-            background: linear-gradient(90deg, #10b981, #1a56db);
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        .quota-progress-fill.warning {
-            background: linear-gradient(90deg, #f59e0b, #ef4444);
-        }
-
-        /* Alerta de sesión */
+        /* Session alert */
         .session-alert {
             display: none;
             background: #fef2f2;
@@ -429,17 +468,23 @@
             margin: 20px;
         }
 
+        .session-alert.visible {
+            display: block;
+        }
+
         .session-alert h3 {
             color: #991b1b;
-            font-size: 18px;
-            margin-bottom: 10px;
+            font-size: 16px;
+            margin-bottom: 8px;
         }
 
         .session-alert p {
             color: #b91c1c;
-            font-size: 14px;
-            margin-bottom: 15px;
+            font-size: 13px;
+            margin-bottom: 12px;
         }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -450,30 +495,22 @@
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
 
-        <!-- ALERTA DE SESIÓN DUPLICADA -->
+        <!-- ALERTA DE SESIÓN -->
         <div class="session-alert" id="sessionAlert">
             <h3>⚠️ Sesión No Disponible</h3>
             <p id="sessionAlertMsg">Esta licencia ya está en uso en otro dispositivo.</p>
-            <button class="btn btn-cancel" id="sessionAlertBtn">
-                Reintentar
-            </button>
+            <button class="btn btn-cancel" id="sessionAlertBtn">Reintentar</button>
         </div>
 
         <!-- PANTALLA DE LOGIN -->
         <div class="login-screen" id="loginScreen">
             <div class="login-icon">🔐</div>
             <div class="login-title">Acceso Restringido</div>
-            <div class="login-subtitle">Ingresa tu código de licencia para continuar</div>
+            <div class="login-subtitle">Ingresa tu código de licencia</div>
 
             <div class="input-group">
                 <label class="input-label">Código de Licencia:</label>
-                <input 
-                    type="text" 
-                    id="licenseInput" 
-                    class="input-field" 
-                    placeholder="DEMO-2025"
-                    maxlength="20"
-                >
+                <input type="text" id="licenseInput" class="input-field" placeholder="TNE-XXXX-XXXX" maxlength="20">
             </div>
 
             <button class="btn" id="loginBtn">
@@ -482,18 +519,16 @@
 
             <div class="error-msg" id="loginError"></div>
 
-            <div class="footer" style="border-top: none; margin-top: 40px;">
-                <p style="color: #9ca3af;">Versión Pro 2.1 - Sesión Segura</p>
-                <p style="margin-top: 5px; color: #9ca3af;">Desarrollado por Luis Monardes</p>
+            <div class="footer" style="border-top: none; margin-top: 30px;">
+                <p style="color: #9ca3af;">Versión Pro 3.0</p>
             </div>
         </div>
 
-        <!-- PANTALLA PRINCIPAL DE LA APP -->
+        <!-- PANTALLA PRINCIPAL -->
         <div class="app-screen" id="appScreen">
             <div class="content">
-                <div class="stats-bar" id="statsBar"></div>
-
-                <!-- Barra de consultas restantes -->
+                
+                <!-- Barra de consultas -->
                 <div class="quota-bar" id="quotaBar">
                     <div class="quota-text" id="quotaText">Consultas: -- / --</div>
                     <div class="quota-progress">
@@ -501,89 +536,69 @@
                     </div>
                 </div>
 
-                <div class="instructions">
-                    <div class="instructions-title">📸 Cómo tomar la foto:</div>
-                    <p>
-                    ✓ <strong>Buena iluminación</strong> (luz natural o LED)<br>
-                    ✓ <strong>Enfocar la FOTO del estudiante</strong> (el RUT está debajo)<br>
-                    ✓ <strong>Foto horizontal</strong> y sin inclinación<br>
-                    ✓ <strong>Esperar que enfoque</strong> antes de capturar<br>
-                    ❌ NO usar flash (crea reflejos)
-                    </p>
-                </div>
-
-                <div class="tip-box">
-                    💡 <strong>Tip:</strong> Enfoca la foto del estudiante - el RUT grande está impreso justo debajo.
-                </div>
-
-                <div class="camera-section">
+                <!-- Contenedor de cámara -->
+                <div class="camera-container" id="cameraContainer">
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <div class="camera-placeholder-icon">📷</div>
+                        <div class="camera-placeholder-text">Toca para abrir cámara</div>
+                    </div>
                     <video id="videoPreview" autoplay playsinline></video>
-                    <img id="imagePreview" alt="Foto capturada">
-                    <canvas id="canvas"></canvas>
+                    <div class="focus-guide" id="focusGuide">
+                        <div class="focus-guide-text">Alinea el RUT aquí</div>
+                    </div>
+                    <div class="scan-status" id="scanStatus">🔍 Buscando RUT...</div>
                 </div>
 
+                <canvas id="canvas"></canvas>
+
+                <!-- Botones -->
                 <div id="initialButtons">
-                    <button class="btn btn-capture" id="galleryBtn">
-                        <span class="btn-icon">📸</span> Tomar Foto (Recomendado)
-                    </button>
-                    <button class="btn btn-secondary" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Usar Cámara Web
+                    <button class="btn btn-capture" id="cameraBtn">
+                        <span class="btn-icon">📷</span> Abrir Cámara
                     </button>
                     <button class="btn btn-logout" id="logoutBtn">
                         <span class="btn-icon">🚪</span> Cerrar Sesión
                     </button>
                 </div>
 
-                <div id="cameraButtons" style="display: none;">
-                    <button class="btn btn-capture" id="captureBtn">
-                        <span class="btn-icon">📸</span> Capturar Foto
-                    </button>
-                    <button class="btn btn-cancel" id="cancelBtn">
-                        <span class="btn-icon">❌</span> Cancelar
-                    </button>
+                <div id="cameraButtons" class="hidden">
+                    <div class="btn-row">
+                        <button class="btn btn-cancel" id="cancelBtn">
+                            <span class="btn-icon">✕</span> Cancelar
+                        </button>
+                        <button class="btn" id="manualBtn">
+                            <span class="btn-icon">⌨️</span> Manual
+                        </button>
+                    </div>
                 </div>
 
-                <input type="file" id="fileInput" accept="image/*" capture="environment">
-
+                <!-- Cargando -->
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Analizando imagen...</div>
+                    <div class="loading-text">Verificando TNE...</div>
                 </div>
 
-                <div id="rutManualSection" style="display: none; margin-top: 20px;">
-                    <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                        <p style="font-size: 14px; color: #92400e; margin-bottom: 10px;">
-                            <strong>⚠️ RUT no detectado automáticamente</strong>
-                        </p>
-                        <p style="font-size: 13px; color: #92400e;">
-                            Por favor, ingresa el RUT manualmente:
-                        </p>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">RUT del Estudiante:</label>
-                        <input 
-                            type="text" 
-                            id="rutManualInput" 
-                            class="input-field" 
-                            placeholder="12345678-9"
-                            maxlength="12"
-                        >
+                <!-- RUT Manual -->
+                <div class="manual-section" id="manualSection">
+                    <div class="manual-title">⌨️ Ingresa el RUT manualmente:</div>
+                    <div class="input-group" style="margin-bottom: 10px;">
+                        <input type="text" id="rutManualInput" class="input-field" placeholder="12345678-9" maxlength="12">
                     </div>
                     <button class="btn btn-capture" id="verificarManualBtn">
-                        <span class="btn-icon">✓</span> Verificar RUT
+                        <span class="btn-icon">✓</span> Verificar
                     </button>
-                    <button class="btn btn-cancel" id="cancelManualBtn">
-                        <span class="btn-icon">↩️</span> Tomar Otra Foto
+                    <button class="btn btn-cancel" id="cancelManualBtn" style="margin-top: 5px;">
+                        <span class="btn-icon">↩️</span> Volver a Cámara
                     </button>
                 </div>
 
+                <!-- Resultado -->
                 <div class="result" id="result">
                     <div class="result-icon" id="resultIcon"></div>
                     <div class="result-title" id="resultTitle"></div>
                     <div class="rut-display" id="rutDisplay"></div>
                     <div class="result-details" id="resultDetails"></div>
-                    <div id="consultasRestantes" style="margin-top: 10px; font-size: 12px; color: #6b7280;"></div>
-                    <button class="btn btn-secondary" id="newScanBtn" style="margin-top: 20px;">
+                    <button class="btn" id="newScanBtn" style="margin-top: 15px;">
                         🔄 Nueva Verificación
                     </button>
                 </div>
@@ -593,8 +608,7 @@
 
             <div class="footer">
                 <p>🚌 Sistema profesional para conductores</p>
-                <p style="margin-top: 5px;">Verificación en tiempo real con JUNAEB</p>
-                <p style="margin-top: 5px; font-size: 10px; color: #9ca3af;" id="deviceIdDisplay"></p>
+                <p style="margin-top: 3px;" id="deviceIdDisplay"></p>
             </div>
         </div>
     </div>
@@ -603,19 +617,21 @@
     <script>
         // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
+        const SCAN_INTERVAL = 1500; // Escanear cada 1.5 segundos
 
         // Variables globales
         let stream = null;
         let licenciaActual = null;
         let conductorNombre = null;
-        let verificacionesHoy = 0;
         let deviceId = null;
         let consultasMaximas = 200;
         let consultasRestantes = 200;
+        let scanInterval = null;
+        let isScanning = false;
+        let tesseractWorker = null;
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
-        const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
 
         // Elementos del DOM
@@ -625,51 +641,44 @@
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
         const licenseBadge = document.getElementById('licenseBadge');
-        const statsBar = document.getElementById('statsBar');
         const logoutBtn = document.getElementById('logoutBtn');
         const sessionAlert = document.getElementById('sessionAlert');
         const sessionAlertMsg = document.getElementById('sessionAlertMsg');
         const sessionAlertBtn = document.getElementById('sessionAlertBtn');
-        const quotaBar = document.getElementById('quotaBar');
         const quotaText = document.getElementById('quotaText');
         const quotaFill = document.getElementById('quotaFill');
 
+        const cameraContainer = document.getElementById('cameraContainer');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
         const cameraBtn = document.getElementById('cameraBtn');
-        const galleryBtn = document.getElementById('galleryBtn');
-        const captureBtn = document.getElementById('captureBtn');
         const cancelBtn = document.getElementById('cancelBtn');
-        const fileInput = document.getElementById('fileInput');
+        const manualBtn = document.getElementById('manualBtn');
         const loading = document.getElementById('loading');
         const result = document.getElementById('result');
         const errorMsg = document.getElementById('errorMsg');
         const newScanBtn = document.getElementById('newScanBtn');
         const initialButtons = document.getElementById('initialButtons');
         const cameraButtons = document.getElementById('cameraButtons');
-        const rutManualSection = document.getElementById('rutManualSection');
+        const focusGuide = document.getElementById('focusGuide');
+        const scanStatus = document.getElementById('scanStatus');
+        const manualSection = document.getElementById('manualSection');
         const rutManualInput = document.getElementById('rutManualInput');
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
 
         // ============================================
-        // GENERAR/OBTENER ID ÚNICO DEL DISPOSITIVO
+        // DEVICE ID
         // ============================================
         function getDeviceId() {
             let id = localStorage.getItem('tne_device_id');
             if (!id) {
-                // Generar ID único basado en características del dispositivo + timestamp
                 const nav = window.navigator;
                 const screen = window.screen;
                 const data = [
-                    nav.userAgent,
-                    nav.language,
-                    screen.width,
-                    screen.height,
-                    screen.colorDepth,
-                    new Date().getTime(),
-                    Math.random().toString(36)
+                    nav.userAgent, nav.language, screen.width, screen.height,
+                    screen.colorDepth, new Date().getTime(), Math.random().toString(36)
                 ].join('|');
                 
-                // Hash simple
                 let hash = 0;
                 for (let i = 0; i < data.length; i++) {
                     const char = data.charCodeAt(i);
@@ -684,9 +693,9 @@
         }
 
         // ============================================
-        // AL CARGAR LA PÁGINA
+        // INICIALIZACIÓN
         // ============================================
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
             deviceId = getDeviceId();
             document.getElementById('deviceIdDisplay').textContent = `ID: ${deviceId.substring(0, 15)}...`;
             
@@ -695,53 +704,36 @@
                 validarLicencia(savedLicense, true);
             }
 
-            const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
-            if (savedCount) {
-                verificacionesHoy = parseInt(savedCount);
-            }
+            // Pre-cargar Tesseract
+            initTesseract();
         });
 
-        // Verificar sesión periódicamente
-        setInterval(async () => {
-            if (licenciaActual && deviceId) {
-                try {
-                    const response = await fetch(WORKER_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            accion: 'verificar_sesion',
-                            licencia: licenciaActual,
-                            deviceId: deviceId
-                        })
-                    });
-                    const data = await response.json();
-                    
-                    if (!data.activa) {
-                        // Sesión cerrada externamente
-                        mostrarAlertaSesion('Tu sesión fue cerrada. Otro dispositivo puede estar usando esta licencia.');
-                    }
-                } catch (e) {
-                    console.log('Error verificando sesión:', e);
-                }
+        async function initTesseract() {
+            try {
+                tesseractWorker = await Tesseract.createWorker('spa');
+                await tesseractWorker.setParameters({
+                    tessedit_char_whitelist: '0123456789K-.',
+                });
+                console.log('Tesseract listo');
+            } catch (e) {
+                console.log('Error inicializando Tesseract:', e);
             }
-        }, 60000); // Cada 1 minuto
+        }
 
         // ============================================
-        // LOGIN CON CONTROL DE SESIÓN
+        // LOGIN
         // ============================================
         loginBtn.addEventListener('click', () => {
             const licencia = licenseInput.value.trim().toUpperCase();
             if (!licencia) {
-                mostrarErrorLogin('Por favor ingresa un código de licencia');
+                mostrarErrorLogin('Ingresa un código de licencia');
                 return;
             }
             validarLicencia(licencia, false);
         });
 
         licenseInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                loginBtn.click();
-            }
+            if (e.key === 'Enter') loginBtn.click();
         });
 
         async function validarLicencia(codigo, autoLogin) {
@@ -771,13 +763,11 @@
                     consultasRestantes = data.consultasRestantes;
                     
                     localStorage.setItem('tne_license', codigo);
-                    
                     mostrarApp(data);
                 } else {
                     if (!autoLogin) {
-                        // Mostrar mensaje específico si es límite de dispositivos
                         if (data.maxMaquinas) {
-                            mostrarErrorLogin(`${data.mensaje} (${data.sesionesActivas}/${data.maxMaquinas} dispositivos)`);
+                            mostrarErrorLogin(`${data.mensaje}`);
                         } else {
                             mostrarErrorLogin(data.mensaje || 'Licencia inválida');
                         }
@@ -788,7 +778,7 @@
                 }
             } catch (error) {
                 if (!autoLogin) {
-                    mostrarErrorLogin('Error de conexión. Verifica tu internet.');
+                    mostrarErrorLogin('Error de conexión');
                 }
             } finally {
                 if (!autoLogin) {
@@ -801,36 +791,15 @@
         function mostrarErrorLogin(mensaje) {
             loginError.textContent = mensaje;
             loginError.style.display = 'block';
-            setTimeout(() => {
-                loginError.style.display = 'none';
-            }, 7000);
+            setTimeout(() => { loginError.style.display = 'none'; }, 5000);
         }
-
-        function mostrarAlertaSesion(mensaje) {
-            sessionAlertMsg.textContent = mensaje;
-            sessionAlert.style.display = 'block';
-            appScreen.classList.remove('active');
-            loginScreen.classList.add('hidden');
-        }
-
-        sessionAlertBtn.addEventListener('click', () => {
-            sessionAlert.style.display = 'none';
-            localStorage.removeItem('tne_license');
-            location.reload();
-        });
 
         function mostrarApp(data) {
             loginScreen.classList.add('hidden');
             appScreen.classList.add('active');
             licenseBadge.textContent = `👤 ${conductorNombre}`;
             licenseBadge.style.display = 'inline-block';
-            actualizarStats();
             actualizarQuota(data.consultasHoy || 0, data.consultasMaximas);
-        }
-
-        function actualizarStats() {
-            const hoy = new Date().toLocaleDateString('es-CL');
-            statsBar.textContent = `📊 Verificaciones hoy: ${verificacionesHoy} | 📅 ${hoy}`;
         }
 
         function actualizarQuota(usadas, maximas) {
@@ -848,10 +817,24 @@
         }
 
         // ============================================
-        // CERRAR SESIÓN
+        // SESIÓN
         // ============================================
+        function mostrarAlertaSesion(mensaje) {
+            sessionAlertMsg.textContent = mensaje;
+            sessionAlert.classList.add('visible');
+            appScreen.classList.remove('active');
+            loginScreen.classList.add('hidden');
+        }
+
+        sessionAlertBtn.addEventListener('click', () => {
+            sessionAlert.classList.remove('visible');
+            localStorage.removeItem('tne_license');
+            location.reload();
+        });
+
         logoutBtn.addEventListener('click', async () => {
-            if (confirm('¿Cerrar sesión? Esto liberará este dispositivo.')) {
+            if (confirm('¿Cerrar sesión?')) {
+                detenerEscaneo();
                 try {
                     await fetch(WORKER_URL, {
                         method: 'POST',
@@ -862,9 +845,7 @@
                             deviceId: deviceId
                         })
                     });
-                } catch (e) {
-                    console.log('Error cerrando sesión:', e);
-                }
+                } catch (e) {}
                 
                 localStorage.removeItem('tne_license');
                 location.reload();
@@ -872,99 +853,143 @@
         });
 
         // ============================================
-        // PROCESAMIENTO DE IMAGEN (sin cambios)
+        // CÁMARA CON ESCANEO AUTOMÁTICO
         // ============================================
-        function preprocesarImagen(imgElement) {
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            const scale = 2;
-            tempCanvas.width = imgElement.width * scale;
-            tempCanvas.height = imgElement.height * scale;
-            
-            tempCtx.drawImage(imgElement, 0, 0, tempCanvas.width, tempCanvas.height);
-            
-            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            const data = imageData.data;
-            
-            for (let i = 0; i < data.length; i += 4) {
-                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                
-                const contrast = 1.5;
-                const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-                let newValue = factor * (avg - 128) + 128;
-                
-                newValue = newValue > 128 ? 255 : 0;
-                
-                data[i] = newValue;
-                data[i + 1] = newValue;
-                data[i + 2] = newValue;
+        
+        // Click en contenedor o botón para abrir cámara
+        cameraContainer.addEventListener('click', () => {
+            if (!stream) {
+                abrirCamara();
+            } else {
+                // Click para enfocar (algunos dispositivos)
+                if (stream.getVideoTracks()[0].getCapabilities) {
+                    const track = stream.getVideoTracks()[0];
+                    if (track.getCapabilities().focusMode) {
+                        track.applyConstraints({ advanced: [{ focusMode: 'manual' }] })
+                            .then(() => track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }))
+                            .catch(() => {});
+                    }
+                }
             }
-            
-            tempCtx.putImageData(imageData, 0, 0);
-            return tempCanvas.toDataURL('image/png');
+        });
+
+        cameraBtn.addEventListener('click', abrirCamara);
+
+        async function abrirCamara() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        focusMode: 'continuous'
+                    } 
+                });
+                
+                video.srcObject = stream;
+                video.style.display = 'block';
+                cameraPlaceholder.classList.add('hidden');
+                initialButtons.classList.add('hidden');
+                cameraButtons.classList.remove('hidden');
+                focusGuide.classList.add('active');
+                scanStatus.classList.add('active');
+                result.style.display = 'none';
+                errorMsg.style.display = 'none';
+                manualSection.classList.remove('visible');
+
+                // Iniciar escaneo automático
+                video.onloadedmetadata = () => {
+                    iniciarEscaneo();
+                };
+
+            } catch (err) {
+                mostrarError('No se pudo acceder a la cámara');
+            }
         }
 
-        async function procesarImagen(imageUrl) {
-            loading.style.display = 'block';
-            result.style.display = 'none';
-            errorMsg.style.display = 'none';
-            initialButtons.style.display = 'none';
-            cameraButtons.style.display = 'none';
-            rutManualSection.style.display = 'none';
+        function cerrarCamara() {
+            detenerEscaneo();
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.style.display = 'none';
+            cameraPlaceholder.classList.remove('hidden');
+            focusGuide.classList.remove('active');
+            scanStatus.classList.remove('active');
+            scanStatus.classList.remove('found');
+            scanStatus.textContent = '🔍 Buscando RUT...';
+            initialButtons.classList.remove('hidden');
+            cameraButtons.classList.add('hidden');
+        }
+
+        cancelBtn.addEventListener('click', cerrarCamara);
+
+        // ============================================
+        // ESCANEO AUTOMÁTICO
+        // ============================================
+        function iniciarEscaneo() {
+            if (scanInterval) return;
+            
+            isScanning = true;
+            scanInterval = setInterval(async () => {
+                if (!isScanning || !stream) return;
+                
+                await escanearFrame();
+            }, SCAN_INTERVAL);
+            
+            // Primer escaneo inmediato
+            setTimeout(escanearFrame, 500);
+        }
+
+        function detenerEscaneo() {
+            isScanning = false;
+            if (scanInterval) {
+                clearInterval(scanInterval);
+                scanInterval = null;
+            }
+        }
+
+        async function escanearFrame() {
+            if (!stream || !tesseractWorker) return;
             
             try {
-                const img = new Image();
-                img.src = imageUrl;
-                await new Promise(resolve => img.onload = resolve);
+                // Capturar frame
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
                 
-                const imagenProcesada = preprocesarImagen(img);
+                // Obtener imagen
+                const imageData = canvas.toDataURL('image/jpeg', 0.8);
                 
-                const worker = await Tesseract.createWorker('spa', 1, {
-                    logger: m => console.log(m)
-                });
+                // OCR
+                const { data: { text } } = await tesseractWorker.recognize(imageData);
+                console.log('OCR:', text);
                 
-                await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789K-.',
-                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
-                });
+                // Buscar RUT
+                const rut = extraerRUT(text);
                 
-                let { data: { text } } = await worker.recognize(imagenProcesada);
-                console.log('OCR Procesada:', text);
-                
-                let rut = extraerRUT(text);
-                
-                if (!rut) {
-                    console.log('Reintentando con original...');
-                    const resultado = await worker.recognize(imageUrl);
-                    text = resultado.data.text;
-                    console.log('OCR Original:', text);
-                    rut = extraerRUT(text);
+                if (rut) {
+                    // ¡RUT encontrado!
+                    scanStatus.textContent = '✅ RUT detectado!';
+                    scanStatus.classList.add('found');
+                    
+                    detenerEscaneo();
+                    cerrarCamara();
+                    
+                    // Verificar automáticamente
+                    await verificarTNE(rut);
                 }
-                
-                await worker.terminate();
-                
-                if (!rut) {
-                    loading.style.display = 'none';
-                    rutManualSection.style.display = 'block';
-                    rutManualInput.focus();
-                    return;
-                }
-                
-                await verificarTNE(rut);
-                
-            } catch (err) {
-                console.error('Error:', err);
-                mostrarError('Error al procesar: ' + err.message);
-                initialButtons.style.display = 'block';
-            } finally {
-                loading.style.display = 'none';
+            } catch (e) {
+                console.log('Error escaneo:', e);
             }
         }
 
+        // ============================================
+        // EXTRAER RUT
+        // ============================================
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
-            console.log('Texto limpio:', texto);
             
             const patrones = [
                 /(\d{1,2}\.\d{3}\.\d{3}[-\s]?[0-9K])/g,
@@ -976,44 +1001,21 @@
             for (const patron of patrones) {
                 const matches = texto.match(patron);
                 if (matches) {
-                    console.log('Matches:', matches);
                     for (const match of matches) {
                         const rutLimpio = match.replace(/[.\-\s]/g, '');
-                        console.log('Probando:', rutLimpio);
                         
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
                             
                             if (validarRUT(rut, dv)) {
-                                const rutFormateado = formatearRUT(rut, dv);
-                                console.log('✓ RUT válido:', rutFormateado);
-                                return rutFormateado;
-                            } else {
-                                console.log('✗ DV incorrecto:', rut + '-' + dv);
+                                return formatearRUT(rut, dv);
                             }
                         }
                     }
                 }
             }
             
-            const numeros = texto.match(/\d{7,9}/g);
-            if (numeros) {
-                console.log('Búsqueda exhaustiva:', numeros);
-                for (const num of numeros) {
-                    if (num.length >= 8) {
-                        const rut = num.slice(0, -1);
-                        const dv = num.slice(-1);
-                        if (validarRUT(rut, dv)) {
-                            const rutFormateado = formatearRUT(rut, dv);
-                            console.log('✓ RUT (exhaustivo):', rutFormateado);
-                            return rutFormateado;
-                        }
-                    }
-                }
-            }
-            
-            console.log('✗ No se encontró RUT');
             return null;
         }
 
@@ -1038,65 +1040,14 @@
         }
 
         // ============================================
-        // CÁMARA
-        // ============================================
-        async function abrirCamara() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 3840, min: 1280 },
-                        height: { ideal: 2160, min: 720 },
-                        focusMode: 'continuous'
-                    } 
-                });
-                video.srcObject = stream;
-                video.style.display = 'block';
-                imagePreview.style.display = 'none';
-                initialButtons.style.display = 'none';
-                cameraButtons.style.display = 'block';
-                result.style.display = 'none';
-                errorMsg.style.display = 'none';
-            } catch (err) {
-                mostrarError('No se pudo acceder a la cámara. Verifica los permisos.');
-            }
-        }
-
-        function cerrarCamara() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-            video.style.display = 'none';
-            initialButtons.style.display = 'block';
-            cameraButtons.style.display = 'none';
-        }
-
-        function capturarFoto() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(video, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                imagePreview.src = url;
-                imagePreview.style.display = 'block';
-                video.style.display = 'none';
-                cerrarCamara();
-                procesarImagen(url);
-            }, 'image/jpeg', 1.0);
-        }
-
-        // ============================================
-        // VERIFICAR TNE CON CONTROL DE LÍMITES
+        // VERIFICAR TNE
         // ============================================
         async function verificarTNE(rut) {
             loading.style.display = 'block';
             result.style.display = 'none';
-            rutManualSection.style.display = 'none';
+            manualSection.classList.remove('visible');
+            initialButtons.classList.add('hidden');
+            cameraButtons.classList.add('hidden');
             
             try {
                 const response = await fetch(WORKER_URL, {
@@ -1112,16 +1063,14 @@
                 
                 const data = await response.json();
                 
-                // Verificar si hay error de sesión
                 if (data.sesionInvalida) {
                     mostrarAlertaSesion(data.mensaje);
                     return;
                 }
                 
-                // Verificar si se superó el límite
                 if (data.limiteSuperado) {
                     mostrarError(data.mensaje);
-                    initialButtons.style.display = 'block';
+                    initialButtons.classList.remove('hidden');
                     actualizarQuota(data.consultasMaximas, data.consultasMaximas);
                     return;
                 }
@@ -1130,34 +1079,27 @@
                     throw new Error(data.error);
                 }
                 
-                const verificacion = {
+                mostrarResultado(rut, {
                     vigente: data.vigente,
                     razon: data.estado,
                     mensaje: data.mensaje,
                     detalles: data.detalles
-                };
+                });
                 
-                mostrarResultado(rut, verificacion, data.consultasRestantes);
-                
-                // Actualizar quota
                 if (data.consultasRestantes !== undefined) {
                     actualizarQuota(data.consultasHoy, consultasMaximas);
                 }
                 
-                verificacionesHoy++;
-                localStorage.setItem('tne_count_' + new Date().toDateString(), verificacionesHoy);
-                actualizarStats();
-                
             } catch (err) {
                 console.error('Error:', err);
                 mostrarError('Error al verificar: ' + err.message);
-                initialButtons.style.display = 'block';
+                initialButtons.classList.remove('hidden');
             } finally {
                 loading.style.display = 'none';
             }
         }
 
-        function mostrarResultado(rut, verificacion, restantes) {
+        function mostrarResultado(rut, verificacion) {
             result.style.display = 'block';
             result.className = 'result';
             
@@ -1172,82 +1114,68 @@
             document.getElementById('resultTitle').textContent = verificacion.razon;
             document.getElementById('rutDisplay').textContent = `RUT: ${rut}`;
             document.getElementById('resultDetails').innerHTML = `
-                <strong>${verificacion.mensaje}</strong><br><br>
+                <strong>${verificacion.mensaje}</strong><br>
                 ${verificacion.detalles}
             `;
-            
-            if (restantes !== undefined) {
-                document.getElementById('consultasRestantes').textContent = 
-                    `📊 Consultas restantes hoy: ${restantes}`;
-            }
         }
 
         function mostrarError(mensaje) {
             errorMsg.textContent = mensaje;
             errorMsg.style.display = 'block';
-            setTimeout(() => {
-                errorMsg.style.display = 'none';
-            }, 7000);
+            setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
         }
 
         // ============================================
-        // EVENT LISTENERS
+        // BOTONES
         // ============================================
-        galleryBtn.addEventListener('click', () => fileInput.click());
-        cameraBtn.addEventListener('click', abrirCamara);
-        captureBtn.addEventListener('click', capturarFoto);
-        cancelBtn.addEventListener('click', cerrarCamara);
-        
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                imagePreview.src = url;
-                imagePreview.style.display = 'block';
-                video.style.display = 'none';
-                procesarImagen(url);
-            }
-        });
-        
         newScanBtn.addEventListener('click', () => {
             result.style.display = 'none';
-            imagePreview.style.display = 'none';
             errorMsg.style.display = 'none';
-            rutManualSection.style.display = 'none';
-            initialButtons.style.display = 'block';
-            fileInput.value = '';
+            manualSection.classList.remove('visible');
+            initialButtons.classList.remove('hidden');
+        });
+
+        manualBtn.addEventListener('click', () => {
+            detenerEscaneo();
+            cerrarCamara();
+            manualSection.classList.add('visible');
+            cameraButtons.classList.add('hidden');
+            rutManualInput.focus();
         });
 
         verificarManualBtn.addEventListener('click', () => {
             const rutIngresado = rutManualInput.value.trim();
             if (!rutIngresado) {
-                mostrarError('Por favor ingresa un RUT');
+                mostrarError('Ingresa un RUT');
                 return;
             }
             
             const rutLimpio = rutIngresado.replace(/[.\-]/g, '');
             if (rutLimpio.length < 8 || rutLimpio.length > 9) {
-                mostrarError('RUT inválido. Formato: 12345678-9');
+                mostrarError('RUT inválido');
                 return;
             }
             
+            manualSection.classList.remove('visible');
             verificarTNE(rutIngresado);
         });
 
         cancelManualBtn.addEventListener('click', () => {
-            rutManualSection.style.display = 'none';
-            imagePreview.style.display = 'none';
-            initialButtons.style.display = 'block';
+            manualSection.classList.remove('visible');
             rutManualInput.value = '';
+            abrirCamara();
         });
 
         rutManualInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                verificarManualBtn.click();
-            }
+            if (e.key === 'Enter') verificarManualBtn.click();
         });
 
+        // Limpiar al salir
         window.addEventListener('beforeunload', () => {
+            detenerEscaneo();
+            if (tesseractWorker) {
+                tesseractWorker.terminate();
+            }
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
