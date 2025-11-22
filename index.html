@@ -384,6 +384,62 @@
             font-size: 12px;
             color: #92400e;
         }
+
+        /* Barra de consultas restantes */
+        .quota-bar {
+            background: #eff6ff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #1a56db;
+        }
+
+        .quota-text {
+            font-size: 13px;
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .quota-progress {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .quota-progress-fill {
+            background: linear-gradient(90deg, #10b981, #1a56db);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .quota-progress-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+        }
+
+        /* Alerta de sesión */
+        .session-alert {
+            display: none;
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .session-alert h3 {
+            color: #991b1b;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .session-alert p {
+            color: #b91c1c;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -392,6 +448,15 @@
             <h1>🎓 Verificador TNE Pro</h1>
             <p id="headerSubtitle">Sistema profesional de verificación</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
+        </div>
+
+        <!-- ALERTA DE SESIÓN DUPLICADA -->
+        <div class="session-alert" id="sessionAlert">
+            <h3>⚠️ Sesión No Disponible</h3>
+            <p id="sessionAlertMsg">Esta licencia ya está en uso en otro dispositivo.</p>
+            <button class="btn btn-cancel" id="sessionAlertBtn">
+                Reintentar
+            </button>
         </div>
 
         <!-- PANTALLA DE LOGIN -->
@@ -418,7 +483,7 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 40px;">
-                <p style="color: #9ca3af;">Versión Pro 2.0</p>
+                <p style="color: #9ca3af;">Versión Pro 2.1 - Sesión Segura</p>
                 <p style="margin-top: 5px; color: #9ca3af;">Desarrollado por Luis Monardes</p>
             </div>
         </div>
@@ -428,11 +493,19 @@
             <div class="content">
                 <div class="stats-bar" id="statsBar"></div>
 
+                <!-- Barra de consultas restantes -->
+                <div class="quota-bar" id="quotaBar">
+                    <div class="quota-text" id="quotaText">Consultas: -- / --</div>
+                    <div class="quota-progress">
+                        <div class="quota-progress-fill" id="quotaFill" style="width: 100%"></div>
+                    </div>
+                </div>
+
                 <div class="instructions">
                     <div class="instructions-title">📸 Cómo tomar la foto:</div>
                     <p>
                     ✓ <strong>Buena iluminación</strong> (luz natural o LED)<br>
-                    ✓ <strong>Enfocar solo el RUT</strong> (acercar celular)<br>
+                    ✓ <strong>Enfocar la FOTO del estudiante</strong> (el RUT está debajo)<br>
                     ✓ <strong>Foto horizontal</strong> y sin inclinación<br>
                     ✓ <strong>Esperar que enfoque</strong> antes de capturar<br>
                     ❌ NO usar flash (crea reflejos)
@@ -440,7 +513,7 @@
                 </div>
 
                 <div class="tip-box">
-                    💡 <strong>Tip:</strong> Usa "Tomar Foto" para mejor calidad. Si no detecta, ingresa el RUT manualmente.
+                    💡 <strong>Tip:</strong> Enfoca la foto del estudiante - el RUT grande está impreso justo debajo.
                 </div>
 
                 <div class="camera-section">
@@ -509,6 +582,7 @@
                     <div class="result-title" id="resultTitle"></div>
                     <div class="rut-display" id="rutDisplay"></div>
                     <div class="result-details" id="resultDetails"></div>
+                    <div id="consultasRestantes" style="margin-top: 10px; font-size: 12px; color: #6b7280;"></div>
                     <button class="btn btn-secondary" id="newScanBtn" style="margin-top: 20px;">
                         🔄 Nueva Verificación
                     </button>
@@ -520,6 +594,7 @@
             <div class="footer">
                 <p>🚌 Sistema profesional para conductores</p>
                 <p style="margin-top: 5px;">Verificación en tiempo real con JUNAEB</p>
+                <p style="margin-top: 5px; font-size: 10px; color: #9ca3af;" id="deviceIdDisplay"></p>
             </div>
         </div>
     </div>
@@ -534,6 +609,9 @@
         let licenciaActual = null;
         let conductorNombre = null;
         let verificacionesHoy = 0;
+        let deviceId = null;
+        let consultasMaximas = 200;
+        let consultasRestantes = 200;
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
@@ -549,6 +627,12 @@
         const licenseBadge = document.getElementById('licenseBadge');
         const statsBar = document.getElementById('statsBar');
         const logoutBtn = document.getElementById('logoutBtn');
+        const sessionAlert = document.getElementById('sessionAlert');
+        const sessionAlertMsg = document.getElementById('sessionAlertMsg');
+        const sessionAlertBtn = document.getElementById('sessionAlertBtn');
+        const quotaBar = document.getElementById('quotaBar');
+        const quotaText = document.getElementById('quotaText');
+        const quotaFill = document.getElementById('quotaFill');
 
         const cameraBtn = document.getElementById('cameraBtn');
         const galleryBtn = document.getElementById('galleryBtn');
@@ -566,8 +650,46 @@
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
 
-        // Al cargar
+        // ============================================
+        // GENERAR/OBTENER ID ÚNICO DEL DISPOSITIVO
+        // ============================================
+        function getDeviceId() {
+            let id = localStorage.getItem('tne_device_id');
+            if (!id) {
+                // Generar ID único basado en características del dispositivo + timestamp
+                const nav = window.navigator;
+                const screen = window.screen;
+                const data = [
+                    nav.userAgent,
+                    nav.language,
+                    screen.width,
+                    screen.height,
+                    screen.colorDepth,
+                    new Date().getTime(),
+                    Math.random().toString(36)
+                ].join('|');
+                
+                // Hash simple
+                let hash = 0;
+                for (let i = 0; i < data.length; i++) {
+                    const char = data.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                
+                id = 'DEV-' + Math.abs(hash).toString(36).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                localStorage.setItem('tne_device_id', id);
+            }
+            return id;
+        }
+
+        // ============================================
+        // AL CARGAR LA PÁGINA
+        // ============================================
         window.addEventListener('load', () => {
+            deviceId = getDeviceId();
+            document.getElementById('deviceIdDisplay').textContent = `ID: ${deviceId.substring(0, 15)}...`;
+            
             const savedLicense = localStorage.getItem('tne_license');
             if (savedLicense) {
                 validarLicencia(savedLicense, true);
@@ -579,7 +701,34 @@
             }
         });
 
-        // Login
+        // Verificar sesión periódicamente
+        setInterval(async () => {
+            if (licenciaActual && deviceId) {
+                try {
+                    const response = await fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            accion: 'verificar_sesion',
+                            licencia: licenciaActual,
+                            deviceId: deviceId
+                        })
+                    });
+                    const data = await response.json();
+                    
+                    if (!data.activa) {
+                        // Sesión cerrada externamente
+                        mostrarAlertaSesion('Tu sesión fue cerrada. Otro dispositivo puede estar usando esta licencia.');
+                    }
+                } catch (e) {
+                    console.log('Error verificando sesión:', e);
+                }
+            }
+        }, 60000); // Cada 1 minuto
+
+        // ============================================
+        // LOGIN CON CONTROL DE SESIÓN
+        // ============================================
         loginBtn.addEventListener('click', () => {
             const licencia = licenseInput.value.trim().toUpperCase();
             if (!licencia) {
@@ -607,7 +756,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         accion: 'validar_licencia',
-                        licencia: codigo
+                        licencia: codigo,
+                        deviceId: deviceId,
+                        userAgent: navigator.userAgent
                     })
                 });
 
@@ -616,12 +767,20 @@
                 if (data.valida) {
                     licenciaActual = codigo;
                     conductorNombre = data.nombre;
+                    consultasMaximas = data.consultasMaximas;
+                    consultasRestantes = data.consultasRestantes;
+                    
                     localStorage.setItem('tne_license', codigo);
                     
-                    mostrarApp();
+                    mostrarApp(data);
                 } else {
                     if (!autoLogin) {
-                        mostrarErrorLogin(data.mensaje || 'Licencia inválida');
+                        // Mostrar mensaje específico si es límite de dispositivos
+                        if (data.maxMaquinas) {
+                            mostrarErrorLogin(`${data.mensaje} (${data.sesionesActivas}/${data.maxMaquinas} dispositivos)`);
+                        } else {
+                            mostrarErrorLogin(data.mensaje || 'Licencia inválida');
+                        }
                         licenseInput.value = '';
                     } else {
                         localStorage.removeItem('tne_license');
@@ -644,15 +803,29 @@
             loginError.style.display = 'block';
             setTimeout(() => {
                 loginError.style.display = 'none';
-            }, 5000);
+            }, 7000);
         }
 
-        function mostrarApp() {
+        function mostrarAlertaSesion(mensaje) {
+            sessionAlertMsg.textContent = mensaje;
+            sessionAlert.style.display = 'block';
+            appScreen.classList.remove('active');
+            loginScreen.classList.add('hidden');
+        }
+
+        sessionAlertBtn.addEventListener('click', () => {
+            sessionAlert.style.display = 'none';
+            localStorage.removeItem('tne_license');
+            location.reload();
+        });
+
+        function mostrarApp(data) {
             loginScreen.classList.add('hidden');
             appScreen.classList.add('active');
             licenseBadge.textContent = `👤 ${conductorNombre}`;
             licenseBadge.style.display = 'inline-block';
             actualizarStats();
+            actualizarQuota(data.consultasHoy || 0, data.consultasMaximas);
         }
 
         function actualizarStats() {
@@ -660,19 +833,51 @@
             statsBar.textContent = `📊 Verificaciones hoy: ${verificacionesHoy} | 📅 ${hoy}`;
         }
 
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Cerrar sesión?')) {
+        function actualizarQuota(usadas, maximas) {
+            consultasRestantes = maximas - usadas;
+            const porcentaje = (consultasRestantes / maximas) * 100;
+            
+            quotaText.textContent = `Consultas restantes: ${consultasRestantes} / ${maximas}`;
+            quotaFill.style.width = porcentaje + '%';
+            
+            if (porcentaje < 20) {
+                quotaFill.classList.add('warning');
+            } else {
+                quotaFill.classList.remove('warning');
+            }
+        }
+
+        // ============================================
+        // CERRAR SESIÓN
+        // ============================================
+        logoutBtn.addEventListener('click', async () => {
+            if (confirm('¿Cerrar sesión? Esto liberará este dispositivo.')) {
+                try {
+                    await fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            accion: 'cerrar_sesion',
+                            licencia: licenciaActual,
+                            deviceId: deviceId
+                        })
+                    });
+                } catch (e) {
+                    console.log('Error cerrando sesión:', e);
+                }
+                
                 localStorage.removeItem('tne_license');
                 location.reload();
             }
         });
 
-        // Preprocesar imagen para mejor OCR
+        // ============================================
+        // PROCESAMIENTO DE IMAGEN (sin cambios)
+        // ============================================
         function preprocesarImagen(imgElement) {
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
-            // Escalar 2x para mejor lectura
             const scale = 2;
             tempCanvas.width = imgElement.width * scale;
             tempCanvas.height = imgElement.height * scale;
@@ -682,16 +887,13 @@
             const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
             const data = imageData.data;
             
-            // Convertir a escala de grises y aumentar contraste
             for (let i = 0; i < data.length; i += 4) {
                 const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                 
-                // Aumentar contraste
                 const contrast = 1.5;
                 const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
                 let newValue = factor * (avg - 128) + 128;
                 
-                // Binarización
                 newValue = newValue > 128 ? 255 : 0;
                 
                 data[i] = newValue;
@@ -703,7 +905,6 @@
             return tempCanvas.toDataURL('image/png');
         }
 
-        // Procesar imagen con OCR mejorado
         async function procesarImagen(imageUrl) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -713,15 +914,12 @@
             rutManualSection.style.display = 'none';
             
             try {
-                // Cargar imagen
                 const img = new Image();
                 img.src = imageUrl;
                 await new Promise(resolve => img.onload = resolve);
                 
-                // Preprocesar
                 const imagenProcesada = preprocesarImagen(img);
                 
-                // OCR mejorado
                 const worker = await Tesseract.createWorker('spa', 1, {
                     logger: m => console.log(m)
                 });
@@ -731,13 +929,11 @@
                     tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
                 });
                 
-                // Intento 1: Imagen procesada
                 let { data: { text } } = await worker.recognize(imagenProcesada);
                 console.log('OCR Procesada:', text);
                 
                 let rut = extraerRUT(text);
                 
-                // Intento 2: Imagen original
                 if (!rut) {
                     console.log('Reintentando con original...');
                     const resultado = await worker.recognize(imageUrl);
@@ -766,7 +962,6 @@
             }
         }
 
-        // Extraer RUT mejorado
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
             console.log('Texto limpio:', texto);
@@ -802,7 +997,6 @@
                 }
             }
             
-            // Búsqueda exhaustiva
             const numeros = texto.match(/\d{7,9}/g);
             if (numeros) {
                 console.log('Búsqueda exhaustiva:', numeros);
@@ -843,7 +1037,9 @@
             return `${rutFormateado}-${dv}`;
         }
 
-        // Cámara web mejorada
+        // ============================================
+        // CÁMARA
+        // ============================================
         async function abrirCamara() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
@@ -877,16 +1073,13 @@
         }
 
         function capturarFoto() {
-            // Usar resolución completa del video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
-            // Dibujar con mejor calidad
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(video, 0, 0);
             
-            // Convertir a blob con máxima calidad
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 imagePreview.src = url;
@@ -894,10 +1087,12 @@
                 video.style.display = 'none';
                 cerrarCamara();
                 procesarImagen(url);
-            }, 'image/jpeg', 1.0); // Calidad 100%
+            }, 'image/jpeg', 1.0);
         }
 
-        // Verificar TNE
+        // ============================================
+        // VERIFICAR TNE CON CONTROL DE LÍMITES
+        // ============================================
         async function verificarTNE(rut) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -910,15 +1105,30 @@
                     body: JSON.stringify({
                         accion: 'verificar_tne',
                         licencia: licenciaActual,
-                        rut: rut
+                        rut: rut,
+                        deviceId: deviceId
                     })
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Error en la verificación');
+                const data = await response.json();
+                
+                // Verificar si hay error de sesión
+                if (data.sesionInvalida) {
+                    mostrarAlertaSesion(data.mensaje);
+                    return;
                 }
                 
-                const data = await response.json();
+                // Verificar si se superó el límite
+                if (data.limiteSuperado) {
+                    mostrarError(data.mensaje);
+                    initialButtons.style.display = 'block';
+                    actualizarQuota(data.consultasMaximas, data.consultasMaximas);
+                    return;
+                }
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 
                 const verificacion = {
                     vigente: data.vigente,
@@ -927,7 +1137,12 @@
                     detalles: data.detalles
                 };
                 
-                mostrarResultado(rut, verificacion);
+                mostrarResultado(rut, verificacion, data.consultasRestantes);
+                
+                // Actualizar quota
+                if (data.consultasRestantes !== undefined) {
+                    actualizarQuota(data.consultasHoy, consultasMaximas);
+                }
                 
                 verificacionesHoy++;
                 localStorage.setItem('tne_count_' + new Date().toDateString(), verificacionesHoy);
@@ -942,7 +1157,7 @@
             }
         }
 
-        function mostrarResultado(rut, verificacion) {
+        function mostrarResultado(rut, verificacion, restantes) {
             result.style.display = 'block';
             result.className = 'result';
             
@@ -960,6 +1175,11 @@
                 <strong>${verificacion.mensaje}</strong><br><br>
                 ${verificacion.detalles}
             `;
+            
+            if (restantes !== undefined) {
+                document.getElementById('consultasRestantes').textContent = 
+                    `📊 Consultas restantes hoy: ${restantes}`;
+            }
         }
 
         function mostrarError(mensaje) {
@@ -967,12 +1187,14 @@
             errorMsg.style.display = 'block';
             setTimeout(() => {
                 errorMsg.style.display = 'none';
-            }, 5000);
+            }, 7000);
         }
 
-        // Event Listeners
-        galleryBtn.addEventListener('click', () => fileInput.click()); // Botón principal
-        cameraBtn.addEventListener('click', abrirCamara); // Botón secundario
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        galleryBtn.addEventListener('click', () => fileInput.click());
+        cameraBtn.addEventListener('click', abrirCamara);
         captureBtn.addEventListener('click', capturarFoto);
         cancelBtn.addEventListener('click', cerrarCamara);
         
