@@ -156,6 +156,7 @@
             margin-bottom: 15px;
             border: 3px solid #1a56db;
             background: #000;
+            position: relative;
         }
 
         #imagePreview {
@@ -168,6 +169,50 @@
 
         canvas {
             display: none;
+        }
+
+        /* Guía visual para enfocar FOTO del estudiante */
+        .focus-guide {
+            position: absolute;
+            top: 20%;
+            left: 5%;
+            width: 45%;
+            height: 55%;
+            border: 4px solid #10b981;
+            border-radius: 15px;
+            background: rgba(16, 185, 129, 0.15);
+            display: none;
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .focus-guide::before {
+            content: "📸 Coloca la FOTO del estudiante aquí";
+            position: absolute;
+            top: -40px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #10b981;
+            font-weight: 700;
+            font-size: 15px;
+            text-shadow: 0 0 10px black, 0 0 5px black;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .focus-guide::after {
+            content: "RUT debajo ↓";
+            position: absolute;
+            bottom: -35px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #10b981;
+            font-weight: 600;
+            font-size: 13px;
+            text-shadow: 0 0 10px black, 0 0 5px black;
         }
 
         .btn {
@@ -203,7 +248,7 @@
             background: #10b981;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
             font-size: 18px;
-            padding: 20px;
+            padding: 22px;
         }
 
         .btn-secondary {
@@ -229,6 +274,7 @@
 
         .camera-section {
             margin-bottom: 15px;
+            position: relative;
         }
 
         .loading {
@@ -256,6 +302,29 @@
             font-size: 16px;
             color: #374151;
             font-weight: 500;
+        }
+
+        .loading-progress {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 10px;
+            margin: 15px auto;
+            width: 80%;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            background: linear-gradient(90deg, #1a56db, #10b981);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 80%; }
+            100% { width: 100%; }
         }
 
         .result {
@@ -381,8 +450,9 @@
             padding: 12px;
             border-radius: 10px;
             margin-bottom: 15px;
-            font-size: 12px;
+            font-size: 13px;
             color: #92400e;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -418,7 +488,7 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 40px;">
-                <p style="color: #9ca3af;">Versión Pro 2.0</p>
+                <p style="color: #9ca3af;">Versión Pro 2.1 - Optimizada</p>
                 <p style="margin-top: 5px; color: #9ca3af;">Desarrollado por Luis Monardes</p>
             </div>
         </div>
@@ -429,32 +499,61 @@
                 <div class="stats-bar" id="statsBar"></div>
 
                 <div class="instructions">
-                    <div class="instructions-title">📸 Cómo tomar la foto:</div>
+                    <div class="instructions-title">📸 Instrucciones Rápidas:</div>
                     <p>
-                    ✓ <strong>Buena iluminación</strong> (luz natural o LED)<br>
-                    ✓ <strong>Enfocar solo el RUT</strong> (acercar celular)<br>
-                    ✓ <strong>Foto horizontal</strong> y sin inclinación<br>
-                    ✓ <strong>Esperar que enfoque</strong> antes de capturar<br>
-                    ❌ NO usar flash (crea reflejos)
+                    1️⃣ Toca "Tomar Foto"<br>
+                    2️⃣ <strong>Enfoca la FOTO del estudiante</strong> (no toda la tarjeta)<br>
+                    3️⃣ El RUT está impreso debajo de la foto<br>
+                    4️⃣ Espera 2-3 segundos → ✅ Listo
                     </p>
                 </div>
 
                 <div class="tip-box">
-                    💡 <strong>Tip:</strong> Usa "Tomar Foto" para mejor calidad. Si no detecta, ingresa el RUT manualmente.
+                    💡 <strong>Consejo clave:</strong> La foto del estudiante tiene el RUT impreso abajo en texto GRANDE - ¡Es más fácil de leer!
+                </div>
+
+                <div style="background: #eff6ff; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #1a56db;">
+                    <p style="font-size: 12px; color: #1e3a8a; font-weight: 600; margin-bottom: 8px;">
+                        📋 Estructura de la TNE:
+                    </p>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="flex: 1; background: white; padding: 10px; border-radius: 8px; border: 2px solid #10b981;">
+                            <div style="font-size: 11px; color: #059669; font-weight: 700; margin-bottom: 5px;">
+                                ✓ ENFOCA AQUÍ
+                            </div>
+                            <div style="background: #d1fae5; height: 50px; border-radius: 4px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #065f46;">
+                                📸 Foto
+                            </div>
+                            <div style="background: #10b981; color: white; padding: 4px; border-radius: 4px; font-size: 10px; font-weight: 700; text-align: center;">
+                                27.928.081-4 ← RUT
+                            </div>
+                        </div>
+                        <div style="flex: 1; background: #f3f4f6; padding: 10px; border-radius: 8px; opacity: 0.5;">
+                            <div style="font-size: 11px; color: #6b7280; font-weight: 600; margin-bottom: 5px;">
+                                ✗ No enfocar
+                            </div>
+                            <div style="font-size: 9px; color: #9ca3af; line-height: 1.3;">
+                                Nombre<br>
+                                Institución<br>
+                                Código barras
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="camera-section">
                     <video id="videoPreview" autoplay playsinline></video>
+                    <div class="focus-guide" id="focusGuide"></div>
                     <img id="imagePreview" alt="Foto capturada">
                     <canvas id="canvas"></canvas>
                 </div>
 
                 <div id="initialButtons">
                     <button class="btn btn-capture" id="galleryBtn">
-                        <span class="btn-icon">📸</span> Tomar Foto (Recomendado)
+                        <span class="btn-icon">📸</span> Tomar Foto
                     </button>
-                    <button class="btn btn-secondary" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Usar Cámara Web
+                    <button class="btn btn-secondary" id="manualBtn">
+                        <span class="btn-icon">✍️</span> Ingresar RUT Manualmente
                     </button>
                     <button class="btn btn-logout" id="logoutBtn">
                         <span class="btn-icon">🚪</span> Cerrar Sesión
@@ -474,16 +573,19 @@
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Analizando imagen...</div>
+                    <div class="loading-text" id="loadingText">Detectando RUT...</div>
+                    <div class="loading-progress">
+                        <div class="loading-progress-bar"></div>
+                    </div>
                 </div>
 
                 <div id="rutManualSection" style="display: none; margin-top: 20px;">
                     <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                         <p style="font-size: 14px; color: #92400e; margin-bottom: 10px;">
-                            <strong>⚠️ RUT no detectado automáticamente</strong>
+                            <strong>✍️ Ingreso Manual</strong>
                         </p>
                         <p style="font-size: 13px; color: #92400e;">
-                            Por favor, ingresa el RUT manualmente:
+                            Escribe el RUT del estudiante:
                         </p>
                     </div>
                     <div class="input-group">
@@ -500,7 +602,7 @@
                         <span class="btn-icon">✓</span> Verificar RUT
                     </button>
                     <button class="btn btn-cancel" id="cancelManualBtn">
-                        <span class="btn-icon">↩️</span> Tomar Otra Foto
+                        <span class="btn-icon">↩️</span> Volver
                     </button>
                 </div>
 
@@ -534,11 +636,13 @@
         let licenciaActual = null;
         let conductorNombre = null;
         let verificacionesHoy = 0;
+        let workerGlobal = null; // Worker pre-cargado
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
+        const focusGuide = document.getElementById('focusGuide');
 
         // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
@@ -550,12 +654,13 @@
         const statsBar = document.getElementById('statsBar');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        const cameraBtn = document.getElementById('cameraBtn');
         const galleryBtn = document.getElementById('galleryBtn');
+        const manualBtn = document.getElementById('manualBtn');
         const captureBtn = document.getElementById('captureBtn');
         const cancelBtn = document.getElementById('cancelBtn');
         const fileInput = document.getElementById('fileInput');
         const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
         const result = document.getElementById('result');
         const errorMsg = document.getElementById('errorMsg');
         const newScanBtn = document.getElementById('newScanBtn');
@@ -565,6 +670,27 @@
         const rutManualInput = document.getElementById('rutManualInput');
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
+
+        // Pre-cargar worker para velocidad
+        async function inicializarWorker() {
+            if (!workerGlobal) {
+                console.log('⚡ Inicializando OCR optimizado...');
+                loadingText.textContent = 'Inicializando OCR...';
+                
+                workerGlobal = await Tesseract.createWorker('spa', 1, {
+                    langPath: 'https://tessdata.projectnaptha.com/4.0.0_fast',
+                    logger: m => console.log(m)
+                });
+                
+                await workerGlobal.setParameters({
+                    tessedit_char_whitelist: '0123456789K-.',
+                    tessedit_pageseg_mode: Tesseract.PSM.SINGLE_LINE,
+                });
+                
+                console.log('✅ OCR listo!');
+            }
+            return workerGlobal;
+        }
 
         // Al cargar
         window.addEventListener('load', () => {
@@ -577,6 +703,11 @@
             if (savedCount) {
                 verificacionesHoy = parseInt(savedCount);
             }
+            
+            // Pre-cargar OCR en segundo plano
+            setTimeout(() => {
+                inicializarWorker();
+            }, 2000);
         });
 
         // Login
@@ -667,45 +798,65 @@
             }
         });
 
-        // Preprocesar imagen para mejor OCR
-        function preprocesarImagen(imgElement) {
+        // Recortar imagen enfocando FOTO del estudiante + RUT debajo
+        function recortarAreaRUT(imgElement) {
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
-            // Escalar 2x para mejor lectura
-            const scale = 2;
-            tempCanvas.width = imgElement.width * scale;
-            tempCanvas.height = imgElement.height * scale;
+            const width = imgElement.width;
+            const height = imgElement.height;
             
-            tempCtx.drawImage(imgElement, 0, 0, tempCanvas.width, tempCanvas.height);
+            // TNE: FOTO del estudiante está en el tercio IZQUIERDO
+            // RUT está impreso DEBAJO de la foto
+            const cropX = 0;
+            const cropY = height * 0.15; // Desde arriba
+            const cropWidth = width * 0.50; // Mitad izquierda
+            const cropHeight = height * 0.70; // 70% de altura (foto + RUT debajo)
             
-            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            // Escalar 3x para máxima nitidez
+            tempCanvas.width = cropWidth * 3;
+            tempCanvas.height = cropHeight * 3;
+            
+            tempCtx.drawImage(
+                imgElement, 
+                cropX, cropY, cropWidth, cropHeight,
+                0, 0, tempCanvas.width, tempCanvas.height
+            );
+            
+            return tempCanvas;
+        }
+
+        // Preprocesar imagen optimizado para texto GRANDE del RUT bajo la foto
+        function preprocesarImagen(canvas) {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
             
-            // Convertir a escala de grises y aumentar contraste
+            // Escala de grises + contraste optimizado para texto grande
             for (let i = 0; i < data.length; i += 4) {
                 const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                 
-                // Aumentar contraste
-                const contrast = 1.5;
+                // Contraste medio (texto grande no necesita tanto)
+                const contrast = 1.8;
                 const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
                 let newValue = factor * (avg - 128) + 128;
                 
-                // Binarización
-                newValue = newValue > 128 ? 255 : 0;
+                // Binarización adaptativa para texto grande
+                newValue = newValue > 120 ? 255 : 0;
                 
                 data[i] = newValue;
                 data[i + 1] = newValue;
                 data[i + 2] = newValue;
             }
             
-            tempCtx.putImageData(imageData, 0, 0);
-            return tempCanvas.toDataURL('image/png');
+            ctx.putImageData(imageData, 0, 0);
+            return canvas.toDataURL('image/png');
         }
 
-        // Procesar imagen con OCR mejorado
+        // Procesar imagen OPTIMIZADO
         async function procesarImagen(imageUrl) {
             loading.style.display = 'block';
+            loadingText.textContent = 'Analizando imagen...';
             result.style.display = 'none';
             errorMsg.style.display = 'none';
             initialButtons.style.display = 'none';
@@ -718,42 +869,39 @@
                 img.src = imageUrl;
                 await new Promise(resolve => img.onload = resolve);
                 
+                loadingText.textContent = 'Recortando foto del estudiante...';
+                
+                // Recortar solo área del RUT
+                const canvasRecortado = recortarAreaRUT(img);
+                
+                loadingText.textContent = 'Optimizando imagen...';
+                
                 // Preprocesar
-                const imagenProcesada = preprocesarImagen(img);
+                const imagenProcesada = preprocesarImagen(canvasRecortado);
                 
-                // OCR mejorado
-                const worker = await Tesseract.createWorker('spa', 1, {
-                    logger: m => console.log(m)
-                });
+                loadingText.textContent = 'Detectando números...';
                 
-                await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789K-.',
-                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
-                });
+                // Asegurar que worker esté listo
+                const worker = await inicializarWorker();
                 
-                // Intento 1: Imagen procesada
-                let { data: { text } } = await worker.recognize(imagenProcesada);
-                console.log('OCR Procesada:', text);
+                // OCR en imagen procesada
+                const { data: { text } } = await worker.recognize(imagenProcesada);
+                console.log('📝 Texto detectado:', text);
                 
-                let rut = extraerRUT(text);
+                loadingText.textContent = 'Extrayendo RUT...';
                 
-                // Intento 2: Imagen original
-                if (!rut) {
-                    console.log('Reintentando con original...');
-                    const resultado = await worker.recognize(imageUrl);
-                    text = resultado.data.text;
-                    console.log('OCR Original:', text);
-                    rut = extraerRUT(text);
-                }
-                
-                await worker.terminate();
+                const rut = extraerRUT(text);
                 
                 if (!rut) {
+                    console.log('❌ No se detectó RUT');
                     loading.style.display = 'none';
                     rutManualSection.style.display = 'block';
                     rutManualInput.focus();
                     return;
                 }
+                
+                console.log('✅ RUT detectado:', rut);
+                loadingText.textContent = 'Verificando con JUNAEB...';
                 
                 await verificarTNE(rut);
                 
@@ -769,33 +917,26 @@
         // Extraer RUT mejorado
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
-            console.log('Texto limpio:', texto);
+            console.log('🔍 Buscando en:', texto);
             
             const patrones = [
                 /(\d{1,2}\.\d{3}\.\d{3}[-\s]?[0-9K])/g,
                 /(\d{7,8}[-\s][0-9K])/g,
                 /(\d{7,8}[0-9K])/g,
-                /(\d{1,2}\s?\d{3}\s?\d{3}\s?[-]?\s?[0-9K])/g,
             ];
             
             for (const patron of patrones) {
                 const matches = texto.match(patron);
                 if (matches) {
-                    console.log('Matches:', matches);
                     for (const match of matches) {
                         const rutLimpio = match.replace(/[.\-\s]/g, '');
-                        console.log('Probando:', rutLimpio);
                         
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
                             
                             if (validarRUT(rut, dv)) {
-                                const rutFormateado = formatearRUT(rut, dv);
-                                console.log('✓ RUT válido:', rutFormateado);
-                                return rutFormateado;
-                            } else {
-                                console.log('✗ DV incorrecto:', rut + '-' + dv);
+                                return formatearRUT(rut, dv);
                             }
                         }
                     }
@@ -805,21 +946,17 @@
             // Búsqueda exhaustiva
             const numeros = texto.match(/\d{7,9}/g);
             if (numeros) {
-                console.log('Búsqueda exhaustiva:', numeros);
                 for (const num of numeros) {
                     if (num.length >= 8) {
                         const rut = num.slice(0, -1);
                         const dv = num.slice(-1);
                         if (validarRUT(rut, dv)) {
-                            const rutFormateado = formatearRUT(rut, dv);
-                            console.log('✓ RUT (exhaustivo):', rutFormateado);
-                            return rutFormateado;
+                            return formatearRUT(rut, dv);
                         }
                     }
                 }
             }
             
-            console.log('✗ No se encontró RUT');
             return null;
         }
 
@@ -843,19 +980,21 @@
             return `${rutFormateado}-${dv}`;
         }
 
-        // Cámara web mejorada
+        // Cámara optimizada para captura NÍTIDA de foto del estudiante
         async function abrirCamara() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
-                        width: { ideal: 3840, min: 1280 },
-                        height: { ideal: 2160, min: 720 },
-                        focusMode: 'continuous'
+                        width: { ideal: 4096, min: 1920 },
+                        height: { ideal: 2160, min: 1080 },
+                        focusMode: ['continuous', 'manual'],
+                        focusDistance: { ideal: 0.3 } // Enfoque cercano
                     } 
                 });
                 video.srcObject = stream;
                 video.style.display = 'block';
+                focusGuide.style.display = 'block';
                 imagePreview.style.display = 'none';
                 initialButtons.style.display = 'none';
                 cameraButtons.style.display = 'block';
@@ -872,34 +1011,34 @@
                 stream = null;
             }
             video.style.display = 'none';
+            focusGuide.style.display = 'none';
             initialButtons.style.display = 'block';
             cameraButtons.style.display = 'none';
         }
 
         function capturarFoto() {
-            // Usar resolución completa del video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
-            // Dibujar con mejor calidad
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(video, 0, 0);
             
-            // Convertir a blob con máxima calidad
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 imagePreview.src = url;
                 imagePreview.style.display = 'block';
                 video.style.display = 'none';
+                focusGuide.style.display = 'none';
                 cerrarCamara();
                 procesarImagen(url);
-            }, 'image/jpeg', 1.0); // Calidad 100%
+            }, 'image/jpeg', 1.0);
         }
 
         // Verificar TNE
         async function verificarTNE(rut) {
             loading.style.display = 'block';
+            loadingText.textContent = 'Consultando JUNAEB...';
             result.style.display = 'none';
             rutManualSection.style.display = 'none';
             
@@ -971,8 +1110,12 @@
         }
 
         // Event Listeners
-        galleryBtn.addEventListener('click', () => fileInput.click()); // Botón principal
-        cameraBtn.addEventListener('click', abrirCamara); // Botón secundario
+        galleryBtn.addEventListener('click', () => fileInput.click());
+        manualBtn.addEventListener('click', () => {
+            initialButtons.style.display = 'none';
+            rutManualSection.style.display = 'block';
+            rutManualInput.focus();
+        });
         captureBtn.addEventListener('click', capturarFoto);
         cancelBtn.addEventListener('click', cerrarCamara);
         
@@ -1027,7 +1170,10 @@
 
         window.addEventListener('beforeunload', () => {
             if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach(track => track.stop();
+            }
+            if (workerGlobal) {
+                workerGlobal.terminate();
             }
         });
     </script>
