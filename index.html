@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a56db">
     <title>Verificador TNE Pro</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         * {
             margin: 0;
@@ -18,7 +16,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a56db;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -26,12 +24,15 @@
         .container {
             background: white;
             min-height: 100vh;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
         }
 
         .header {
             background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
             color: white;
-            padding: 25px 20px 20px;
+            padding: 25px 20px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
@@ -81,12 +82,6 @@
             font-weight: 700;
             color: #1e40af;
             margin-bottom: 10px;
-        }
-
-        .login-subtitle {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 30px;
         }
 
         .input-group {
@@ -227,10 +222,6 @@
             display: none;
         }
 
-        .camera-section {
-            margin-bottom: 15px;
-        }
-
         .loading {
             text-align: center;
             padding: 40px 20px;
@@ -258,12 +249,9 @@
             font-weight: 500;
         }
 
+        /* RESULTADO COMPLETO */
         .result {
             display: none;
-            padding: 30px 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            text-align: center;
             animation: slideUp 0.4s ease;
         }
 
@@ -278,79 +266,107 @@
             }
         }
 
-        .result.vigente {
-            background: #d1fae5;
-            border: 4px solid #10b981;
+        .result-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
         }
 
-        .result.no-vigente {
-            background: #fee2e2;
-            border: 4px solid #ef4444;
+        .result-header.no-vigente {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
-        .result.warning {
-            background: #fef3c7;
-            border: 4px solid #f59e0b;
+        .result-header.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         .result-icon {
-            font-size: 70px;
-            margin-bottom: 15px;
+            font-size: 60px;
+            margin-bottom: 10px;
         }
 
         .result-title {
             font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
-        .result.vigente .result-title {
-            color: #065f46;
+        .result-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
         }
 
-        .result.no-vigente .result-title {
-            color: #991b1b;
+        .result-body {
+            background: white;
+            border: 3px solid #10b981;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            padding: 20px;
         }
 
-        .result.warning .result-title {
-            color: #92400e;
+        .result-body.no-vigente {
+            border-color: #f59e0b;
         }
 
-        .result-details {
-            font-size: 15px;
-            margin-top: 15px;
-            line-height: 1.6;
+        .result-body.error {
+            border-color: #ef4444;
         }
 
-        .result.vigente .result-details {
-            color: #047857;
+        .data-section {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
         }
 
-        .result.no-vigente .result-details {
-            color: #b91c1c;
+        .data-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .result.warning .result-details {
-            color: #b45309;
+        .data-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #374151;
+            min-width: 100px;
+            font-size: 14px;
+        }
+
+        .data-value {
+            color: #1f2937;
+            font-size: 14px;
+            flex: 1;
         }
 
         .rut-display {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .footer {
-            padding: 20px;
+            background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 30px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
         }
 
         .error-msg {
@@ -374,15 +390,41 @@
             margin-bottom: 15px;
             font-size: 13px;
             color: #6b7280;
+            text-align: center;
         }
 
-        .tip-box {
+        /* Ingreso Manual */
+        #rutManualSection {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .manual-alert {
             background: #fef3c7;
-            padding: 12px;
+            padding: 15px;
             border-radius: 10px;
             margin-bottom: 15px;
-            font-size: 12px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .manual-alert strong {
             color: #92400e;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .manual-alert p {
+            color: #92400e;
+            font-size: 13px;
+        }
+
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 30px;
         }
     </style>
 </head>
@@ -418,15 +460,15 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 40px;">
-                <p style="color: #9ca3af;">Versión Pro 2.0</p>
-                <p style="margin-top: 5px; color: #9ca3af;">Desarrollado por Luis Monardes</p>
+                <p style="color: #9ca3af;">Versión Pro 3.0</p>
+                <p style="margin-top: 5px; color: #9ca3af;">Powered by JUNAEB API</p>
             </div>
         </div>
 
         <!-- PANTALLA PRINCIPAL DE LA APP -->
         <div class="app-screen" id="appScreen">
             <div class="content">
-                <div class="stats-bar" id="statsBar"></div>
+                <div class="stats-bar" id="statsBar">📊 Verificaciones hoy: 0</div>
 
                 <div class="instructions">
                     <div class="instructions-title">📸 Cómo tomar la foto:</div>
@@ -434,13 +476,8 @@
                     ✓ <strong>Buena iluminación</strong> (luz natural o LED)<br>
                     ✓ <strong>Enfocar solo el RUT</strong> (acercar celular)<br>
                     ✓ <strong>Foto horizontal</strong> y sin inclinación<br>
-                    ✓ <strong>Esperar que enfoque</strong> antes de capturar<br>
-                    ❌ NO usar flash (crea reflejos)
+                    ✓ <strong>Esperar que enfoque</strong> antes de capturar
                     </p>
-                </div>
-
-                <div class="tip-box">
-                    💡 <strong>Tip:</strong> Usa "Tomar Foto" para mejor calidad. Si no detecta, ingresa el RUT manualmente.
                 </div>
 
                 <div class="camera-section">
@@ -477,14 +514,10 @@
                     <div class="loading-text">Analizando imagen...</div>
                 </div>
 
-                <div id="rutManualSection" style="display: none; margin-top: 20px;">
-                    <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                        <p style="font-size: 14px; color: #92400e; margin-bottom: 10px;">
-                            <strong>⚠️ RUT no detectado automáticamente</strong>
-                        </p>
-                        <p style="font-size: 13px; color: #92400e;">
-                            Por favor, ingresa el RUT manualmente:
-                        </p>
+                <div id="rutManualSection">
+                    <div class="manual-alert">
+                        <strong>⚠️ RUT no detectado automáticamente</strong>
+                        <p>Por favor, ingresa el RUT manualmente:</p>
                     </div>
                     <div class="input-group">
                         <label class="input-label">RUT del Estudiante:</label>
@@ -504,14 +537,66 @@
                     </button>
                 </div>
 
+                <!-- RESULTADO COMPLETO -->
                 <div class="result" id="result">
-                    <div class="result-icon" id="resultIcon"></div>
-                    <div class="result-title" id="resultTitle"></div>
-                    <div class="rut-display" id="rutDisplay"></div>
-                    <div class="result-details" id="resultDetails"></div>
-                    <button class="btn btn-secondary" id="newScanBtn" style="margin-top: 20px;">
-                        🔄 Nueva Verificación
-                    </button>
+                    <div class="result-header" id="resultHeader">
+                        <div class="result-icon" id="resultIcon">✅</div>
+                        <div class="result-title" id="resultTitle">TNE VIGENTE</div>
+                        <div class="result-subtitle" id="resultSubtitle">El estudiante puede usar tarifa escolar</div>
+                    </div>
+                    
+                    <div class="result-body" id="resultBody">
+                        <div class="rut-display" id="rutDisplay">RUT: 12.345.678-9</div>
+                        
+                        <!-- Datos del Estudiante -->
+                        <div class="data-section" id="datosEstudiante">
+                            <div class="data-section-title">
+                                <span>👤</span> DATOS DEL ESTUDIANTE
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Nombre:</div>
+                                <div class="data-value" id="nombreCompleto">-</div>
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Nivel:</div>
+                                <div class="data-value" id="nivel">-</div>
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Curso:</div>
+                                <div class="data-value" id="curso">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Datos de la Institución -->
+                        <div class="data-section" id="datosInstitucion">
+                            <div class="data-section-title">
+                                <span>🏫</span> DATOS DE LA INSTITUCIÓN
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Nombre:</div>
+                                <div class="data-value" id="establecimiento">-</div>
+                            </div>
+                            <div class="data-row" id="regionRow" style="display: none;">
+                                <div class="data-label">Región:</div>
+                                <div class="data-value" id="region">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Estado TNE -->
+                        <div class="data-section" id="estadoTneSection">
+                            <div class="data-section-title">
+                                <span>📋</span> INFORMACIÓN TNE
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Estado:</div>
+                                <div class="data-value" id="estadoOficial">-</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary" id="newScanBtn" style="margin-top: 20px;">
+                            🔄 Nueva Verificación
+                        </button>
+                    </div>
                 </div>
 
                 <div class="error-msg" id="errorMsg"></div>
@@ -528,17 +613,24 @@
     <script>
         // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
-
+        
         // Variables globales
         let stream = null;
         let licenciaActual = null;
         let conductorNombre = null;
         let verificacionesHoy = 0;
+        let deviceId = localStorage.getItem('device_id') || generarDeviceId();
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
+
+        function generarDeviceId() {
+            const id = 'device_' + Math.random().toString(36).substr(2, 9) + Date.now();
+            localStorage.setItem('device_id', id);
+            return id;
+        }
 
         // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
@@ -672,7 +764,6 @@
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
-            // Escalar 2x para mejor lectura
             const scale = 2;
             tempCanvas.width = imgElement.width * scale;
             tempCanvas.height = imgElement.height * scale;
@@ -682,16 +773,11 @@
             const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
             const data = imageData.data;
             
-            // Convertir a escala de grises y aumentar contraste
             for (let i = 0; i < data.length; i += 4) {
                 const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                
-                // Aumentar contraste
                 const contrast = 1.5;
                 const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
                 let newValue = factor * (avg - 128) + 128;
-                
-                // Binarización
                 newValue = newValue > 128 ? 255 : 0;
                 
                 data[i] = newValue;
@@ -703,7 +789,7 @@
             return tempCanvas.toDataURL('image/png');
         }
 
-        // Procesar imagen con OCR mejorado
+        // Procesar imagen con OCR
         async function procesarImagen(imageUrl) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -713,15 +799,12 @@
             rutManualSection.style.display = 'none';
             
             try {
-                // Cargar imagen
                 const img = new Image();
                 img.src = imageUrl;
                 await new Promise(resolve => img.onload = resolve);
                 
-                // Preprocesar
                 const imagenProcesada = preprocesarImagen(img);
                 
-                // OCR mejorado
                 const worker = await Tesseract.createWorker('spa', 1, {
                     logger: m => console.log(m)
                 });
@@ -731,13 +814,11 @@
                     tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
                 });
                 
-                // Intento 1: Imagen procesada
                 let { data: { text } } = await worker.recognize(imagenProcesada);
                 console.log('OCR Procesada:', text);
                 
                 let rut = extraerRUT(text);
                 
-                // Intento 2: Imagen original
                 if (!rut) {
                     console.log('Reintentando con original...');
                     const resultado = await worker.recognize(imageUrl);
@@ -766,7 +847,7 @@
             }
         }
 
-        // Extraer RUT mejorado
+        // Extraer RUT
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
             console.log('Texto limpio:', texto);
@@ -794,15 +875,12 @@
                                 const rutFormateado = formatearRUT(rut, dv);
                                 console.log('✓ RUT válido:', rutFormateado);
                                 return rutFormateado;
-                            } else {
-                                console.log('✗ DV incorrecto:', rut + '-' + dv);
                             }
                         }
                     }
                 }
             }
             
-            // Búsqueda exhaustiva
             const numeros = texto.match(/\d{7,9}/g);
             if (numeros) {
                 console.log('Búsqueda exhaustiva:', numeros);
@@ -843,7 +921,7 @@
             return `${rutFormateado}-${dv}`;
         }
 
-        // Cámara web mejorada
+        // Cámara web
         async function abrirCamara() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
@@ -851,7 +929,6 @@
                         facingMode: 'environment',
                         width: { ideal: 3840, min: 1280 },
                         height: { ideal: 2160, min: 720 },
-                        focusMode: 'continuous'
                     } 
                 });
                 video.srcObject = stream;
@@ -877,16 +954,13 @@
         }
 
         function capturarFoto() {
-            // Usar resolución completa del video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
-            // Dibujar con mejor calidad
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(video, 0, 0);
             
-            // Convertir a blob con máxima calidad
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 imagePreview.src = url;
@@ -894,7 +968,7 @@
                 video.style.display = 'none';
                 cerrarCamara();
                 procesarImagen(url);
-            }, 'image/jpeg', 1.0); // Calidad 100%
+            }, 'image/jpeg', 1.0);
         }
 
         // Verificar TNE
@@ -920,14 +994,7 @@
                 
                 const data = await response.json();
                 
-                const verificacion = {
-                    vigente: data.vigente,
-                    razon: data.estado,
-                    mensaje: data.mensaje,
-                    detalles: data.detalles
-                };
-                
-                mostrarResultado(rut, verificacion);
+                mostrarResultado(rut, data);
                 
                 verificacionesHoy++;
                 localStorage.setItem('tne_count_' + new Date().toDateString(), verificacionesHoy);
@@ -942,24 +1009,71 @@
             }
         }
 
-        function mostrarResultado(rut, verificacion) {
-            result.style.display = 'block';
-            result.className = 'result';
+        function mostrarResultado(rut, data) {
+            const resultHeader = document.getElementById('resultHeader');
+            const resultBody = document.getElementById('resultBody');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultSubtitle = document.getElementById('resultSubtitle');
             
-            if (verificacion.vigente) {
-                result.classList.add('vigente');
-                document.getElementById('resultIcon').textContent = '✅';
+            // Resetear clases
+            resultHeader.className = 'result-header';
+            resultBody.className = 'result-body';
+            
+            // Configurar según estado
+            if (data.vigente) {
+                resultHeader.classList.add('vigente');
+                resultBody.classList.add('vigente');
+                resultIcon.textContent = '✅';
+                resultTitle.textContent = data.estado || 'TNE VIGENTE';
+                resultSubtitle.textContent = data.mensaje || 'El estudiante puede usar tarifa escolar';
             } else {
-                result.classList.add('warning');
-                document.getElementById('resultIcon').textContent = '⚠️';
+                resultHeader.classList.add('no-vigente');
+                resultBody.classList.add('no-vigente');
+                resultIcon.textContent = '⚠️';
+                resultTitle.textContent = data.estado || 'TNE NO VIGENTE';
+                resultSubtitle.textContent = data.mensaje || 'Verificar estado de la TNE';
             }
             
-            document.getElementById('resultTitle').textContent = verificacion.razon;
+            // RUT
             document.getElementById('rutDisplay').textContent = `RUT: ${rut}`;
-            document.getElementById('resultDetails').innerHTML = `
-                <strong>${verificacion.mensaje}</strong><br><br>
-                ${verificacion.detalles}
-            `;
+            
+            // Datos del estudiante
+            if (data.nombreCompleto) {
+                document.getElementById('nombreCompleto').textContent = data.nombreCompleto;
+                document.getElementById('nivel').textContent = data.nivel || '-';
+                document.getElementById('curso').textContent = data.curso || '-';
+                document.getElementById('datosEstudiante').style.display = 'block';
+            } else {
+                document.getElementById('datosEstudiante').style.display = 'none';
+            }
+            
+            // Datos de la institución
+            if (data.establecimiento) {
+                document.getElementById('establecimiento').textContent = data.establecimiento;
+                document.getElementById('datosInstitucion').style.display = 'block';
+                
+                // Región (extraer del detalles si existe)
+                if (data.detalles && data.detalles.includes('Región:')) {
+                    const regionMatch = data.detalles.match(/Región:\s*(.+)/);
+                    if (regionMatch) {
+                        document.getElementById('region').textContent = regionMatch[1].trim();
+                        document.getElementById('regionRow').style.display = 'flex';
+                    }
+                }
+            } else {
+                document.getElementById('datosInstitucion').style.display = 'none';
+            }
+            
+            // Estado oficial
+            if (data.estadoOficial) {
+                document.getElementById('estadoOficial').textContent = data.estadoOficial;
+                document.getElementById('estadoTneSection').style.display = 'block';
+            } else {
+                document.getElementById('estadoTneSection').style.display = 'none';
+            }
+            
+            result.style.display = 'block';
         }
 
         function mostrarError(mensaje) {
@@ -971,8 +1085,8 @@
         }
 
         // Event Listeners
-        galleryBtn.addEventListener('click', () => fileInput.click()); // Botón principal
-        cameraBtn.addEventListener('click', abrirCamara); // Botón secundario
+        galleryBtn.addEventListener('click', () => fileInput.click());
+        cameraBtn.addEventListener('click', abrirCamara);
         captureBtn.addEventListener('click', capturarFoto);
         cancelBtn.addEventListener('click', cerrarCamara);
         
