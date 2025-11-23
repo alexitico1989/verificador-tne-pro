@@ -792,6 +792,48 @@
         let verificacionesHoy = 0;
         let rutManualValue = '';
         let capturando = false;
+        let deviceId = null;
+        let consultasRestantes = null;
+
+        // ====================================
+        // GENERAR DEVICE ID ÚNICO
+        // ====================================
+        function getDeviceId() {
+            let id = localStorage.getItem('tne_device_id');
+            if (!id) {
+                const nav = navigator;
+                const screen = window.screen;
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillText('TNE', 2, 2);
+                
+                const fingerprint = [
+                    nav.userAgent,
+                    nav.language,
+                    screen.width + 'x' + screen.height,
+                    screen.colorDepth,
+                    new Date().getTimezoneOffset(),
+                    canvas.toDataURL()
+                ].join('|');
+                
+                let hash = 0;
+                for (let i = 0; i < fingerprint.length; i++) {
+                    const char = fingerprint.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                
+                id = 'DEV-' + Math.abs(hash).toString(36) + '-' + Date.now().toString(36);
+                localStorage.setItem('tne_device_id', id);
+                console.log('[DEVICE] Nuevo ID generado:', id);
+            }
+            return id;
+        }
+
+        deviceId = getDeviceId();
+        console.log('[DEVICE] ID actual:', deviceId);
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
@@ -870,7 +912,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         accion: 'validar_licencia',
-                        licencia: codigo
+                        licencia: codigo,
+                        deviceId: deviceId
                     })
                 });
 
@@ -879,6 +922,7 @@
                 if (data.valida) {
                     licenciaActual = codigo;
                     conductorNombre = data.nombre;
+                    consultasRestantes = data.consultasRestantes;
                     localStorage.setItem('tne_license', codigo);
                     mostrarApp();
                 } else {
@@ -917,7 +961,11 @@
 
         function actualizarStats() {
             const hoy = new Date().toLocaleDateString('es-CL');
-            statsBar.textContent = `📊 Verificaciones: ${verificacionesHoy} | 📅 ${hoy}`;
+            let texto = `📊 Verificaciones: ${verificacionesHoy} | 📅 ${hoy}`;
+            if (consultasRestantes !== null) {
+                texto += ` | 🔢 Quedan: ${consultasRestantes}`;
+            }
+            statsBar.textContent = texto;
         }
 
         logoutBtn.addEventListener('click', () => {
@@ -1387,11 +1435,18 @@
                     body: JSON.stringify({
                         accion: 'verificar_tne',
                         licencia: licenciaActual,
+                        deviceId: deviceId,
                         rut: rut
                     })
                 });
                 
                 const data = await response.json();
+                
+                // Actualizar consultas restantes
+                if (data.consultasRestantes !== undefined) {
+                    consultasRestantes = data.consultasRestantes;
+                }
+                
                 mostrarResultado(rut, data);
                 
                 verificacionesHoy++;
