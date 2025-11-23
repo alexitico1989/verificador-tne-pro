@@ -3,31 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a56db">
     <title>Verificador TNE Pro</title>
-    <link rel="manifest" href="manifest.json">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #1a56db;
             min-height: 100vh;
             overflow-x: hidden;
         }
-
-        .container {
-            background: white;
-            min-height: 100vh;
-        }
-
+        .container { background: white; min-height: 100vh; }
         .header {
             background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
             color: white;
@@ -35,18 +23,8 @@
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
-        .header h1 {
-            font-size: 22px;
-            margin-bottom: 3px;
-            font-weight: 700;
-        }
-
-        .header p {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
+        .header h1 { font-size: 22px; margin-bottom: 3px; font-weight: 700; }
+        .header p { font-size: 12px; opacity: 0.9; }
         .license-badge {
             background: rgba(255,255,255,0.2);
             padding: 6px 12px;
@@ -55,53 +33,16 @@
             margin-top: 8px;
             display: inline-block;
         }
+        .content { padding: 15px; }
 
-        .content {
-            padding: 15px;
-        }
-
-        /* Pantalla de Login */
-        .login-screen {
-            display: block;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .login-screen.hidden {
-            display: none;
-        }
-
-        .login-icon {
-            font-size: 70px;
-            margin-bottom: 15px;
-        }
-
-        .login-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 25px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-label {
-            display: block;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
-
+        /* Login */
+        .login-screen { display: block; padding: 40px 20px; text-align: center; }
+        .login-screen.hidden { display: none; }
+        .login-icon { font-size: 70px; margin-bottom: 15px; }
+        .login-title { font-size: 22px; font-weight: 700; color: #1e40af; margin-bottom: 8px; }
+        .login-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 25px; }
+        .input-group { margin-bottom: 15px; }
+        .input-label { display: block; text-align: left; font-weight: 600; color: #374151; margin-bottom: 6px; font-size: 13px; }
         .input-field {
             width: 100%;
             padding: 14px;
@@ -113,22 +54,13 @@
             font-weight: 600;
             text-transform: uppercase;
         }
+        .input-field:focus { outline: none; border-color: #1a56db; }
 
-        .input-field:focus {
-            outline: none;
-            border-color: #1a56db;
-        }
+        /* App */
+        .app-screen { display: none; }
+        .app-screen.active { display: block; }
 
-        /* App Principal */
-        .app-screen {
-            display: none;
-        }
-
-        .app-screen.active {
-            display: block;
-        }
-
-        /* Barra de consultas */
+        /* Quota */
         .quota-bar {
             background: #eff6ff;
             padding: 10px 12px;
@@ -136,50 +68,23 @@
             margin-bottom: 12px;
             border: 1px solid #1a56db;
         }
+        .quota-text { font-size: 12px; color: #1e40af; font-weight: 600; margin-bottom: 4px; }
+        .quota-progress { background: #e5e7eb; height: 6px; border-radius: 10px; overflow: hidden; }
+        .quota-progress-fill { background: linear-gradient(90deg, #10b981, #1a56db); height: 100%; transition: width 0.3s ease; }
+        .quota-progress-fill.warning { background: linear-gradient(90deg, #f59e0b, #ef4444); }
 
-        .quota-text {
-            font-size: 12px;
-            color: #1e40af;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .quota-progress {
-            background: #e5e7eb;
-            height: 6px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .quota-progress-fill {
-            background: linear-gradient(90deg, #10b981, #1a56db);
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        .quota-progress-fill.warning {
-            background: linear-gradient(90deg, #f59e0b, #ef4444);
-        }
-
-        /* Cámara */
+        /* Camera */
         .camera-container {
             position: relative;
             width: 100%;
-            height: 280px;
+            height: 250px;
             background: #000;
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 12px;
             border: 3px solid #1a56db;
         }
-
-        #videoPreview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
+        #videoPreview { width: 100%; height: 100%; object-fit: cover; display: none; }
         .camera-placeholder {
             width: 100%;
             height: 100%;
@@ -190,93 +95,69 @@
             color: #6b7280;
             background: #f3f4f6;
         }
+        .camera-placeholder.hidden { display: none; }
+        .camera-placeholder-icon { font-size: 50px; margin-bottom: 10px; }
+        .camera-placeholder-text { font-size: 14px; }
 
-        .camera-placeholder.hidden {
-            display: none;
-        }
-
-        .camera-placeholder-icon {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-
-        .camera-placeholder-text {
-            font-size: 14px;
-        }
-
-        /* Guía de enfoque */
+        /* Focus Guide */
         .focus-guide {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 85%;
-            height: 60px;
+            height: 55px;
             border: 3px dashed #10b981;
             border-radius: 8px;
             pointer-events: none;
             display: none;
         }
-
-        .focus-guide.active {
-            display: block;
-            animation: pulse 1.5s infinite;
-        }
-
+        .focus-guide.active { display: block; animation: pulse 1.5s infinite; }
         @keyframes pulse {
             0%, 100% { border-color: #10b981; opacity: 1; }
             50% { border-color: #1a56db; opacity: 0.7; }
         }
-
         .focus-guide-text {
             position: absolute;
-            bottom: -25px;
+            bottom: -22px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.7);
             color: white;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 5px;
-            font-size: 11px;
+            font-size: 10px;
             white-space: nowrap;
         }
 
-        /* Estado de escaneo */
         .scan-status {
             position: absolute;
-            top: 10px;
+            top: 8px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.7);
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 11px;
             display: none;
         }
+        .scan-status.active { display: block; }
+        .scan-status.found { background: #10b981; }
 
-        .scan-status.active {
-            display: block;
-        }
+        canvas { display: none; }
 
-        .scan-status.found {
-            background: #10b981;
-        }
-
-        canvas {
-            display: none;
-        }
-
+        /* Buttons */
         .btn {
             background: #1a56db;
             color: white;
             border: none;
-            padding: 16px;
-            font-size: 16px;
+            padding: 15px;
+            font-size: 15px;
             border-radius: 12px;
             cursor: pointer;
             width: 100%;
-            margin: 6px 0;
+            margin: 5px 0;
             font-weight: 600;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
@@ -284,138 +165,46 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-decoration: none;
         }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+        .btn-capture { background: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .btn-cancel { background: #ef4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .btn-logout { background: #6b7280; box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2); font-size: 13px; padding: 12px; }
+        .btn-junaeb { background: #7c3aed; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); font-size: 16px; padding: 18px; }
+        .btn-icon { font-size: 18px; }
+        .btn-row { display: flex; gap: 10px; }
+        .btn-row .btn { flex: 1; }
 
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .btn-capture {
-            background: #10b981;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-cancel {
-            background: #ef4444;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-logout {
-            background: #6b7280;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2);
-            font-size: 13px;
-            padding: 12px;
-        }
-
-        .btn-icon {
-            font-size: 20px;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-row .btn {
-            flex: 1;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 30px 20px;
-            display: none;
-        }
-
-        .spinner {
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid #1a56db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 15px;
-            color: #374151;
-            font-weight: 500;
-        }
-
+        /* Result */
         .result {
             display: none;
-            padding: 25px 15px;
+            padding: 20px 15px;
             border-radius: 15px;
-            margin-top: 15px;
+            margin-top: 12px;
             text-align: center;
             animation: slideUp 0.4s ease;
         }
-
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .result.vigente {
-            background: #d1fae5;
-            border: 3px solid #10b981;
-        }
-
-        .result.no-vigente {
-            background: #fee2e2;
-            border: 3px solid #ef4444;
-        }
-
-        .result.warning {
-            background: #fef3c7;
-            border: 3px solid #f59e0b;
-        }
-
-        .result-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
-
-        .result-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .result.vigente .result-title { color: #065f46; }
-        .result.no-vigente .result-title { color: #991b1b; }
-        .result.warning .result-title { color: #92400e; }
-
-        .result-details {
-            font-size: 14px;
-            margin-top: 10px;
-            line-height: 1.5;
-        }
-
-        .result.vigente .result-details { color: #047857; }
-        .result.no-vigente .result-details { color: #b91c1c; }
-        .result.warning .result-details { color: #b45309; }
-
+        .result.detected { background: #eff6ff; border: 3px solid #1a56db; }
+        .result-icon { font-size: 50px; margin-bottom: 10px; }
+        .result-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #1e40af; }
         .rut-display {
             background: white;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
             margin: 12px 0;
-            font-size: 17px;
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            color: #1e40af;
+            border: 2px solid #1a56db;
         }
+        .result-info { font-size: 13px; color: #6b7280; margin-bottom: 15px; line-height: 1.5; }
 
         .footer {
             padding: 15px;
@@ -437,27 +226,18 @@
             font-size: 13px;
         }
 
-        /* RUT Manual */
+        /* Manual */
         .manual-section {
             background: #fef3c7;
             padding: 15px;
             border-radius: 12px;
-            margin-top: 15px;
+            margin-top: 12px;
             display: none;
         }
+        .manual-section.visible { display: block; }
+        .manual-title { font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 10px; }
 
-        .manual-section.visible {
-            display: block;
-        }
-
-        .manual-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #92400e;
-            margin-bottom: 10px;
-        }
-
-        /* Session alert */
+        /* Session Alert */
         .session-alert {
             display: none;
             background: #fef2f2;
@@ -467,80 +247,73 @@
             text-align: center;
             margin: 20px;
         }
-
-        .session-alert.visible {
-            display: block;
-        }
-
-        .session-alert h3 {
-            color: #991b1b;
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .session-alert p {
-            color: #b91c1c;
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
+        .session-alert.visible { display: block; }
+        .session-alert h3 { color: #991b1b; font-size: 16px; margin-bottom: 8px; }
+        .session-alert p { color: #b91c1c; font-size: 13px; margin-bottom: 12px; }
 
         .hidden { display: none !important; }
+        .loading { text-align: center; padding: 20px; display: none; }
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #1a56db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { font-size: 14px; color: #374151; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎓 Verificador TNE Pro</h1>
-            <p id="headerSubtitle">Sistema profesional de verificación</p>
+            <p id="headerSubtitle">Escaneo automático de RUT</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
 
-        <!-- ALERTA DE SESIÓN -->
+        <!-- Session Alert -->
         <div class="session-alert" id="sessionAlert">
             <h3>⚠️ Sesión No Disponible</h3>
-            <p id="sessionAlertMsg">Esta licencia ya está en uso en otro dispositivo.</p>
+            <p id="sessionAlertMsg">Esta licencia ya está en uso.</p>
             <button class="btn btn-cancel" id="sessionAlertBtn">Reintentar</button>
         </div>
 
-        <!-- PANTALLA DE LOGIN -->
+        <!-- Login -->
         <div class="login-screen" id="loginScreen">
             <div class="login-icon">🔐</div>
             <div class="login-title">Acceso Restringido</div>
             <div class="login-subtitle">Ingresa tu código de licencia</div>
-
             <div class="input-group">
                 <label class="input-label">Código de Licencia:</label>
                 <input type="text" id="licenseInput" class="input-field" placeholder="TNE-XXXX-XXXX" maxlength="20">
             </div>
-
-            <button class="btn" id="loginBtn">
-                <span class="btn-icon">✓</span> Validar Licencia
-            </button>
-
+            <button class="btn" id="loginBtn"><span class="btn-icon">✓</span> Validar</button>
             <div class="error-msg" id="loginError"></div>
-
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">Versión Pro 3.0</p>
+                <p style="color: #9ca3af;">Versión Pro 3.5 Final</p>
             </div>
         </div>
 
-        <!-- PANTALLA PRINCIPAL -->
+        <!-- App -->
         <div class="app-screen" id="appScreen">
             <div class="content">
                 
-                <!-- Barra de consultas -->
+                <!-- Quota -->
                 <div class="quota-bar" id="quotaBar">
-                    <div class="quota-text" id="quotaText">Consultas: -- / --</div>
+                    <div class="quota-text" id="quotaText">Escaneos: -- / --</div>
                     <div class="quota-progress">
                         <div class="quota-progress-fill" id="quotaFill" style="width: 100%"></div>
                     </div>
                 </div>
 
-                <!-- Contenedor de cámara -->
+                <!-- Camera -->
                 <div class="camera-container" id="cameraContainer">
                     <div class="camera-placeholder" id="cameraPlaceholder">
                         <div class="camera-placeholder-icon">📷</div>
-                        <div class="camera-placeholder-text">Toca para abrir cámara</div>
+                        <div class="camera-placeholder-text">Toca para escanear TNE</div>
                     </div>
                     <video id="videoPreview" autoplay playsinline></video>
                     <div class="focus-guide" id="focusGuide">
@@ -551,10 +324,10 @@
 
                 <canvas id="canvas"></canvas>
 
-                <!-- Botones -->
+                <!-- Buttons -->
                 <div id="initialButtons">
                     <button class="btn btn-capture" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Abrir Cámara
+                        <span class="btn-icon">📷</span> Escanear TNE
                     </button>
                     <button class="btn btn-logout" id="logoutBtn">
                         <span class="btn-icon">🚪</span> Cerrar Sesión
@@ -572,34 +345,40 @@
                     </div>
                 </div>
 
-                <!-- Cargando -->
+                <!-- Loading -->
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Verificando TNE...</div>
+                    <div class="loading-text">Escaneando...</div>
                 </div>
 
-                <!-- RUT Manual -->
+                <!-- Result -->
+                <div class="result detected" id="result">
+                    <div class="result-icon">🎯</div>
+                    <div class="result-title">RUT Detectado</div>
+                    <div class="rut-display" id="rutDisplay">00.000.000-0</div>
+                    <div class="result-info">
+                        ✓ RUT escaneado correctamente<br>
+                        Toca el botón para verificar vigencia en JUNAEB:
+                    </div>
+                    <a class="btn btn-junaeb" id="btnVerificarJunaeb" href="#" target="_blank">
+                        <span class="btn-icon">🔍</span> Verificar en JUNAEB
+                    </a>
+                    <button class="btn" id="newScanBtn" style="margin-top: 8px;">
+                        🔄 Nuevo Escaneo
+                    </button>
+                </div>
+
+                <!-- Manual -->
                 <div class="manual-section" id="manualSection">
-                    <div class="manual-title">⌨️ Ingresa el RUT manualmente:</div>
+                    <div class="manual-title">⌨️ Ingresa el RUT:</div>
                     <div class="input-group" style="margin-bottom: 10px;">
                         <input type="text" id="rutManualInput" class="input-field" placeholder="12345678-9" maxlength="12">
                     </div>
                     <button class="btn btn-capture" id="verificarManualBtn">
-                        <span class="btn-icon">✓</span> Verificar
+                        <span class="btn-icon">✓</span> Buscar
                     </button>
                     <button class="btn btn-cancel" id="cancelManualBtn" style="margin-top: 5px;">
-                        <span class="btn-icon">↩️</span> Volver a Cámara
-                    </button>
-                </div>
-
-                <!-- Resultado -->
-                <div class="result" id="result">
-                    <div class="result-icon" id="resultIcon"></div>
-                    <div class="result-title" id="resultTitle"></div>
-                    <div class="rut-display" id="rutDisplay"></div>
-                    <div class="result-details" id="resultDetails"></div>
-                    <button class="btn" id="newScanBtn" style="margin-top: 15px;">
-                        🔄 Nueva Verificación
+                        <span class="btn-icon">↩️</span> Volver
                     </button>
                 </div>
 
@@ -607,7 +386,7 @@
             </div>
 
             <div class="footer">
-                <p>🚌 Sistema profesional para conductores</p>
+                <p>🚌 Sistema para conductores</p>
                 <p style="margin-top: 3px;" id="deviceIdDisplay"></p>
             </div>
         </div>
@@ -615,293 +394,188 @@
 
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
-        // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
-        const SCAN_INTERVAL = 1500; // Escanear cada 1.5 segundos
+        const SCAN_INTERVAL = 1200;
 
-        // Variables globales
         let stream = null;
         let licenciaActual = null;
         let conductorNombre = null;
         let deviceId = null;
         let consultasMaximas = 200;
-        let consultasRestantes = 200;
         let scanInterval = null;
         let isScanning = false;
         let tesseractWorker = null;
+        let escaneosDiarios = 0;
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
-        // Elementos del DOM
-        const loginScreen = document.getElementById('loginScreen');
-        const appScreen = document.getElementById('appScreen');
-        const licenseInput = document.getElementById('licenseInput');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginError = document.getElementById('loginError');
-        const licenseBadge = document.getElementById('licenseBadge');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const sessionAlert = document.getElementById('sessionAlert');
-        const sessionAlertMsg = document.getElementById('sessionAlertMsg');
-        const sessionAlertBtn = document.getElementById('sessionAlertBtn');
-        const quotaText = document.getElementById('quotaText');
-        const quotaFill = document.getElementById('quotaFill');
-
-        const cameraContainer = document.getElementById('cameraContainer');
-        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
-        const cameraBtn = document.getElementById('cameraBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const manualBtn = document.getElementById('manualBtn');
-        const loading = document.getElementById('loading');
-        const result = document.getElementById('result');
-        const errorMsg = document.getElementById('errorMsg');
-        const newScanBtn = document.getElementById('newScanBtn');
-        const initialButtons = document.getElementById('initialButtons');
-        const cameraButtons = document.getElementById('cameraButtons');
-        const focusGuide = document.getElementById('focusGuide');
-        const scanStatus = document.getElementById('scanStatus');
-        const manualSection = document.getElementById('manualSection');
-        const rutManualInput = document.getElementById('rutManualInput');
-        const verificarManualBtn = document.getElementById('verificarManualBtn');
-        const cancelManualBtn = document.getElementById('cancelManualBtn');
-
-        // ============================================
-        // DEVICE ID
-        // ============================================
+        // Device ID
         function getDeviceId() {
             let id = localStorage.getItem('tne_device_id');
             if (!id) {
-                const nav = window.navigator;
-                const screen = window.screen;
-                const data = [
-                    nav.userAgent, nav.language, screen.width, screen.height,
-                    screen.colorDepth, new Date().getTime(), Math.random().toString(36)
-                ].join('|');
-                
+                const data = [navigator.userAgent, navigator.language, screen.width, screen.height, Date.now(), Math.random()].join('|');
                 let hash = 0;
                 for (let i = 0; i < data.length; i++) {
-                    const char = data.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
+                    hash = ((hash << 5) - hash) + data.charCodeAt(i);
                     hash = hash & hash;
                 }
-                
                 id = 'DEV-' + Math.abs(hash).toString(36).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
                 localStorage.setItem('tne_device_id', id);
             }
             return id;
         }
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
+        // Init
         window.addEventListener('load', async () => {
             deviceId = getDeviceId();
             document.getElementById('deviceIdDisplay').textContent = `ID: ${deviceId.substring(0, 15)}...`;
             
             const savedLicense = localStorage.getItem('tne_license');
-            if (savedLicense) {
-                validarLicencia(savedLicense, true);
-            }
-
-            // Pre-cargar Tesseract
+            if (savedLicense) validarLicencia(savedLicense, true);
+            
+            const today = new Date().toDateString();
+            escaneosDiarios = parseInt(localStorage.getItem('tne_scans_' + today) || '0');
+            
             initTesseract();
         });
 
         async function initTesseract() {
             try {
                 tesseractWorker = await Tesseract.createWorker('spa');
-                await tesseractWorker.setParameters({
-                    tessedit_char_whitelist: '0123456789K-.',
-                });
+                await tesseractWorker.setParameters({ tessedit_char_whitelist: '0123456789K-.' });
                 console.log('Tesseract listo');
             } catch (e) {
-                console.log('Error inicializando Tesseract:', e);
+                console.log('Error Tesseract:', e);
             }
         }
 
-        // ============================================
-        // LOGIN
-        // ============================================
-        loginBtn.addEventListener('click', () => {
-            const licencia = licenseInput.value.trim().toUpperCase();
-            if (!licencia) {
-                mostrarErrorLogin('Ingresa un código de licencia');
-                return;
-            }
+        // Login
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const licencia = document.getElementById('licenseInput').value.trim().toUpperCase();
+            if (!licencia) { mostrarErrorLogin('Ingresa un código'); return; }
             validarLicencia(licencia, false);
         });
 
-        licenseInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loginBtn.click();
-        });
+        document.getElementById('licenseInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
 
         async function validarLicencia(codigo, autoLogin) {
-            if (!autoLogin) {
-                loginBtn.disabled = true;
-                loginBtn.textContent = 'Validando...';
-            }
+            const loginBtn = document.getElementById('loginBtn');
+            if (!autoLogin) { loginBtn.disabled = true; loginBtn.textContent = 'Validando...'; }
 
             try {
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        accion: 'validar_licencia',
-                        licencia: codigo,
-                        deviceId: deviceId,
-                        userAgent: navigator.userAgent
-                    })
+                    body: JSON.stringify({ accion: 'validar_licencia', licencia: codigo, deviceId, userAgent: navigator.userAgent })
                 });
-
                 const data = await response.json();
 
                 if (data.valida) {
                     licenciaActual = codigo;
                     conductorNombre = data.nombre;
-                    consultasMaximas = data.consultasMaximas;
-                    consultasRestantes = data.consultasRestantes;
-                    
+                    consultasMaximas = data.consultasMaximas || 200;
                     localStorage.setItem('tne_license', codigo);
                     mostrarApp(data);
                 } else {
                     if (!autoLogin) {
-                        if (data.maxMaquinas) {
-                            mostrarErrorLogin(`${data.mensaje}`);
-                        } else {
-                            mostrarErrorLogin(data.mensaje || 'Licencia inválida');
-                        }
-                        licenseInput.value = '';
+                        mostrarErrorLogin(data.mensaje || 'Licencia inválida');
+                        document.getElementById('licenseInput').value = '';
                     } else {
                         localStorage.removeItem('tne_license');
                     }
                 }
             } catch (error) {
-                if (!autoLogin) {
-                    mostrarErrorLogin('Error de conexión');
-                }
+                if (!autoLogin) mostrarErrorLogin('Error de conexión');
             } finally {
                 if (!autoLogin) {
                     loginBtn.disabled = false;
-                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Validar Licencia';
+                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Validar';
                 }
             }
         }
 
-        function mostrarErrorLogin(mensaje) {
-            loginError.textContent = mensaje;
+        function mostrarErrorLogin(msg) {
+            const loginError = document.getElementById('loginError');
+            loginError.textContent = msg;
             loginError.style.display = 'block';
             setTimeout(() => { loginError.style.display = 'none'; }, 5000);
         }
 
         function mostrarApp(data) {
-            loginScreen.classList.add('hidden');
-            appScreen.classList.add('active');
-            licenseBadge.textContent = `👤 ${conductorNombre}`;
-            licenseBadge.style.display = 'inline-block';
-            actualizarQuota(data.consultasHoy || 0, data.consultasMaximas);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('active');
+            document.getElementById('licenseBadge').textContent = `👤 ${conductorNombre}`;
+            document.getElementById('licenseBadge').style.display = 'inline-block';
+            actualizarQuota();
         }
 
-        function actualizarQuota(usadas, maximas) {
-            consultasRestantes = maximas - usadas;
-            const porcentaje = (consultasRestantes / maximas) * 100;
-            
-            quotaText.textContent = `Consultas restantes: ${consultasRestantes} / ${maximas}`;
-            quotaFill.style.width = porcentaje + '%';
-            
-            if (porcentaje < 20) {
-                quotaFill.classList.add('warning');
-            } else {
-                quotaFill.classList.remove('warning');
-            }
+        function actualizarQuota() {
+            const max = consultasMaximas;
+            const restante = max - escaneosDiarios;
+            const pct = (restante / max) * 100;
+            document.getElementById('quotaText').textContent = `Escaneos restantes: ${restante} / ${max}`;
+            document.getElementById('quotaFill').style.width = pct + '%';
+            if (pct < 20) document.getElementById('quotaFill').classList.add('warning');
         }
 
-        // ============================================
-        // SESIÓN
-        // ============================================
-        function mostrarAlertaSesion(mensaje) {
-            sessionAlertMsg.textContent = mensaje;
-            sessionAlert.classList.add('visible');
-            appScreen.classList.remove('active');
-            loginScreen.classList.add('hidden');
+        function incrementarEscaneos() {
+            escaneosDiarios++;
+            const today = new Date().toDateString();
+            localStorage.setItem('tne_scans_' + today, escaneosDiarios.toString());
+            actualizarQuota();
         }
 
-        sessionAlertBtn.addEventListener('click', () => {
-            sessionAlert.classList.remove('visible');
+        // Session
+        function mostrarAlertaSesion(msg) {
+            document.getElementById('sessionAlertMsg').textContent = msg;
+            document.getElementById('sessionAlert').classList.add('visible');
+            document.getElementById('appScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.add('hidden');
+        }
+
+        document.getElementById('sessionAlertBtn').addEventListener('click', () => {
+            document.getElementById('sessionAlert').classList.remove('visible');
             localStorage.removeItem('tne_license');
             location.reload();
         });
 
-        logoutBtn.addEventListener('click', async () => {
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
             if (confirm('¿Cerrar sesión?')) {
                 detenerEscaneo();
                 try {
                     await fetch(WORKER_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            accion: 'cerrar_sesion',
-                            licencia: licenciaActual,
-                            deviceId: deviceId
-                        })
+                        body: JSON.stringify({ accion: 'cerrar_sesion', licencia: licenciaActual, deviceId })
                     });
                 } catch (e) {}
-                
                 localStorage.removeItem('tne_license');
                 location.reload();
             }
         });
 
-        // ============================================
-        // CÁMARA CON ESCANEO AUTOMÁTICO
-        // ============================================
-        
-        // Click en contenedor o botón para abrir cámara
-        cameraContainer.addEventListener('click', () => {
-            if (!stream) {
-                abrirCamara();
-            } else {
-                // Click para enfocar (algunos dispositivos)
-                if (stream.getVideoTracks()[0].getCapabilities) {
-                    const track = stream.getVideoTracks()[0];
-                    if (track.getCapabilities().focusMode) {
-                        track.applyConstraints({ advanced: [{ focusMode: 'manual' }] })
-                            .then(() => track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }))
-                            .catch(() => {});
-                    }
-                }
-            }
-        });
-
-        cameraBtn.addEventListener('click', abrirCamara);
+        // Camera
+        document.getElementById('cameraContainer').addEventListener('click', () => { if (!stream) abrirCamara(); });
+        document.getElementById('cameraBtn').addEventListener('click', abrirCamara);
 
         async function abrirCamara() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 },
-                        focusMode: 'continuous'
-                    } 
+                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } 
                 });
-                
                 video.srcObject = stream;
                 video.style.display = 'block';
-                cameraPlaceholder.classList.add('hidden');
-                initialButtons.classList.add('hidden');
-                cameraButtons.classList.remove('hidden');
-                focusGuide.classList.add('active');
-                scanStatus.classList.add('active');
-                result.style.display = 'none';
-                errorMsg.style.display = 'none';
-                manualSection.classList.remove('visible');
-
-                // Iniciar escaneo automático
-                video.onloadedmetadata = () => {
-                    iniciarEscaneo();
-                };
-
+                document.getElementById('cameraPlaceholder').classList.add('hidden');
+                document.getElementById('initialButtons').classList.add('hidden');
+                document.getElementById('cameraButtons').classList.remove('hidden');
+                document.getElementById('focusGuide').classList.add('active');
+                document.getElementById('scanStatus').classList.add('active');
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('errorMsg').style.display = 'none';
+                document.getElementById('manualSection').classList.remove('visible');
+                video.onloadedmetadata = () => { iniciarEscaneo(); };
             } catch (err) {
                 mostrarError('No se pudo acceder a la cámara');
             }
@@ -909,93 +583,61 @@
 
         function cerrarCamara() {
             detenerEscaneo();
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
             video.style.display = 'none';
-            cameraPlaceholder.classList.remove('hidden');
-            focusGuide.classList.remove('active');
+            document.getElementById('cameraPlaceholder').classList.remove('hidden');
+            document.getElementById('focusGuide').classList.remove('active');
+            const scanStatus = document.getElementById('scanStatus');
             scanStatus.classList.remove('active');
             scanStatus.classList.remove('found');
             scanStatus.textContent = '🔍 Buscando RUT...';
-            initialButtons.classList.remove('hidden');
-            cameraButtons.classList.add('hidden');
+            document.getElementById('initialButtons').classList.remove('hidden');
+            document.getElementById('cameraButtons').classList.add('hidden');
         }
 
-        cancelBtn.addEventListener('click', cerrarCamara);
+        document.getElementById('cancelBtn').addEventListener('click', cerrarCamara);
 
-        // ============================================
-        // ESCANEO AUTOMÁTICO
-        // ============================================
+        // Scanning
         function iniciarEscaneo() {
             if (scanInterval) return;
-            
             isScanning = true;
-            scanInterval = setInterval(async () => {
-                if (!isScanning || !stream) return;
-                
-                await escanearFrame();
-            }, SCAN_INTERVAL);
-            
-            // Primer escaneo inmediato
+            scanInterval = setInterval(async () => { if (isScanning && stream) await escanearFrame(); }, SCAN_INTERVAL);
             setTimeout(escanearFrame, 500);
         }
 
         function detenerEscaneo() {
             isScanning = false;
-            if (scanInterval) {
-                clearInterval(scanInterval);
-                scanInterval = null;
-            }
+            if (scanInterval) { clearInterval(scanInterval); scanInterval = null; }
         }
 
         async function escanearFrame() {
             if (!stream || !tesseractWorker) return;
-            
             try {
-                // Capturar frame
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 ctx.drawImage(video, 0, 0);
-                
-                // Obtener imagen
                 const imageData = canvas.toDataURL('image/jpeg', 0.8);
-                
-                // OCR
                 const { data: { text } } = await tesseractWorker.recognize(imageData);
                 console.log('OCR:', text);
-                
-                // Buscar RUT
                 const rut = extraerRUT(text);
-                
                 if (rut) {
-                    // ¡RUT encontrado!
+                    const scanStatus = document.getElementById('scanStatus');
                     scanStatus.textContent = '✅ RUT detectado!';
                     scanStatus.classList.add('found');
-                    
                     detenerEscaneo();
                     cerrarCamara();
-                    
-                    // Verificar automáticamente
-                    await verificarTNE(rut);
+                    mostrarResultado(rut);
+                    incrementarEscaneos();
                 }
-            } catch (e) {
-                console.log('Error escaneo:', e);
-            }
+            } catch (e) { console.log('Error escaneo:', e); }
         }
 
-        // ============================================
-        // EXTRAER RUT
-        // ============================================
         function extraerRUT(texto) {
             texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
-            
             const patrones = [
                 /(\d{1,2}\.\d{3}\.\d{3}[-\s]?[0-9K])/g,
                 /(\d{7,8}[-\s][0-9K])/g,
                 /(\d{7,8}[0-9K])/g,
-                /(\d{1,2}\s?\d{3}\s?\d{3}\s?[-]?\s?[0-9K])/g,
             ];
             
             for (const patron of patrones) {
@@ -1003,11 +645,9 @@
                 if (matches) {
                     for (const match of matches) {
                         const rutLimpio = match.replace(/[.\-\s]/g, '');
-                        
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
-                            
                             if (validarRUT(rut, dv)) {
                                 return formatearRUT(rut, dv);
                             }
@@ -1016,21 +656,30 @@
                 }
             }
             
+            const numeros = texto.match(/\d{7,9}/g);
+            if (numeros) {
+                for (const num of numeros) {
+                    if (num.length >= 8) {
+                        const rut = num.slice(0, -1);
+                        const dv = num.slice(-1);
+                        if (validarRUT(rut, dv)) {
+                            return formatearRUT(rut, dv);
+                        }
+                    }
+                }
+            }
             return null;
         }
 
         function validarRUT(rut, dv) {
             let suma = 0;
             let multiplicador = 2;
-            
             for (let i = rut.length - 1; i >= 0; i--) {
                 suma += parseInt(rut[i]) * multiplicador;
                 multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
             }
-            
             const dvCalculado = 11 - (suma % 11);
             const dvFinal = dvCalculado === 11 ? '0' : dvCalculado === 10 ? 'K' : dvCalculado.toString();
-            
             return dv === dvFinal;
         }
 
@@ -1039,146 +688,72 @@
             return `${rutFormateado}-${dv}`;
         }
 
-        // ============================================
-        // VERIFICAR TNE
-        // ============================================
-        async function verificarTNE(rut) {
-            loading.style.display = 'block';
-            result.style.display = 'none';
-            manualSection.classList.remove('visible');
-            initialButtons.classList.add('hidden');
-            cameraButtons.classList.add('hidden');
+        function mostrarResultado(rut) {
+            document.getElementById('rutDisplay').textContent = rut;
             
-            try {
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        accion: 'verificar_tne',
-                        licencia: licenciaActual,
-                        rut: rut,
-                        deviceId: deviceId
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.sesionInvalida) {
-                    mostrarAlertaSesion(data.mensaje);
-                    return;
-                }
-                
-                if (data.limiteSuperado) {
-                    mostrarError(data.mensaje);
-                    initialButtons.classList.remove('hidden');
-                    actualizarQuota(data.consultasMaximas, data.consultasMaximas);
-                    return;
-                }
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                mostrarResultado(rut, {
-                    vigente: data.vigente,
-                    razon: data.estado,
-                    mensaje: data.mensaje,
-                    detalles: data.detalles
-                });
-                
-                if (data.consultasRestantes !== undefined) {
-                    actualizarQuota(data.consultasHoy, consultasMaximas);
-                }
-                
-            } catch (err) {
-                console.error('Error:', err);
-                mostrarError('Error al verificar: ' + err.message);
-                initialButtons.classList.remove('hidden');
-            } finally {
-                loading.style.display = 'none';
-            }
+            // Crear URL de JUNAEB con el RUT
+            const rutLimpio = rut.replace(/[.\-]/g, '');
+            const rutNumero = rutLimpio.slice(0, -1);
+            const rutDV = rutLimpio.slice(-1);
+            const urlJunaeb = `https://www.junaeb.cl/verificacion-tne?rut=${rutNumero}&dv=${rutDV}`;
+            
+            document.getElementById('btnVerificarJunaeb').href = urlJunaeb;
+            document.getElementById('result').style.display = 'block';
         }
 
-        function mostrarResultado(rut, verificacion) {
-            result.style.display = 'block';
-            result.className = 'result';
-            
-            if (verificacion.vigente) {
-                result.classList.add('vigente');
-                document.getElementById('resultIcon').textContent = '✅';
-            } else {
-                result.classList.add('warning');
-                document.getElementById('resultIcon').textContent = '⚠️';
-            }
-            
-            document.getElementById('resultTitle').textContent = verificacion.razon;
-            document.getElementById('rutDisplay').textContent = `RUT: ${rut}`;
-            document.getElementById('resultDetails').innerHTML = `
-                <strong>${verificacion.mensaje}</strong><br>
-                ${verificacion.detalles}
-            `;
-        }
-
-        function mostrarError(mensaje) {
-            errorMsg.textContent = mensaje;
+        function mostrarError(msg) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = msg;
             errorMsg.style.display = 'block';
             setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
         }
 
-        // ============================================
-        // BOTONES
-        // ============================================
-        newScanBtn.addEventListener('click', () => {
-            result.style.display = 'none';
-            errorMsg.style.display = 'none';
-            manualSection.classList.remove('visible');
-            initialButtons.classList.remove('hidden');
+        // Buttons
+        document.getElementById('newScanBtn').addEventListener('click', () => {
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('manualSection').classList.remove('visible');
+            document.getElementById('initialButtons').classList.remove('hidden');
         });
 
-        manualBtn.addEventListener('click', () => {
+        document.getElementById('manualBtn').addEventListener('click', () => {
             detenerEscaneo();
             cerrarCamara();
-            manualSection.classList.add('visible');
-            cameraButtons.classList.add('hidden');
-            rutManualInput.focus();
+            document.getElementById('manualSection').classList.add('visible');
+            document.getElementById('cameraButtons').classList.add('hidden');
+            document.getElementById('rutManualInput').focus();
         });
 
-        verificarManualBtn.addEventListener('click', () => {
-            const rutIngresado = rutManualInput.value.trim();
+        document.getElementById('verificarManualBtn').addEventListener('click', () => {
+            const rutIngresado = document.getElementById('rutManualInput').value.trim();
             if (!rutIngresado) {
                 mostrarError('Ingresa un RUT');
                 return;
             }
-            
             const rutLimpio = rutIngresado.replace(/[.\-]/g, '');
             if (rutLimpio.length < 8 || rutLimpio.length > 9) {
                 mostrarError('RUT inválido');
                 return;
             }
-            
-            manualSection.classList.remove('visible');
-            verificarTNE(rutIngresado);
+            document.getElementById('manualSection').classList.remove('visible');
+            mostrarResultado(rutIngresado);
+            incrementarEscaneos();
         });
 
-        cancelManualBtn.addEventListener('click', () => {
-            manualSection.classList.remove('visible');
-            rutManualInput.value = '';
+        document.getElementById('cancelManualBtn').addEventListener('click', () => {
+            document.getElementById('manualSection').classList.remove('visible');
+            document.getElementById('rutManualInput').value = '';
             abrirCamara();
         });
 
-        rutManualInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verificarManualBtn.click();
+        document.getElementById('rutManualInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('verificarManualBtn').click();
         });
 
-        // Limpiar al salir
         window.addEventListener('beforeunload', () => {
             detenerEscaneo();
-            if (tesseractWorker) {
-                tesseractWorker.terminate();
-            }
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            if (tesseractWorker) tesseractWorker.terminate();
+            if (stream) stream.getTracks().forEach(t => t.stop());
         });
     </script>
 </body>
