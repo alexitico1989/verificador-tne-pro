@@ -243,6 +243,16 @@
             display: none;
         }
 
+        /* Canvas de procesamiento (oculto, para debug se puede mostrar) */
+        #processCanvas {
+            display: none; /* Cambiar a 'block' para ver imagen procesada */
+            width: 100%;
+            max-width: 300px;
+            border: 2px solid #f59e0b;
+            margin: 10px auto;
+            border-radius: 8px;
+        }
+
         .btn {
             background: #1a56db;
             color: white;
@@ -310,6 +320,12 @@
             font-size: 14px;
             color: #374151;
             font-weight: 500;
+        }
+
+        .loading-progress {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
         }
 
         /* Ingreso Manual con Teclado Grande */
@@ -581,7 +597,7 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">Versión Pro 4.0</p>
+                <p style="color: #9ca3af;">Versión Pro 4.1 - OCR Mejorado</p>
                 <p style="margin-top: 4px; color: #9ca3af;">Powered by JUNAEB API</p>
             </div>
         </div>
@@ -596,7 +612,8 @@
                     <p>
                     1. Presiona "Iniciar Cámara"<br>
                     2. Enfoca el RUT en el recuadro verde<br>
-                    3. Toca la pantalla para capturar
+                    3. Toca la pantalla para capturar<br>
+                    <strong>💡 Tip: Buena luz y enfoque nítido</strong>
                     </p>
                 </div>
 
@@ -631,10 +648,12 @@
                 </div>
 
                 <canvas id="canvas"></canvas>
+                <canvas id="processCanvas"></canvas>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
                     <div class="loading-text">Analizando RUT...</div>
+                    <div class="loading-progress" id="loadingProgress"></div>
                 </div>
 
                 <!-- Ingreso Manual con Teclado Grande -->
@@ -765,8 +784,10 @@
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
+        const processCanvas = document.getElementById('processCanvas');
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
+        const processCtx = processCanvas.getContext('2d');
 
         // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
@@ -783,6 +804,7 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const previewContainer = document.getElementById('previewContainer');
         const loading = document.getElementById('loading');
+        const loadingProgress = document.getElementById('loadingProgress');
         const result = document.getElementById('result');
         const errorMsg = document.getElementById('errorMsg');
         const newScanBtn = document.getElementById('newScanBtn');
@@ -898,8 +920,8 @@
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 },
+                        width: { ideal: 2560, min: 1920 },
+                        height: { ideal: 1440, min: 1080 },
                     } 
                 });
                 video.srcObject = stream;
@@ -942,35 +964,121 @@
             cameraButtons.style.display = 'none';
         }
 
-        // OCR
+        // ====================================
+        // PREPROCESAMIENTO AVANZADO DE IMAGEN
+        // ====================================
+        function preprocesarImagenAvanzado(imageSrc) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Escalar imagen para mejor OCR
+                    const scale = 3;
+                    processCanvas.width = img.width * scale;
+                    processCanvas.height = img.height * scale;
+                    
+                    processCtx.drawImage(img, 0, 0, processCanvas.width, processCanvas.height);
+                    
+                    const imageData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
+                    const data = imageData.data;
+                    
+                    // Convertir a escala de grises y aplicar umbral adaptativo
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Promedio RGB
+                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        
+                        // Aumentar contraste
+                        const contrast = 1.8;
+                        const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+                        let pixel = factor * (avg - 128) + 128;
+                        
+                        // Binarización con umbral
+                        pixel = pixel > 140 ? 255 : 0;
+                        
+                        data[i] = pixel;
+                        data[i + 1] = pixel;
+                        data[i + 2] = pixel;
+                    }
+                    
+                    processCtx.putImageData(imageData, 0, 0);
+                    resolve(processCanvas.toDataURL('image/png'));
+                };
+                img.src = imageSrc;
+            });
+        }
+
+        // ====================================
+        // OCR MEJORADO CON MÚLTIPLES INTENTOS
+        // ====================================
         async function procesarImagen(imageUrl) {
             loading.style.display = 'block';
+            loadingProgress.textContent = 'Preparando imagen...';
             result.style.display = 'none';
             errorMsg.style.display = 'none';
             rutManualSection.style.display = 'none';
             
             try {
-                const worker = await Tesseract.createWorker('spa');
-                await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789K-.',
+                // Preprocesar imagen
+                loadingProgress.textContent = 'Optimizando imagen...';
+                const imagenProcesada = await preprocesarImagenAvanzado(imageUrl);
+                
+                // Crear worker de Tesseract
+                loadingProgress.textContent = 'Iniciando OCR...';
+                const worker = await Tesseract.createWorker('spa', 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            loadingProgress.textContent = `Analizando: ${Math.round(m.progress * 100)}%`;
+                        }
+                    }
                 });
                 
-                const { data: { text } } = await worker.recognize(imageUrl);
+                // Configuración optimizada para RUTs
+                await worker.setParameters({
+                    tessedit_char_whitelist: '0123456789K-.',
+                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                    tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
+                });
+                
+                // INTENTO 1: Imagen procesada
+                loadingProgress.textContent = 'Intento 1 de 3...';
+                let { data: { text } } = await worker.recognize(imagenProcesada);
+                console.log('OCR Intento 1 (procesada):', text);
+                let rut = extraerRUT(text);
+                
+                // INTENTO 2: Imagen original
+                if (!rut) {
+                    loadingProgress.textContent = 'Intento 2 de 3...';
+                    const resultado2 = await worker.recognize(imageUrl);
+                    text = resultado2.data.text;
+                    console.log('OCR Intento 2 (original):', text);
+                    rut = extraerRUT(text);
+                }
+                
+                // INTENTO 3: Con diferentes parámetros
+                if (!rut) {
+                    loadingProgress.textContent = 'Intento 3 de 3...';
+                    await worker.setParameters({
+                        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+                    });
+                    const resultado3 = await worker.recognize(imagenProcesada);
+                    text = resultado3.data.text;
+                    console.log('OCR Intento 3 (block):', text);
+                    rut = extraerRUT(text);
+                }
+                
                 await worker.terminate();
                 
-                console.log('OCR:', text);
-                const rut = extraerRUT(text);
-                
                 if (!rut) {
+                    console.log('No se detectó RUT. Mostrando teclado manual.');
                     loading.style.display = 'none';
                     mostrarIngresoManual();
                     return;
                 }
                 
+                console.log('✓ RUT detectado:', rut);
                 await verificarTNE(rut);
                 
             } catch (err) {
-                console.error('Error:', err);
+                console.error('Error OCR:', err);
                 mostrarError('Error al procesar');
                 resetear();
             } finally {
@@ -979,21 +1087,30 @@
         }
 
         function extraerRUT(texto) {
+            // Limpiar texto
             texto = texto.toUpperCase().replace(/[^0-9K\-\.]/g, '');
+            console.log('Texto limpio:', texto);
             
             const patrones = [
-                /(\d{7,8}[-]?[0-9K])/g,
+                // Formato completo con puntos: 12.345.678-9
                 /(\d{1,2}\.\d{3}\.\d{3}[-]?[0-9K])/g,
+                // Formato sin puntos: 12345678-9
+                /(\d{7,8}[-][0-9K])/g,
+                // Formato sin guión: 123456789
+                /(\d{8,9})/g,
             ];
             
             for (const patron of patrones) {
                 const matches = texto.match(patron);
                 if (matches) {
+                    console.log('Matches encontrados:', matches);
                     for (const match of matches) {
                         const rutLimpio = match.replace(/[.\-]/g, '');
+                        
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
+                            
                             if (validarRUT(rut, dv)) {
                                 return formatearRUT(rut, dv);
                             }
@@ -1001,6 +1118,29 @@
                     }
                 }
             }
+            
+            // Búsqueda exhaustiva sin patrón
+            const numeros = texto.match(/\d+/g);
+            if (numeros) {
+                console.log('Búsqueda exhaustiva:', numeros);
+                for (const num of numeros) {
+                    if (num.length >= 8 && num.length <= 9) {
+                        const rut = num.slice(0, -1);
+                        const dv = num.slice(-1);
+                        if (validarRUT(rut, dv)) {
+                            return formatearRUT(rut, dv);
+                        }
+                        
+                        // Probar con K como dígito verificador
+                        if (texto.includes('K')) {
+                            if (validarRUT(num, 'K')) {
+                                return formatearRUT(num, 'K');
+                            }
+                        }
+                    }
+                }
+            }
+            
             return null;
         }
 
@@ -1058,6 +1198,7 @@
         // Verificar TNE
         async function verificarTNE(rut) {
             loading.style.display = 'block';
+            loadingProgress.textContent = 'Consultando JUNAEB...';
             result.style.display = 'none';
             rutManualSection.style.display = 'none';
             
