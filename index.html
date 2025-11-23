@@ -663,6 +663,9 @@
                     <div class="spinner"></div>
                     <div class="loading-text">Analizando RUT...</div>
                     <div class="loading-progress" id="loadingProgress"></div>
+                    <button class="btn btn-cancel" id="emergencyManualBtn" style="display: none; margin-top: 20px;">
+                        <span class="btn-icon">⌨️</span> Ingreso Manual
+                    </button>
                 </div>
 
                 <!-- Ingreso Manual -->
@@ -767,6 +770,12 @@
                 </div>
 
                 <div class="error-msg" id="errorMsg"></div>
+                
+                <!-- Debug console para móviles -->
+                <div id="debugConsole" style="display: none; background: #1f2937; color: #10b981; padding: 10px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 10px; max-height: 200px; overflow-y: auto;"></div>
+                <button class="btn" id="toggleDebugBtn" style="display: none; font-size: 11px; padding: 8px; margin-top: 10px;">
+                    🐛 Mostrar/Ocultar Debug
+                </button>
             </div>
 
             <div class="footer">
@@ -826,6 +835,53 @@
         const rutManualText = document.getElementById('rutManualText');
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
+        const emergencyManualBtn = document.getElementById('emergencyManualBtn');
+        const debugConsole = document.getElementById('debugConsole');
+        const toggleDebugBtn = document.getElementById('toggleDebugBtn');
+
+        // Sistema de debug para móviles
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        function addDebugLog(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${type}: ${args.join(' ')}`;
+            const logDiv = document.createElement('div');
+            logDiv.textContent = message;
+            logDiv.style.color = type === 'ERROR' ? '#ef4444' : '#10b981';
+            debugConsole.appendChild(logDiv);
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+            
+            // Limitar a 50 líneas
+            while (debugConsole.children.length > 50) {
+                debugConsole.removeChild(debugConsole.firstChild);
+            }
+        }
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addDebugLog('LOG', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addDebugLog('ERROR', ...args);
+        };
+        
+        // Toggle debug console
+        toggleDebugBtn.addEventListener('click', () => {
+            if (debugConsole.style.display === 'none') {
+                debugConsole.style.display = 'block';
+            } else {
+                debugConsole.style.display = 'none';
+            }
+        });
+        
+        // Mostrar botón de debug si es móvil
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            toggleDebugBtn.style.display = 'block';
+            console.log('[MOBILE] Dispositivo móvil detectado');
+        }
 
         // Al cargar
         window.addEventListener('load', () => {
@@ -838,6 +894,8 @@
             if (savedCount) {
                 verificacionesHoy = parseInt(savedCount);
             }
+            
+            console.log('[INIT] App cargada. UserAgent:', navigator.userAgent);
         });
 
         // Login
@@ -986,7 +1044,27 @@
             previewContainer.classList.add('active');
             
             capturando = false;
-            procesarImagenMultiple(capturas);
+            
+            // Mostrar botón de emergencia después de 15 segundos
+            const timeoutId = setTimeout(() => {
+                console.log('[TIMEOUT] OCR tomando mucho tiempo, mostrando botón de emergencia');
+                emergencyManualBtn.style.display = 'block';
+            }, 15000);
+            
+            // Agregar listener al botón de emergencia
+            emergencyManualBtn.onclick = () => {
+                console.log('[EMERGENCY] Botón de emergencia presionado');
+                clearTimeout(timeoutId);
+                emergencyManualBtn.style.display = 'none';
+                loading.style.display = 'none';
+                mostrarIngresoManual();
+            };
+            
+            await procesarImagenMultiple(capturas);
+            
+            // Limpiar timeout si terminó antes
+            clearTimeout(timeoutId);
+            emergencyManualBtn.style.display = 'none';
         }
 
         // Seleccionar la imagen más nítida (basado en varianza Laplaciana)
@@ -1105,15 +1183,19 @@
         // OCR CON VALIDACIÓN CRUZADA
         // ====================================
         async function procesarImagenMultiple(imagenes) {
+            console.log('[OCR] Iniciando procesamiento de', imagenes.length, 'imágenes');
             loading.style.display = 'block';
             result.style.display = 'none';
             errorMsg.style.display = 'none';
             rutManualSection.style.display = 'none';
             
+            let worker = null;
+            
             try {
                 loadingProgress.textContent = 'Iniciando OCR avanzado...';
+                console.log('[OCR] Creando worker de Tesseract...');
                 
-                const worker = await Tesseract.createWorker('spa', 1, {
+                worker = await Tesseract.createWorker('spa', 1, {
                     logger: m => {
                         if (m.status === 'recognizing text') {
                             loadingProgress.textContent = `Procesando: ${Math.round(m.progress * 100)}%`;
@@ -1121,82 +1203,134 @@
                     }
                 });
                 
+                console.log('[OCR] Worker creado exitosamente');
                 const resultados = [];
+                let rut = null;
                 
                 // ESTRATEGIA 1: Mejor imagen procesada
-                loadingProgress.textContent = 'Estrategia 1: Mejor imagen...';
-                const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
-                await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789K-.',
-                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
-                    tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
-                });
-                let { data: { text } } = await worker.recognize(mejorProcesada);
-                console.log('Estrategia 1:', text);
-                let rut = extraerRUT(text);
-                if (rut) resultados.push(rut);
+                try {
+                    loadingProgress.textContent = 'Estrategia 1: Mejor imagen...';
+                    console.log('[OCR] Ejecutando Estrategia 1...');
+                    const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
+                    await worker.setParameters({
+                        tessedit_char_whitelist: '0123456789K-.',
+                        tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                        tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
+                    });
+                    let { data: { text } } = await worker.recognize(mejorProcesada);
+                    console.log('[OCR] Estrategia 1 resultado:', text);
+                    rut = extraerRUT(text);
+                    if (rut) {
+                        console.log('[OCR] RUT encontrado en Estrategia 1:', rut);
+                        resultados.push(rut);
+                    }
+                } catch (err) {
+                    console.error('[OCR] Error en Estrategia 1:', err);
+                }
                 
                 // ESTRATEGIA 2: Todas las imágenes procesadas
-                for (let i = 0; i < Math.min(3, imagenes.length) && !rut; i++) {
-                    loadingProgress.textContent = `Estrategia 2: Imagen ${i + 1}/3...`;
-                    const procesada = await preprocesarImagenExtremo(imagenes[i]);
-                    const resultado = await worker.recognize(procesada);
-                    text = resultado.data.text;
-                    console.log(`Estrategia 2 (${i + 1}):`, text);
-                    rut = extraerRUT(text);
-                    if (rut) resultados.push(rut);
+                if (!rut) {
+                    try {
+                        for (let i = 0; i < Math.min(3, imagenes.length); i++) {
+                            loadingProgress.textContent = `Estrategia 2: Imagen ${i + 1}/3...`;
+                            console.log(`[OCR] Ejecutando Estrategia 2 - imagen ${i + 1}...`);
+                            const procesada = await preprocesarImagenExtremo(imagenes[i]);
+                            const resultado = await worker.recognize(procesada);
+                            const text = resultado.data.text;
+                            console.log(`[OCR] Estrategia 2 (${i + 1}) resultado:`, text);
+                            rut = extraerRUT(text);
+                            if (rut) {
+                                console.log(`[OCR] RUT encontrado en Estrategia 2-${i + 1}:`, rut);
+                                resultados.push(rut);
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        console.error('[OCR] Error en Estrategia 2:', err);
+                    }
                 }
                 
                 // ESTRATEGIA 3: Modo SINGLE_BLOCK
                 if (!rut) {
-                    loadingProgress.textContent = 'Estrategia 3: Modo block...';
-                    await worker.setParameters({
-                        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-                    });
-                    const resultado = await worker.recognize(mejorProcesada);
-                    text = resultado.data.text;
-                    console.log('Estrategia 3:', text);
-                    rut = extraerRUT(text);
-                    if (rut) resultados.push(rut);
+                    try {
+                        loadingProgress.textContent = 'Estrategia 3: Modo block...';
+                        console.log('[OCR] Ejecutando Estrategia 3...');
+                        const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
+                        await worker.setParameters({
+                            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+                        });
+                        const resultado = await worker.recognize(mejorProcesada);
+                        const text = resultado.data.text;
+                        console.log('[OCR] Estrategia 3 resultado:', text);
+                        rut = extraerRUT(text);
+                        if (rut) {
+                            console.log('[OCR] RUT encontrado en Estrategia 3:', rut);
+                            resultados.push(rut);
+                        }
+                    } catch (err) {
+                        console.error('[OCR] Error en Estrategia 3:', err);
+                    }
                 }
                 
                 // ESTRATEGIA 4: Imágenes originales sin procesar
                 if (!rut) {
-                    loadingProgress.textContent = 'Estrategia 4: Imágenes originales...';
-                    await worker.setParameters({
-                        tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
-                    });
-                    for (let i = 0; i < Math.min(2, imagenes.length); i++) {
-                        const resultado = await worker.recognize(imagenes[i]);
-                        text = resultado.data.text;
-                        console.log(`Estrategia 4 (${i + 1}):`, text);
-                        rut = extraerRUT(text);
-                        if (rut) {
-                            resultados.push(rut);
-                            break;
+                    try {
+                        loadingProgress.textContent = 'Estrategia 4: Imágenes originales...';
+                        console.log('[OCR] Ejecutando Estrategia 4...');
+                        await worker.setParameters({
+                            tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                        });
+                        for (let i = 0; i < Math.min(2, imagenes.length); i++) {
+                            console.log(`[OCR] Estrategia 4 - imagen ${i + 1}...`);
+                            const resultado = await worker.recognize(imagenes[i]);
+                            const text = resultado.data.text;
+                            console.log(`[OCR] Estrategia 4 (${i + 1}) resultado:`, text);
+                            rut = extraerRUT(text);
+                            if (rut) {
+                                console.log(`[OCR] RUT encontrado en Estrategia 4-${i + 1}:`, rut);
+                                resultados.push(rut);
+                                break;
+                            }
                         }
+                    } catch (err) {
+                        console.error('[OCR] Error en Estrategia 4:', err);
                     }
                 }
                 
-                await worker.terminate();
+                console.log('[OCR] Terminando worker...');
+                if (worker) {
+                    await worker.terminate();
+                }
+                console.log('[OCR] Worker terminado');
                 
                 // Validación cruzada: si tenemos múltiples resultados, usar el más común
                 if (resultados.length > 0) {
                     const rutFinal = validacionCruzada(resultados);
-                    console.log('✓ RUT final (validación cruzada):', rutFinal);
+                    console.log('[OCR] ✓ RUT final (validación cruzada):', rutFinal);
                     loading.style.display = 'none';
                     await verificarTNE(rutFinal);
                 } else {
-                    console.log('✗ No se detectó RUT en ninguna estrategia');
+                    console.log('[OCR] ✗ No se detectó RUT en ninguna estrategia');
+                    console.log('[OCR] Mostrando teclado manual...');
                     loading.style.display = 'none';
+                    
+                    // Forzar espera para asegurar que loading se oculte
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
                     mostrarIngresoManual();
+                    console.log('[OCR] Teclado manual debería estar visible');
                 }
                 
             } catch (err) {
-                console.error('Error OCR:', err);
+                console.error('[OCR] ❌ ERROR CRÍTICO:', err);
+                console.error('[OCR] Stack:', err.stack);
                 loading.style.display = 'none';
-                mostrarError('Error al procesar: ' + err.message);
-                resetear();
+                
+                // Esperar antes de mostrar teclado manual
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                console.log('[OCR] Mostrando teclado manual por error...');
+                mostrarIngresoManual();
             }
         }
 
@@ -1284,15 +1418,31 @@
 
         // Teclado Numérico
         function mostrarIngresoManual() {
-            console.log('Mostrando ingreso manual');
+            console.log('[MANUAL] ========== MOSTRANDO INGRESO MANUAL ==========');
+            console.log('[MANUAL] Ocultando elementos...');
+            
             loading.style.display = 'none';
             result.style.display = 'none';
             errorMsg.style.display = 'none';
             initialButtons.style.display = 'none';
             cameraButtons.style.display = 'none';
+            previewContainer.style.display = 'none';
+            
+            console.log('[MANUAL] Mostrando sección manual...');
             rutManualSection.style.display = 'block';
+            
+            console.log('[MANUAL] Limpiando valor...');
             rutManualValue = '';
             actualizarDisplayManual();
+            
+            console.log('[MANUAL] Estado actual:');
+            console.log('[MANUAL] - rutManualSection.style.display:', rutManualSection.style.display);
+            console.log('[MANUAL] - loading.style.display:', loading.style.display);
+            console.log('[MANUAL] - result.style.display:', result.style.display);
+            console.log('[MANUAL] ========== FIN ==========');
+            
+            // Forzar reflow para asegurar que se apliquen los estilos
+            rutManualSection.offsetHeight;
         }
 
         document.querySelectorAll('.key').forEach(key => {
