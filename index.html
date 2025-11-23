@@ -1184,6 +1184,7 @@
                 if (resultados.length > 0) {
                     const rutFinal = validacionCruzada(resultados);
                     console.log('✓ RUT final (validación cruzada):', rutFinal);
+                    loading.style.display = 'none';
                     await verificarTNE(rutFinal);
                 } else {
                     console.log('✗ No se detectó RUT en ninguna estrategia');
@@ -1193,10 +1194,9 @@
                 
             } catch (err) {
                 console.error('Error OCR:', err);
-                mostrarError('Error al procesar');
-                resetear();
-            } finally {
                 loading.style.display = 'none';
+                mostrarError('Error al procesar: ' + err.message);
+                resetear();
             }
         }
 
@@ -1284,6 +1284,12 @@
 
         // Teclado Numérico
         function mostrarIngresoManual() {
+            console.log('Mostrando ingreso manual');
+            loading.style.display = 'none';
+            result.style.display = 'none';
+            errorMsg.style.display = 'none';
+            initialButtons.style.display = 'none';
+            cameraButtons.style.display = 'none';
             rutManualSection.style.display = 'block';
             rutManualValue = '';
             actualizarDisplayManual();
@@ -1302,12 +1308,12 @@
         });
 
         function actualizarDisplayManual() {
-            rutManualText.textContent = rutManualValue || ' ';
+            rutManualText.textContent = rutManualValue || '- - -';
         }
 
         verificarManualBtn.addEventListener('click', () => {
             if (rutManualValue.length < 8) {
-                mostrarError('RUT incompleto');
+                mostrarError('RUT incompleto. Mínimo 8 dígitos.');
                 return;
             }
             verificarTNE(rutManualValue);
@@ -1423,12 +1429,16 @@
         newScanBtn.addEventListener('click', resetear);
 
         function resetear() {
+            console.log('Reseteando aplicación');
             result.style.display = 'none';
             previewContainer.classList.remove('active');
             rutManualSection.style.display = 'none';
             errorMsg.style.display = 'none';
+            loading.style.display = 'none';
             initialButtons.style.display = 'block';
+            cameraButtons.style.display = 'none';
             rutManualValue = '';
+            capturando = false;
         }
     </script>
 </body>
