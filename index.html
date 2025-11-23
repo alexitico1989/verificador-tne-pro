@@ -220,6 +220,20 @@
             50% { opacity: 0.5; }
         }
 
+        /* Contador de captura */
+        .capture-counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            display: none;
+        }
+
         /* Preview capturado (más pequeño) */
         .preview-container {
             display: none;
@@ -241,16 +255,6 @@
 
         canvas {
             display: none;
-        }
-
-        /* Canvas de procesamiento (oculto, para debug se puede mostrar) */
-        #processCanvas {
-            display: none; /* Cambiar a 'block' para ver imagen procesada */
-            width: 100%;
-            max-width: 300px;
-            border: 2px solid #f59e0b;
-            margin: 10px auto;
-            border-radius: 8px;
         }
 
         .btn {
@@ -597,8 +601,8 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">Versión Pro 4.1 - OCR Mejorado</p>
-                <p style="margin-top: 4px; color: #9ca3af;">Powered by JUNAEB API</p>
+                <p style="color: #9ca3af;">Versión Pro 5.0 - OCR Ultra Preciso</p>
+                <p style="margin-top: 4px; color: #9ca3af;">Captura múltiple con estabilización</p>
             </div>
         </div>
 
@@ -612,8 +616,8 @@
                     <p>
                     1. Presiona "Iniciar Cámara"<br>
                     2. Enfoca el RUT en el recuadro verde<br>
-                    3. Toca la pantalla para capturar<br>
-                    <strong>💡 Tip: Buena luz y enfoque nítido</strong>
+                    3. Toca para iniciar captura automática (5 fotos)<br>
+                    <strong>💡 El sistema selecciona la mejor imagen</strong>
                     </p>
                 </div>
 
@@ -633,7 +637,8 @@
                     <div class="focus-guide">
                         <div class="focus-text">📍 ENFOCAR RUT AQUÍ</div>
                     </div>
-                    <div class="tap-hint">👆 Toca la pantalla para capturar</div>
+                    <div class="tap-hint">👆 Toca para capturar (5 fotos automáticas)</div>
+                    <div class="capture-counter" id="captureCounter">Capturando 1/5...</div>
                 </div>
 
                 <div id="cameraButtons" style="display: none;">
@@ -642,13 +647,17 @@
                     </button>
                 </div>
 
-                <!-- Preview Capturado (más pequeño) -->
+                <!-- Preview Capturado -->
                 <div class="preview-container" id="previewContainer">
-                    <img id="imagePreview" alt="Foto capturada">
+                    <img id="imagePreview" alt="Mejor foto seleccionada">
                 </div>
 
                 <canvas id="canvas"></canvas>
-                <canvas id="processCanvas"></canvas>
+                <canvas id="canvas1"></canvas>
+                <canvas id="canvas2"></canvas>
+                <canvas id="canvas3"></canvas>
+                <canvas id="canvas4"></canvas>
+                <canvas id="canvas5"></canvas>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
@@ -656,18 +665,17 @@
                     <div class="loading-progress" id="loadingProgress"></div>
                 </div>
 
-                <!-- Ingreso Manual con Teclado Grande -->
+                <!-- Ingreso Manual -->
                 <div id="rutManualSection">
                     <div class="manual-alert">
                         <strong>⚠️ RUT no detectado</strong>
-                        <p>Ingresa el RUT manualmente usando el teclado:</p>
+                        <p>Ingresa el RUT manualmente:</p>
                     </div>
                     
-                    <div class="rut-display-input" id="rutManualDisplay">
+                    <div class="rut-display-input">
                         <span id="rutManualText"></span>
                     </div>
                     
-                    <!-- Teclado Numérico Grande -->
                     <div class="custom-keyboard">
                         <div class="key" data-key="1">1</div>
                         <div class="key" data-key="2">2</div>
@@ -683,10 +691,8 @@
                         <div class="key key-k" data-key="K">K</div>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="key key-delete" data-key="delete" style="grid-column: span 2;">
-                            ⌫ BORRAR
-                        </div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                        <div class="key key-delete" data-key="delete">⌫ BORRAR</div>
                     </div>
                     
                     <button class="btn btn-camera" id="verificarManualBtn" style="margin-top: 15px;">
@@ -765,7 +771,7 @@
 
             <div class="footer">
                 <p>🚌 Sistema para conductores</p>
-                <p style="margin-top: 4px;">Detección de sellos falsos</p>
+                <p style="margin-top: 4px;">Detección ultra precisa de RUTs</p>
             </div>
         </div>
     </div>
@@ -774,6 +780,7 @@
     <script>
         // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
+        const NUM_CAPTURAS = 5; // Número de fotos en ráfaga
         
         // Variables globales
         let stream = null;
@@ -781,13 +788,18 @@
         let conductorNombre = null;
         let verificacionesHoy = 0;
         let rutManualValue = '';
+        let capturando = false;
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
-        const processCanvas = document.getElementById('processCanvas');
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
-        const processCtx = processCanvas.getContext('2d');
+
+        // Canvas para múltiples capturas
+        const canvases = [];
+        for (let i = 1; i <= NUM_CAPTURAS; i++) {
+            canvases.push(document.getElementById(`canvas${i}`));
+        }
 
         // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
@@ -798,10 +810,10 @@
         const licenseBadge = document.getElementById('licenseBadge');
         const statsBar = document.getElementById('statsBar');
         const logoutBtn = document.getElementById('logoutBtn');
-
         const cameraBtn = document.getElementById('cameraBtn');
         const cameraContainer = document.getElementById('cameraContainer');
         const cancelBtn = document.getElementById('cancelBtn');
+        const captureCounter = document.getElementById('captureCounter');
         const previewContainer = document.getElementById('previewContainer');
         const loading = document.getElementById('loading');
         const loadingProgress = document.getElementById('loadingProgress');
@@ -811,7 +823,6 @@
         const initialButtons = document.getElementById('initialButtons');
         const cameraButtons = document.getElementById('cameraButtons');
         const rutManualSection = document.getElementById('rutManualSection');
-        const rutManualDisplay = document.getElementById('rutManualDisplay');
         const rutManualText = document.getElementById('rutManualText');
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
@@ -920,8 +931,8 @@
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
-                        width: { ideal: 2560, min: 1920 },
-                        height: { ideal: 1440, min: 1080 },
+                        width: { ideal: 3840, min: 1920 },
+                        height: { ideal: 2160, min: 1080 },
                     } 
                 });
                 video.srcObject = stream;
@@ -935,21 +946,102 @@
             }
         }
 
-        // Capturar al tocar el video
-        video.addEventListener('click', capturarFoto);
+        // Captura múltiple al tocar el video
+        video.addEventListener('click', capturarMultiple);
 
-        function capturarFoto() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            ctx.drawImage(video, 0, 0);
-            
-            const imageUrl = canvas.toDataURL('image/jpeg', 1.0);
-            imagePreview.src = imageUrl;
-            
+        async function capturarMultiple() {
+            if (capturando) return;
+            capturando = true;
+
+            captureCounter.style.display = 'block';
+            const capturas = [];
+
+            // Capturar 5 fotos con intervalo de 200ms
+            for (let i = 0; i < NUM_CAPTURAS; i++) {
+                captureCounter.textContent = `Capturando ${i + 1}/${NUM_CAPTURAS}...`;
+                
+                const cnv = canvases[i];
+                const context = cnv.getContext('2d');
+                
+                cnv.width = video.videoWidth;
+                cnv.height = video.videoHeight;
+                context.drawImage(video, 0, 0);
+                
+                const imageUrl = cnv.toDataURL('image/jpeg', 1.0);
+                capturas.push(imageUrl);
+                
+                if (i < NUM_CAPTURAS - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
+            captureCounter.style.display = 'none';
             cerrarCamara();
+
+            // Seleccionar mejor imagen (la más nítida)
+            loadingProgress.textContent = 'Seleccionando mejor imagen...';
+            const mejorImagen = await seleccionarMejorImagen(capturas);
+            
+            imagePreview.src = mejorImagen;
             previewContainer.classList.add('active');
-            procesarImagen(imageUrl);
+            
+            capturando = false;
+            procesarImagenMultiple(capturas);
+        }
+
+        // Seleccionar la imagen más nítida (basado en varianza Laplaciana)
+        async function seleccionarMejorImagen(imagenes) {
+            let mejorScore = -1;
+            let mejorIndice = 0;
+
+            for (let i = 0; i < imagenes.length; i++) {
+                const score = await calcularNitidez(imagenes[i]);
+                console.log(`Imagen ${i + 1} nitidez:`, score);
+                if (score > mejorScore) {
+                    mejorScore = score;
+                    mejorIndice = i;
+                }
+            }
+
+            console.log(`Mejor imagen: ${mejorIndice + 1} (score: ${mejorScore})`);
+            return imagenes[mejorIndice];
+        }
+
+        function calcularNitidez(imageSrc) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    
+                    const scale = 0.5;
+                    tempCanvas.width = img.width * scale;
+                    tempCanvas.height = img.height * scale;
+                    tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+                    
+                    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                    const data = imageData.data;
+                    
+                    // Convertir a escala de grises
+                    const gris = [];
+                    for (let i = 0; i < data.length; i += 4) {
+                        gris.push((data[i] + data[i + 1] + data[i + 2]) / 3);
+                    }
+                    
+                    // Calcular varianza Laplaciana (medida de nitidez)
+                    let suma = 0;
+                    const w = tempCanvas.width;
+                    for (let i = w; i < gris.length - w; i++) {
+                        const laplacian = Math.abs(
+                            -gris[i - w] - gris[i - 1] + 8 * gris[i] - gris[i + 1] - gris[i + w]
+                        );
+                        suma += laplacian;
+                    }
+                    
+                    resolve(suma / gris.length);
+                };
+                img.src = imageSrc;
+            });
         }
 
         cancelBtn.addEventListener('click', cerrarCamara);
@@ -962,120 +1054,142 @@
             cameraContainer.classList.remove('active');
             initialButtons.style.display = 'block';
             cameraButtons.style.display = 'none';
+            captureCounter.style.display = 'none';
         }
 
         // ====================================
-        // PREPROCESAMIENTO AVANZADO DE IMAGEN
+        // PREPROCESAMIENTO EXTREMO
         // ====================================
-        function preprocesarImagenAvanzado(imageSrc) {
+        function preprocesarImagenExtremo(imageSrc) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Escalar imagen para mejor OCR
-                    const scale = 3;
-                    processCanvas.width = img.width * scale;
-                    processCanvas.height = img.height * scale;
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
                     
-                    processCtx.drawImage(img, 0, 0, processCanvas.width, processCanvas.height);
+                    // Escala 4x para máxima resolución
+                    const scale = 4;
+                    tempCanvas.width = img.width * scale;
+                    tempCanvas.height = img.height * scale;
                     
-                    const imageData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
+                    tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+                    
+                    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                     const data = imageData.data;
                     
-                    // Convertir a escala de grises y aplicar umbral adaptativo
+                    // Convertir a escala de grises con máximo contraste
                     for (let i = 0; i < data.length; i += 4) {
-                        // Promedio RGB
                         const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                         
-                        // Aumentar contraste
-                        const contrast = 1.8;
+                        // Contraste extremo
+                        const contrast = 2.5;
                         const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
                         let pixel = factor * (avg - 128) + 128;
                         
-                        // Binarización con umbral
-                        pixel = pixel > 140 ? 255 : 0;
+                        // Binarización adaptativa
+                        pixel = pixel > 130 ? 255 : 0;
                         
                         data[i] = pixel;
                         data[i + 1] = pixel;
                         data[i + 2] = pixel;
                     }
                     
-                    processCtx.putImageData(imageData, 0, 0);
-                    resolve(processCanvas.toDataURL('image/png'));
+                    tempCtx.putImageData(imageData, 0, 0);
+                    resolve(tempCanvas.toDataURL('image/png'));
                 };
                 img.src = imageSrc;
             });
         }
 
         // ====================================
-        // OCR MEJORADO CON MÚLTIPLES INTENTOS
+        // OCR CON VALIDACIÓN CRUZADA
         // ====================================
-        async function procesarImagen(imageUrl) {
+        async function procesarImagenMultiple(imagenes) {
             loading.style.display = 'block';
-            loadingProgress.textContent = 'Preparando imagen...';
             result.style.display = 'none';
             errorMsg.style.display = 'none';
             rutManualSection.style.display = 'none';
             
             try {
-                // Preprocesar imagen
-                loadingProgress.textContent = 'Optimizando imagen...';
-                const imagenProcesada = await preprocesarImagenAvanzado(imageUrl);
+                loadingProgress.textContent = 'Iniciando OCR avanzado...';
                 
-                // Crear worker de Tesseract
-                loadingProgress.textContent = 'Iniciando OCR...';
                 const worker = await Tesseract.createWorker('spa', 1, {
                     logger: m => {
                         if (m.status === 'recognizing text') {
-                            loadingProgress.textContent = `Analizando: ${Math.round(m.progress * 100)}%`;
+                            loadingProgress.textContent = `Procesando: ${Math.round(m.progress * 100)}%`;
                         }
                     }
                 });
                 
-                // Configuración optimizada para RUTs
+                const resultados = [];
+                
+                // ESTRATEGIA 1: Mejor imagen procesada
+                loadingProgress.textContent = 'Estrategia 1: Mejor imagen...';
+                const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
                 await worker.setParameters({
                     tessedit_char_whitelist: '0123456789K-.',
                     tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
                     tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
                 });
-                
-                // INTENTO 1: Imagen procesada
-                loadingProgress.textContent = 'Intento 1 de 3...';
-                let { data: { text } } = await worker.recognize(imagenProcesada);
-                console.log('OCR Intento 1 (procesada):', text);
+                let { data: { text } } = await worker.recognize(mejorProcesada);
+                console.log('Estrategia 1:', text);
                 let rut = extraerRUT(text);
+                if (rut) resultados.push(rut);
                 
-                // INTENTO 2: Imagen original
-                if (!rut) {
-                    loadingProgress.textContent = 'Intento 2 de 3...';
-                    const resultado2 = await worker.recognize(imageUrl);
-                    text = resultado2.data.text;
-                    console.log('OCR Intento 2 (original):', text);
+                // ESTRATEGIA 2: Todas las imágenes procesadas
+                for (let i = 0; i < Math.min(3, imagenes.length) && !rut; i++) {
+                    loadingProgress.textContent = `Estrategia 2: Imagen ${i + 1}/3...`;
+                    const procesada = await preprocesarImagenExtremo(imagenes[i]);
+                    const resultado = await worker.recognize(procesada);
+                    text = resultado.data.text;
+                    console.log(`Estrategia 2 (${i + 1}):`, text);
                     rut = extraerRUT(text);
+                    if (rut) resultados.push(rut);
                 }
                 
-                // INTENTO 3: Con diferentes parámetros
+                // ESTRATEGIA 3: Modo SINGLE_BLOCK
                 if (!rut) {
-                    loadingProgress.textContent = 'Intento 3 de 3...';
+                    loadingProgress.textContent = 'Estrategia 3: Modo block...';
                     await worker.setParameters({
                         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
                     });
-                    const resultado3 = await worker.recognize(imagenProcesada);
-                    text = resultado3.data.text;
-                    console.log('OCR Intento 3 (block):', text);
+                    const resultado = await worker.recognize(mejorProcesada);
+                    text = resultado.data.text;
+                    console.log('Estrategia 3:', text);
                     rut = extraerRUT(text);
+                    if (rut) resultados.push(rut);
+                }
+                
+                // ESTRATEGIA 4: Imágenes originales sin procesar
+                if (!rut) {
+                    loadingProgress.textContent = 'Estrategia 4: Imágenes originales...';
+                    await worker.setParameters({
+                        tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                    });
+                    for (let i = 0; i < Math.min(2, imagenes.length); i++) {
+                        const resultado = await worker.recognize(imagenes[i]);
+                        text = resultado.data.text;
+                        console.log(`Estrategia 4 (${i + 1}):`, text);
+                        rut = extraerRUT(text);
+                        if (rut) {
+                            resultados.push(rut);
+                            break;
+                        }
+                    }
                 }
                 
                 await worker.terminate();
                 
-                if (!rut) {
-                    console.log('No se detectó RUT. Mostrando teclado manual.');
+                // Validación cruzada: si tenemos múltiples resultados, usar el más común
+                if (resultados.length > 0) {
+                    const rutFinal = validacionCruzada(resultados);
+                    console.log('✓ RUT final (validación cruzada):', rutFinal);
+                    await verificarTNE(rutFinal);
+                } else {
+                    console.log('✗ No se detectó RUT en ninguna estrategia');
                     loading.style.display = 'none';
                     mostrarIngresoManual();
-                    return;
                 }
-                
-                console.log('✓ RUT detectado:', rut);
-                await verificarTNE(rut);
                 
             } catch (err) {
                 console.error('Error OCR:', err);
@@ -1086,31 +1200,45 @@
             }
         }
 
+        // Validación cruzada de resultados
+        function validacionCruzada(resultados) {
+            const frecuencia = {};
+            for (const rut of resultados) {
+                frecuencia[rut] = (frecuencia[rut] || 0) + 1;
+            }
+            
+            let maxFrecuencia = 0;
+            let rutMasFrecuente = resultados[0];
+            
+            for (const [rut, freq] of Object.entries(frecuencia)) {
+                if (freq > maxFrecuencia) {
+                    maxFrecuencia = freq;
+                    rutMasFrecuente = rut;
+                }
+            }
+            
+            console.log('Frecuencias:', frecuencia);
+            return rutMasFrecuente;
+        }
+
         function extraerRUT(texto) {
-            // Limpiar texto
             texto = texto.toUpperCase().replace(/[^0-9K\-\.]/g, '');
             console.log('Texto limpio:', texto);
             
             const patrones = [
-                // Formato completo con puntos: 12.345.678-9
                 /(\d{1,2}\.\d{3}\.\d{3}[-]?[0-9K])/g,
-                // Formato sin puntos: 12345678-9
                 /(\d{7,8}[-][0-9K])/g,
-                // Formato sin guión: 123456789
                 /(\d{8,9})/g,
             ];
             
             for (const patron of patrones) {
                 const matches = texto.match(patron);
                 if (matches) {
-                    console.log('Matches encontrados:', matches);
                     for (const match of matches) {
                         const rutLimpio = match.replace(/[.\-]/g, '');
-                        
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
-                            
                             if (validarRUT(rut, dv)) {
                                 return formatearRUT(rut, dv);
                             }
@@ -1119,10 +1247,8 @@
                 }
             }
             
-            // Búsqueda exhaustiva sin patrón
             const numeros = texto.match(/\d+/g);
             if (numeros) {
-                console.log('Búsqueda exhaustiva:', numeros);
                 for (const num of numeros) {
                     if (num.length >= 8 && num.length <= 9) {
                         const rut = num.slice(0, -1);
@@ -1130,12 +1256,8 @@
                         if (validarRUT(rut, dv)) {
                             return formatearRUT(rut, dv);
                         }
-                        
-                        // Probar con K como dígito verificador
-                        if (texto.includes('K')) {
-                            if (validarRUT(num, 'K')) {
-                                return formatearRUT(num, 'K');
-                            }
+                        if (texto.includes('K') && validarRUT(num, 'K')) {
+                            return formatearRUT(num, 'K');
                         }
                     }
                 }
@@ -1170,13 +1292,11 @@
         document.querySelectorAll('.key').forEach(key => {
             key.addEventListener('click', () => {
                 const valor = key.dataset.key;
-                
                 if (valor === 'delete') {
                     rutManualValue = rutManualValue.slice(0, -1);
                 } else if (rutManualValue.length < 10) {
                     rutManualValue += valor;
                 }
-                
                 actualizarDisplayManual();
             });
         });
@@ -1187,7 +1307,7 @@
 
         verificarManualBtn.addEventListener('click', () => {
             if (rutManualValue.length < 8) {
-                mostrarError('RUT incompleto. Mínimo 8 dígitos.');
+                mostrarError('RUT incompleto');
                 return;
             }
             verificarTNE(rutManualValue);
