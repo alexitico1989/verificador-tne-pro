@@ -32,36 +32,36 @@
         .header {
             background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
             color: white;
-            padding: 25px 20px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .header h1 {
-            font-size: 26px;
+            font-size: 24px;
             margin-bottom: 5px;
             font-weight: 700;
         }
 
         .header p {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.9;
         }
 
         .license-badge {
             background: rgba(255,255,255,0.2);
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 12px;
-            margin-top: 10px;
+            font-size: 11px;
+            margin-top: 8px;
             display: inline-block;
         }
 
         .content {
-            padding: 20px;
+            padding: 15px;
         }
 
-        /* Pantalla de Login */
+        /* Login Screen */
         .login-screen {
             display: block;
             padding: 40px 20px;
@@ -73,19 +73,19 @@
         }
 
         .login-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 70px;
+            margin-bottom: 15px;
         }
 
         .login-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: #1e40af;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .input-label {
@@ -93,16 +93,16 @@
             text-align: left;
             font-weight: 600;
             color: #374151;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 13px;
         }
 
         .input-field {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             text-align: center;
             letter-spacing: 2px;
             font-weight: 600;
@@ -123,42 +123,120 @@
             display: block;
         }
 
+        .stats-bar {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+        }
+
         .instructions {
             background: #eff6ff;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
             border-left: 4px solid #1a56db;
         }
 
         .instructions-title {
             font-weight: 600;
             color: #1e40af;
-            margin-bottom: 8px;
-            font-size: 15px;
+            margin-bottom: 6px;
+            font-size: 13px;
         }
 
         .instructions p {
-            font-size: 13px;
+            font-size: 12px;
             color: #1e3a8a;
-            line-height: 1.6;
+            line-height: 1.5;
+        }
+
+        /* Cámara con guía de enfoque */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 15px;
+            display: none;
+        }
+
+        .camera-container.active {
+            display: block;
         }
 
         #videoPreview {
             width: 100%;
-            border-radius: 15px;
-            display: none;
-            margin-bottom: 15px;
+            border-radius: 12px;
             border: 3px solid #1a56db;
             background: #000;
+            display: block;
+            cursor: pointer;
+        }
+
+        /* Guía de enfoque sobre el video */
+        .focus-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 30%;
+            border: 3px dashed #10b981;
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+
+        .focus-text {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tap-hint {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #1a56db;
+            font-size: 13px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Preview capturado (más pequeño) */
+        .preview-container {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .preview-container.active {
+            display: block;
         }
 
         #imagePreview {
             width: 100%;
-            border-radius: 15px;
-            display: none;
-            margin-bottom: 15px;
-            border: 3px solid #1a56db;
+            max-width: 300px;
+            border-radius: 10px;
+            border: 2px solid #1a56db;
+            display: block;
+            margin: 0 auto;
         }
 
         canvas {
@@ -169,73 +247,58 @@
             background: #1a56db;
             color: white;
             border: none;
-            padding: 18px;
-            font-size: 17px;
-            border-radius: 12px;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            margin: 8px 0;
+            margin: 6px 0;
             font-weight: 600;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+            box-shadow: 0 4px 10px rgba(26, 86, 219, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn:active {
             transform: scale(0.97);
         }
 
-        .btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .btn-capture {
+        .btn-camera {
             background: #10b981;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            font-size: 18px;
-            padding: 20px;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+            font-size: 17px;
+            padding: 16px;
         }
 
         .btn-cancel {
             background: #ef4444;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
         .btn-logout {
             background: #f59e0b;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            font-size: 14px;
-            padding: 12px;
-        }
-
-        #fileInput {
-            display: none;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+            font-size: 13px;
+            padding: 10px;
         }
 
         .loading {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 15px;
             display: none;
         }
 
         .spinner {
-            border: 5px solid #e5e7eb;
-            border-top: 5px solid #1a56db;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #1a56db;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
@@ -244,12 +307,101 @@
         }
 
         .loading-text {
-            font-size: 16px;
+            font-size: 14px;
             color: #374151;
             font-weight: 500;
         }
 
-        /* RESULTADO COMPLETO */
+        /* Ingreso Manual con Teclado Grande */
+        #rutManualSection {
+            display: none;
+        }
+
+        .manual-alert {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .manual-alert strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .manual-alert p {
+            color: #92400e;
+            font-size: 12px;
+        }
+
+        .rut-display-input {
+            background: white;
+            border: 3px solid #1a56db;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e40af;
+        }
+
+        /* Teclado Numérico Grande */
+        .custom-keyboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .key {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .key:active {
+            background: #e5e7eb;
+            transform: scale(0.95);
+        }
+
+        .key.key-special {
+            background: #1a56db;
+            color: white;
+            border-color: #1e40af;
+        }
+
+        .key.key-delete {
+            background: #ef4444;
+            color: white;
+            border-color: #dc2626;
+        }
+
+        .key.key-k {
+            background: #10b981;
+            color: white;
+            border-color: #059669;
+        }
+
+        /* Resultado */
         .result {
             display: none;
             animation: slideUp 0.4s ease;
@@ -269,8 +421,8 @@
         .result-header {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 20px;
-            border-radius: 15px 15px 0 0;
+            padding: 15px;
+            border-radius: 12px 12px 0 0;
             text-align: center;
         }
 
@@ -278,23 +430,23 @@
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
-        .result-header.error {
+        .result-header.falso {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         .result-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
+            font-size: 50px;
+            margin-bottom: 8px;
         }
 
         .result-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .result-subtitle {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.9;
         }
 
@@ -302,40 +454,40 @@
             background: white;
             border: 3px solid #10b981;
             border-top: none;
-            border-radius: 0 0 15px 15px;
-            padding: 20px;
+            border-radius: 0 0 12px 12px;
+            padding: 15px;
         }
 
         .result-body.no-vigente {
             border-color: #f59e0b;
         }
 
-        .result-body.error {
+        .result-body.falso {
             border-color: #ef4444;
         }
 
         .data-section {
             background: #f9fafb;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
         }
 
         .data-section-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .data-row {
             display: flex;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #e5e7eb;
         }
 
@@ -346,85 +498,55 @@
         .data-label {
             font-weight: 600;
             color: #374151;
-            min-width: 100px;
-            font-size: 14px;
+            min-width: 90px;
+            font-size: 13px;
         }
 
         .data-value {
             color: #1f2937;
-            font-size: 14px;
+            font-size: 13px;
             flex: 1;
         }
 
         .rut-display {
             background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 8px;
             text-align: center;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: 2px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(26, 86, 219, 0.3);
         }
 
         .error-msg {
             background: #fee2e2;
             color: #991b1b;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
             display: none;
             border-left: 4px solid #ef4444;
-        }
-
-        .btn-icon {
-            font-size: 24px;
-        }
-
-        .stats-bar {
-            background: #f3f4f6;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: #6b7280;
-            text-align: center;
-        }
-
-        /* Ingreso Manual */
-        #rutManualSection {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .manual-alert {
-            background: #fef3c7;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #f59e0b;
-        }
-
-        .manual-alert strong {
-            color: #92400e;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .manual-alert p {
-            color: #92400e;
             font-size: 13px;
         }
 
         .footer {
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #6b7280;
             border-top: 1px solid #e5e7eb;
-            margin-top: 30px;
+            margin-top: 20px;
+        }
+
+        .btn-icon {
+            font-size: 20px;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -440,7 +562,6 @@
         <div class="login-screen" id="loginScreen">
             <div class="login-icon">🔐</div>
             <div class="login-title">Acceso Restringido</div>
-            <div class="login-subtitle">Ingresa tu código de licencia para continuar</div>
 
             <div class="input-group">
                 <label class="input-label">Código de Licencia:</label>
@@ -459,9 +580,9 @@
 
             <div class="error-msg" id="loginError"></div>
 
-            <div class="footer" style="border-top: none; margin-top: 40px;">
-                <p style="color: #9ca3af;">Versión Pro 3.0</p>
-                <p style="margin-top: 5px; color: #9ca3af;">Powered by JUNAEB API</p>
+            <div class="footer" style="border-top: none; margin-top: 30px;">
+                <p style="color: #9ca3af;">Versión Pro 4.0</p>
+                <p style="margin-top: 4px; color: #9ca3af;">Powered by JUNAEB API</p>
             </div>
         </div>
 
@@ -471,84 +592,103 @@
                 <div class="stats-bar" id="statsBar">📊 Verificaciones hoy: 0</div>
 
                 <div class="instructions">
-                    <div class="instructions-title">📸 Cómo tomar la foto:</div>
+                    <div class="instructions-title">📸 Instrucciones:</div>
                     <p>
-                    ✓ <strong>Buena iluminación</strong> (luz natural o LED)<br>
-                    ✓ <strong>Enfocar solo el RUT</strong> (acercar celular)<br>
-                    ✓ <strong>Foto horizontal</strong> y sin inclinación<br>
-                    ✓ <strong>Esperar que enfoque</strong> antes de capturar
+                    1. Presiona "Iniciar Cámara"<br>
+                    2. Enfoca el RUT en el recuadro verde<br>
+                    3. Toca la pantalla para capturar
                     </p>
                 </div>
 
-                <div class="camera-section">
-                    <video id="videoPreview" autoplay playsinline></video>
-                    <img id="imagePreview" alt="Foto capturada">
-                    <canvas id="canvas"></canvas>
-                </div>
-
+                <!-- Botón Iniciar Cámara -->
                 <div id="initialButtons">
-                    <button class="btn btn-capture" id="galleryBtn">
-                        <span class="btn-icon">📸</span> Tomar Foto (Recomendado)
-                    </button>
-                    <button class="btn btn-secondary" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Usar Cámara Web
+                    <button class="btn btn-camera" id="cameraBtn">
+                        <span class="btn-icon">📷</span> Iniciar Cámara
                     </button>
                     <button class="btn btn-logout" id="logoutBtn">
                         <span class="btn-icon">🚪</span> Cerrar Sesión
                     </button>
                 </div>
 
+                <!-- Contenedor de Cámara con Guía -->
+                <div class="camera-container" id="cameraContainer">
+                    <video id="videoPreview" autoplay playsinline></video>
+                    <div class="focus-guide">
+                        <div class="focus-text">📍 ENFOCAR RUT AQUÍ</div>
+                    </div>
+                    <div class="tap-hint">👆 Toca la pantalla para capturar</div>
+                </div>
+
                 <div id="cameraButtons" style="display: none;">
-                    <button class="btn btn-capture" id="captureBtn">
-                        <span class="btn-icon">📸</span> Capturar Foto
-                    </button>
                     <button class="btn btn-cancel" id="cancelBtn">
                         <span class="btn-icon">❌</span> Cancelar
                     </button>
                 </div>
 
-                <input type="file" id="fileInput" accept="image/*" capture="environment">
+                <!-- Preview Capturado (más pequeño) -->
+                <div class="preview-container" id="previewContainer">
+                    <img id="imagePreview" alt="Foto capturada">
+                </div>
+
+                <canvas id="canvas"></canvas>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Analizando imagen...</div>
+                    <div class="loading-text">Analizando RUT...</div>
                 </div>
 
+                <!-- Ingreso Manual con Teclado Grande -->
                 <div id="rutManualSection">
                     <div class="manual-alert">
-                        <strong>⚠️ RUT no detectado automáticamente</strong>
-                        <p>Por favor, ingresa el RUT manualmente:</p>
+                        <strong>⚠️ RUT no detectado</strong>
+                        <p>Ingresa el RUT manualmente usando el teclado:</p>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">RUT del Estudiante:</label>
-                        <input 
-                            type="text" 
-                            id="rutManualInput" 
-                            class="input-field" 
-                            placeholder="12345678-9"
-                            maxlength="12"
-                        >
+                    
+                    <div class="rut-display-input" id="rutManualDisplay">
+                        <span id="rutManualText"></span>
                     </div>
-                    <button class="btn btn-capture" id="verificarManualBtn">
+                    
+                    <!-- Teclado Numérico Grande -->
+                    <div class="custom-keyboard">
+                        <div class="key" data-key="1">1</div>
+                        <div class="key" data-key="2">2</div>
+                        <div class="key" data-key="3">3</div>
+                        <div class="key" data-key="4">4</div>
+                        <div class="key" data-key="5">5</div>
+                        <div class="key" data-key="6">6</div>
+                        <div class="key" data-key="7">7</div>
+                        <div class="key" data-key="8">8</div>
+                        <div class="key" data-key="9">9</div>
+                        <div class="key key-special" data-key="-">-</div>
+                        <div class="key" data-key="0">0</div>
+                        <div class="key key-k" data-key="K">K</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="key key-delete" data-key="delete" style="grid-column: span 2;">
+                            ⌫ BORRAR
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-camera" id="verificarManualBtn" style="margin-top: 15px;">
                         <span class="btn-icon">✓</span> Verificar RUT
                     </button>
                     <button class="btn btn-cancel" id="cancelManualBtn">
-                        <span class="btn-icon">↩️</span> Tomar Otra Foto
+                        <span class="btn-icon">↩️</span> Nueva Captura
                     </button>
                 </div>
 
-                <!-- RESULTADO COMPLETO -->
+                <!-- RESULTADO -->
                 <div class="result" id="result">
                     <div class="result-header" id="resultHeader">
                         <div class="result-icon" id="resultIcon">✅</div>
                         <div class="result-title" id="resultTitle">TNE VIGENTE</div>
-                        <div class="result-subtitle" id="resultSubtitle">El estudiante puede usar tarifa escolar</div>
+                        <div class="result-subtitle" id="resultSubtitle">Puede usar tarifa escolar</div>
                     </div>
                     
                     <div class="result-body" id="resultBody">
                         <div class="rut-display" id="rutDisplay">RUT: 12.345.678-9</div>
                         
-                        <!-- Datos del Estudiante -->
                         <div class="data-section" id="datosEstudiante">
                             <div class="data-section-title">
                                 <span>👤</span> DATOS DEL ESTUDIANTE
@@ -567,10 +707,9 @@
                             </div>
                         </div>
 
-                        <!-- Datos de la Institución -->
                         <div class="data-section" id="datosInstitucion">
                             <div class="data-section-title">
-                                <span>🏫</span> DATOS DE LA INSTITUCIÓN
+                                <span>🏫</span> INSTITUCIÓN
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -582,18 +721,21 @@
                             </div>
                         </div>
 
-                        <!-- Estado TNE -->
                         <div class="data-section" id="estadoTneSection">
                             <div class="data-section-title">
-                                <span>📋</span> INFORMACIÓN TNE
+                                <span>📋</span> ESTADO TNE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Estado:</div>
                                 <div class="data-value" id="estadoOficial">-</div>
                             </div>
+                            <div class="data-row" id="fechaRow" style="display: none;">
+                                <div class="data-label">Fecha:</div>
+                                <div class="data-value" id="fechaTramite">-</div>
+                            </div>
                         </div>
 
-                        <button class="btn btn-secondary" id="newScanBtn" style="margin-top: 20px;">
+                        <button class="btn" id="newScanBtn" style="margin-top: 15px;">
                             🔄 Nueva Verificación
                         </button>
                     </div>
@@ -603,8 +745,8 @@
             </div>
 
             <div class="footer">
-                <p>🚌 Sistema profesional para conductores</p>
-                <p style="margin-top: 5px;">Verificación en tiempo real con JUNAEB</p>
+                <p>🚌 Sistema para conductores</p>
+                <p style="margin-top: 4px;">Detección de sellos falsos</p>
             </div>
         </div>
     </div>
@@ -619,18 +761,12 @@
         let licenciaActual = null;
         let conductorNombre = null;
         let verificacionesHoy = 0;
-        let deviceId = localStorage.getItem('device_id') || generarDeviceId();
+        let rutManualValue = '';
 
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
-
-        function generarDeviceId() {
-            const id = 'device_' + Math.random().toString(36).substr(2, 9) + Date.now();
-            localStorage.setItem('device_id', id);
-            return id;
-        }
 
         // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
@@ -643,10 +779,9 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         const cameraBtn = document.getElementById('cameraBtn');
-        const galleryBtn = document.getElementById('galleryBtn');
-        const captureBtn = document.getElementById('captureBtn');
+        const cameraContainer = document.getElementById('cameraContainer');
         const cancelBtn = document.getElementById('cancelBtn');
-        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
         const loading = document.getElementById('loading');
         const result = document.getElementById('result');
         const errorMsg = document.getElementById('errorMsg');
@@ -654,7 +789,8 @@
         const initialButtons = document.getElementById('initialButtons');
         const cameraButtons = document.getElementById('cameraButtons');
         const rutManualSection = document.getElementById('rutManualSection');
-        const rutManualInput = document.getElementById('rutManualInput');
+        const rutManualDisplay = document.getElementById('rutManualDisplay');
+        const rutManualText = document.getElementById('rutManualText');
         const verificarManualBtn = document.getElementById('verificarManualBtn');
         const cancelManualBtn = document.getElementById('cancelManualBtn');
 
@@ -682,9 +818,7 @@
         });
 
         licenseInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                loginBtn.click();
-            }
+            if (e.key === 'Enter') loginBtn.click();
         });
 
         async function validarLicencia(codigo, autoLogin) {
@@ -709,7 +843,6 @@
                     licenciaActual = codigo;
                     conductorNombre = data.nombre;
                     localStorage.setItem('tne_license', codigo);
-                    
                     mostrarApp();
                 } else {
                     if (!autoLogin) {
@@ -721,7 +854,7 @@
                 }
             } catch (error) {
                 if (!autoLogin) {
-                    mostrarErrorLogin('Error de conexión. Verifica tu internet.');
+                    mostrarErrorLogin('Error de conexión');
                 }
             } finally {
                 if (!autoLogin) {
@@ -734,9 +867,7 @@
         function mostrarErrorLogin(mensaje) {
             loginError.textContent = mensaje;
             loginError.style.display = 'block';
-            setTimeout(() => {
-                loginError.style.display = 'none';
-            }, 5000);
+            setTimeout(() => loginError.style.display = 'none', 5000);
         }
 
         function mostrarApp() {
@@ -749,7 +880,7 @@
 
         function actualizarStats() {
             const hoy = new Date().toLocaleDateString('es-CL');
-            statsBar.textContent = `📊 Verificaciones hoy: ${verificacionesHoy} | 📅 ${hoy}`;
+            statsBar.textContent = `📊 Verificaciones: ${verificacionesHoy} | 📅 ${hoy}`;
         }
 
         logoutBtn.addEventListener('click', () => {
@@ -759,80 +890,80 @@
             }
         });
 
-        // Preprocesar imagen para mejor OCR
-        function preprocesarImagen(imgElement) {
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            const scale = 2;
-            tempCanvas.width = imgElement.width * scale;
-            tempCanvas.height = imgElement.height * scale;
-            
-            tempCtx.drawImage(imgElement, 0, 0, tempCanvas.width, tempCanvas.height);
-            
-            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            const data = imageData.data;
-            
-            for (let i = 0; i < data.length; i += 4) {
-                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                const contrast = 1.5;
-                const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-                let newValue = factor * (avg - 128) + 128;
-                newValue = newValue > 128 ? 255 : 0;
-                
-                data[i] = newValue;
-                data[i + 1] = newValue;
-                data[i + 2] = newValue;
+        // Cámara
+        cameraBtn.addEventListener('click', abrirCamara);
+
+        async function abrirCamara() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                    } 
+                });
+                video.srcObject = stream;
+                cameraContainer.classList.add('active');
+                initialButtons.style.display = 'none';
+                cameraButtons.style.display = 'block';
+                result.style.display = 'none';
+                errorMsg.style.display = 'none';
+            } catch (err) {
+                mostrarError('No se pudo acceder a la cámara');
             }
-            
-            tempCtx.putImageData(imageData, 0, 0);
-            return tempCanvas.toDataURL('image/png');
         }
 
-        // Procesar imagen con OCR
+        // Capturar al tocar el video
+        video.addEventListener('click', capturarFoto);
+
+        function capturarFoto() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            ctx.drawImage(video, 0, 0);
+            
+            const imageUrl = canvas.toDataURL('image/jpeg', 1.0);
+            imagePreview.src = imageUrl;
+            
+            cerrarCamara();
+            previewContainer.classList.add('active');
+            procesarImagen(imageUrl);
+        }
+
+        cancelBtn.addEventListener('click', cerrarCamara);
+
+        function cerrarCamara() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            cameraContainer.classList.remove('active');
+            initialButtons.style.display = 'block';
+            cameraButtons.style.display = 'none';
+        }
+
+        // OCR
         async function procesarImagen(imageUrl) {
             loading.style.display = 'block';
             result.style.display = 'none';
             errorMsg.style.display = 'none';
-            initialButtons.style.display = 'none';
-            cameraButtons.style.display = 'none';
             rutManualSection.style.display = 'none';
             
             try {
-                const img = new Image();
-                img.src = imageUrl;
-                await new Promise(resolve => img.onload = resolve);
-                
-                const imagenProcesada = preprocesarImagen(img);
-                
-                const worker = await Tesseract.createWorker('spa', 1, {
-                    logger: m => console.log(m)
-                });
-                
+                const worker = await Tesseract.createWorker('spa');
                 await worker.setParameters({
                     tessedit_char_whitelist: '0123456789K-.',
-                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
                 });
                 
-                let { data: { text } } = await worker.recognize(imagenProcesada);
-                console.log('OCR Procesada:', text);
-                
-                let rut = extraerRUT(text);
-                
-                if (!rut) {
-                    console.log('Reintentando con original...');
-                    const resultado = await worker.recognize(imageUrl);
-                    text = resultado.data.text;
-                    console.log('OCR Original:', text);
-                    rut = extraerRUT(text);
-                }
-                
+                const { data: { text } } = await worker.recognize(imageUrl);
                 await worker.terminate();
+                
+                console.log('OCR:', text);
+                const rut = extraerRUT(text);
                 
                 if (!rut) {
                     loading.style.display = 'none';
-                    rutManualSection.style.display = 'block';
-                    rutManualInput.focus();
+                    mostrarIngresoManual();
                     return;
                 }
                 
@@ -840,136 +971,89 @@
                 
             } catch (err) {
                 console.error('Error:', err);
-                mostrarError('Error al procesar: ' + err.message);
-                initialButtons.style.display = 'block';
+                mostrarError('Error al procesar');
+                resetear();
             } finally {
                 loading.style.display = 'none';
             }
         }
 
-        // Extraer RUT
         function extraerRUT(texto) {
-            texto = texto.toUpperCase().replace(/[^0-9K\-\.\s]/g, '');
-            console.log('Texto limpio:', texto);
+            texto = texto.toUpperCase().replace(/[^0-9K\-\.]/g, '');
             
             const patrones = [
-                /(\d{1,2}\.\d{3}\.\d{3}[-\s]?[0-9K])/g,
-                /(\d{7,8}[-\s][0-9K])/g,
-                /(\d{7,8}[0-9K])/g,
-                /(\d{1,2}\s?\d{3}\s?\d{3}\s?[-]?\s?[0-9K])/g,
+                /(\d{7,8}[-]?[0-9K])/g,
+                /(\d{1,2}\.\d{3}\.\d{3}[-]?[0-9K])/g,
             ];
             
             for (const patron of patrones) {
                 const matches = texto.match(patron);
                 if (matches) {
-                    console.log('Matches:', matches);
                     for (const match of matches) {
-                        const rutLimpio = match.replace(/[.\-\s]/g, '');
-                        console.log('Probando:', rutLimpio);
-                        
+                        const rutLimpio = match.replace(/[.\-]/g, '');
                         if (rutLimpio.length >= 8 && rutLimpio.length <= 9) {
                             const rut = rutLimpio.slice(0, -1);
                             const dv = rutLimpio.slice(-1);
-                            
                             if (validarRUT(rut, dv)) {
-                                const rutFormateado = formatearRUT(rut, dv);
-                                console.log('✓ RUT válido:', rutFormateado);
-                                return rutFormateado;
+                                return formatearRUT(rut, dv);
                             }
                         }
                     }
                 }
             }
-            
-            const numeros = texto.match(/\d{7,9}/g);
-            if (numeros) {
-                console.log('Búsqueda exhaustiva:', numeros);
-                for (const num of numeros) {
-                    if (num.length >= 8) {
-                        const rut = num.slice(0, -1);
-                        const dv = num.slice(-1);
-                        if (validarRUT(rut, dv)) {
-                            const rutFormateado = formatearRUT(rut, dv);
-                            console.log('✓ RUT (exhaustivo):', rutFormateado);
-                            return rutFormateado;
-                        }
-                    }
-                }
-            }
-            
-            console.log('✗ No se encontró RUT');
             return null;
         }
 
         function validarRUT(rut, dv) {
             let suma = 0;
             let multiplicador = 2;
-            
             for (let i = rut.length - 1; i >= 0; i--) {
                 suma += parseInt(rut[i]) * multiplicador;
                 multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
             }
-            
-            const dvCalculado = 11 - (suma % 11);
-            const dvFinal = dvCalculado === 11 ? '0' : dvCalculado === 10 ? 'K' : dvCalculado.toString();
-            
+            const dvCalc = 11 - (suma % 11);
+            const dvFinal = dvCalc === 11 ? '0' : dvCalc === 10 ? 'K' : dvCalc.toString();
             return dv === dvFinal;
         }
 
         function formatearRUT(rut, dv) {
-            const rutFormateado = rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            return `${rutFormateado}-${dv}`;
+            return rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
         }
 
-        // Cámara web
-        async function abrirCamara() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 3840, min: 1280 },
-                        height: { ideal: 2160, min: 720 },
-                    } 
-                });
-                video.srcObject = stream;
-                video.style.display = 'block';
-                imagePreview.style.display = 'none';
-                initialButtons.style.display = 'none';
-                cameraButtons.style.display = 'block';
-                result.style.display = 'none';
-                errorMsg.style.display = 'none';
-            } catch (err) {
-                mostrarError('No se pudo acceder a la cámara. Verifica los permisos.');
+        // Teclado Numérico
+        function mostrarIngresoManual() {
+            rutManualSection.style.display = 'block';
+            rutManualValue = '';
+            actualizarDisplayManual();
+        }
+
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('click', () => {
+                const valor = key.dataset.key;
+                
+                if (valor === 'delete') {
+                    rutManualValue = rutManualValue.slice(0, -1);
+                } else if (rutManualValue.length < 10) {
+                    rutManualValue += valor;
+                }
+                
+                actualizarDisplayManual();
+            });
+        });
+
+        function actualizarDisplayManual() {
+            rutManualText.textContent = rutManualValue || ' ';
+        }
+
+        verificarManualBtn.addEventListener('click', () => {
+            if (rutManualValue.length < 8) {
+                mostrarError('RUT incompleto. Mínimo 8 dígitos.');
+                return;
             }
-        }
+            verificarTNE(rutManualValue);
+        });
 
-        function cerrarCamara() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-            video.style.display = 'none';
-            initialButtons.style.display = 'block';
-            cameraButtons.style.display = 'none';
-        }
-
-        function capturarFoto() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(video, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                imagePreview.src = url;
-                imagePreview.style.display = 'block';
-                video.style.display = 'none';
-                cerrarCamara();
-                procesarImagen(url);
-            }, 'image/jpeg', 1.0);
-        }
+        cancelManualBtn.addEventListener('click', resetear);
 
         // Verificar TNE
         async function verificarTNE(rut) {
@@ -988,12 +1072,7 @@
                     })
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Error en la verificación');
-                }
-                
                 const data = await response.json();
-                
                 mostrarResultado(rut, data);
                 
                 verificacionesHoy++;
@@ -1001,9 +1080,8 @@
                 actualizarStats();
                 
             } catch (err) {
-                console.error('Error:', err);
-                mostrarError('Error al verificar: ' + err.message);
-                initialButtons.style.display = 'block';
+                mostrarError('Error al verificar');
+                resetear();
             } finally {
                 loading.style.display = 'none';
             }
@@ -1016,29 +1094,29 @@
             const resultTitle = document.getElementById('resultTitle');
             const resultSubtitle = document.getElementById('resultSubtitle');
             
-            // Resetear clases
             resultHeader.className = 'result-header';
             resultBody.className = 'result-body';
             
-            // Configurar según estado
-            if (data.vigente) {
-                resultHeader.classList.add('vigente');
-                resultBody.classList.add('vigente');
+            if (data.selloFalso) {
+                resultHeader.classList.add('falso');
+                resultBody.classList.add('falso');
+                resultIcon.textContent = '🚨';
+                resultTitle.textContent = data.estado || 'SELLO FALSO';
+                resultSubtitle.textContent = data.mensaje;
+            } else if (data.vigente) {
                 resultIcon.textContent = '✅';
                 resultTitle.textContent = data.estado || 'TNE VIGENTE';
-                resultSubtitle.textContent = data.mensaje || 'El estudiante puede usar tarifa escolar';
+                resultSubtitle.textContent = data.instrucciones || 'Puede usar tarifa escolar';
             } else {
                 resultHeader.classList.add('no-vigente');
                 resultBody.classList.add('no-vigente');
                 resultIcon.textContent = '⚠️';
                 resultTitle.textContent = data.estado || 'TNE NO VIGENTE';
-                resultSubtitle.textContent = data.mensaje || 'Verificar estado de la TNE';
+                resultSubtitle.textContent = data.instrucciones || data.mensaje;
             }
             
-            // RUT
             document.getElementById('rutDisplay').textContent = `RUT: ${rut}`;
             
-            // Datos del estudiante
             if (data.nombreCompleto) {
                 document.getElementById('nombreCompleto').textContent = data.nombreCompleto;
                 document.getElementById('nivel').textContent = data.nivel || '-';
@@ -1048,27 +1126,26 @@
                 document.getElementById('datosEstudiante').style.display = 'none';
             }
             
-            // Datos de la institución
             if (data.establecimiento) {
                 document.getElementById('establecimiento').textContent = data.establecimiento;
                 document.getElementById('datosInstitucion').style.display = 'block';
                 
-                // Región (extraer del detalles si existe)
-                if (data.detalles && data.detalles.includes('Región:')) {
-                    const regionMatch = data.detalles.match(/Región:\s*(.+)/);
-                    if (regionMatch) {
-                        document.getElementById('region').textContent = regionMatch[1].trim();
-                        document.getElementById('regionRow').style.display = 'flex';
-                    }
+                if (data.region) {
+                    document.getElementById('region').textContent = data.region;
+                    document.getElementById('regionRow').style.display = 'flex';
                 }
             } else {
                 document.getElementById('datosInstitucion').style.display = 'none';
             }
             
-            // Estado oficial
             if (data.estadoOficial) {
                 document.getElementById('estadoOficial').textContent = data.estadoOficial;
                 document.getElementById('estadoTneSection').style.display = 'block';
+                
+                if (data.fechaUltimoTramite) {
+                    document.getElementById('fechaTramite').textContent = data.fechaUltimoTramite;
+                    document.getElementById('fechaRow').style.display = 'flex';
+                }
             } else {
                 document.getElementById('estadoTneSection').style.display = 'none';
             }
@@ -1079,71 +1156,19 @@
         function mostrarError(mensaje) {
             errorMsg.textContent = mensaje;
             errorMsg.style.display = 'block';
-            setTimeout(() => {
-                errorMsg.style.display = 'none';
-            }, 5000);
+            setTimeout(() => errorMsg.style.display = 'none', 5000);
         }
 
-        // Event Listeners
-        galleryBtn.addEventListener('click', () => fileInput.click());
-        cameraBtn.addEventListener('click', abrirCamara);
-        captureBtn.addEventListener('click', capturarFoto);
-        cancelBtn.addEventListener('click', cerrarCamara);
-        
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                imagePreview.src = url;
-                imagePreview.style.display = 'block';
-                video.style.display = 'none';
-                procesarImagen(url);
-            }
-        });
-        
-        newScanBtn.addEventListener('click', () => {
+        newScanBtn.addEventListener('click', resetear);
+
+        function resetear() {
             result.style.display = 'none';
-            imagePreview.style.display = 'none';
+            previewContainer.classList.remove('active');
+            rutManualSection.style.display = 'none';
             errorMsg.style.display = 'none';
-            rutManualSection.style.display = 'none';
             initialButtons.style.display = 'block';
-            fileInput.value = '';
-        });
-
-        verificarManualBtn.addEventListener('click', () => {
-            const rutIngresado = rutManualInput.value.trim();
-            if (!rutIngresado) {
-                mostrarError('Por favor ingresa un RUT');
-                return;
-            }
-            
-            const rutLimpio = rutIngresado.replace(/[.\-]/g, '');
-            if (rutLimpio.length < 8 || rutLimpio.length > 9) {
-                mostrarError('RUT inválido. Formato: 12345678-9');
-                return;
-            }
-            
-            verificarTNE(rutIngresado);
-        });
-
-        cancelManualBtn.addEventListener('click', () => {
-            rutManualSection.style.display = 'none';
-            imagePreview.style.display = 'none';
-            initialButtons.style.display = 'block';
-            rutManualInput.value = '';
-        });
-
-        rutManualInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                verificarManualBtn.click();
-            }
-        });
-
-        window.addEventListener('beforeunload', () => {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-        });
+            rutManualValue = '';
+        }
     </script>
 </body>
 </html>
