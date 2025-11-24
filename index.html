@@ -568,6 +568,105 @@
         .hidden {
             display: none !important;
         }
+
+        /* Selector de Máquinas */
+        .machine-selector {
+            display: none;
+            padding: 20px;
+        }
+
+        .machine-selector.active {
+            display: block;
+        }
+
+        .selector-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .machine-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .machine-card {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .machine-card:hover {
+            border-color: #1a56db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+        }
+
+        .machine-card.disponible {
+            border-color: #10b981;
+        }
+
+        .machine-card.ocupada {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .machine-card.sin-consultas {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .machine-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .machine-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-disponible {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-ocupada {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .machine-consultas {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .machine-consultas strong {
+            color: #1f2937;
+        }
     </style>
 </head>
 <body>
@@ -604,6 +703,24 @@
                 <p style="color: #9ca3af;">Versión Pro 5.0 - OCR Ultra Preciso</p>
                 <p style="margin-top: 4px; color: #9ca3af;">Sistema de Empresarios y Máquinas</p>
             </div>
+        </div>
+
+        <!-- PANTALLA DE SELECCIÓN DE MÁQUINA -->
+        <div class="machine-selector" id="machineSelector">
+            <div class="selector-title">🚌 Selecciona tu Máquina</div>
+            
+            <div class="instructions" style="margin-bottom: 20px;">
+                <div class="instructions-title">📋 Instrucciones:</div>
+                <p>Elige el bus/máquina que vas a usar hoy. Solo podrás usar esta máquina durante esta sesión.</p>
+            </div>
+
+            <div class="machine-list" id="machineList">
+                <!-- Las máquinas se cargan dinámicamente aquí -->
+            </div>
+
+            <button class="btn btn-cancel" id="cancelMachineBtn">
+                <span class="btn-icon">↩️</span> Volver al Login
+            </button>
         </div>
 
         <!-- PANTALLA PRINCIPAL DE LA APP -->
@@ -849,11 +966,14 @@
 
         // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
+        const machineSelector = document.getElementById('machineSelector');
         const appScreen = document.getElementById('appScreen');
         const licenseInput = document.getElementById('licenseInput');
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
         const licenseBadge = document.getElementById('licenseBadge');
+        const machineList = document.getElementById('machineList');
+        const cancelMachineBtn = document.getElementById('cancelMachineBtn');
         const statsBar = document.getElementById('statsBar');
         const logoutBtn = document.getElementById('logoutBtn');
         const cameraBtn = document.getElementById('cameraBtn');
@@ -901,7 +1021,7 @@
             if (e.key === 'Enter') loginBtn.click();
         });
 
-        // ✅ FUNCIÓN ACTUALIZADA: validarEmpresario (antes validarLicencia)
+        // ✅ FUNCIÓN ACTUALIZADA: validarEmpresario (ahora lista máquinas)
         async function validarEmpresario(codigo, autoLogin) {
             if (!autoLogin) {
                 loginBtn.disabled = true;
@@ -913,27 +1033,26 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        accion: 'validar_empresario', // ✅ CAMBIO
-                        codigoEmpresario: codigo, // ✅ CAMBIO
-                        deviceId: deviceId
+                        accion: 'listar_maquinas', // ✅ CAMBIO
+                        codigoEmpresario: codigo,
                     })
                 });
 
                 const data = await response.json();
 
-                if (data.valida) {
-                    codigoEmpresarioActual = codigo; // ✅ CAMBIO
-                    empresarioNombre = data.nombreEmpresario; // ✅ CAMBIO
-                    maquinaAsignada = data.maquina; // ✅ NUEVO
-                    consultasRestantes = data.consultasRestantes;
-                    localStorage.setItem('tne_empresario', codigo); // ✅ CAMBIO
-                    mostrarApp();
+                if (data.valido) {
+                    codigoEmpresarioActual = codigo;
+                    empresarioNombre = data.empresario;
+                    localStorage.setItem('tne_empresario', codigo);
+                    
+                    // Mostrar selector de máquinas
+                    mostrarSelectorMaquinas(data.maquinas);
                 } else {
                     if (!autoLogin) {
-                        mostrarErrorLogin(data.mensaje || 'Código inválido');
+                        mostrarErrorLogin(data.error || 'Código inválido');
                         licenseInput.value = '';
                     } else {
-                        localStorage.removeItem('tne_empresario'); // ✅ CAMBIO
+                        localStorage.removeItem('tne_empresario');
                     }
                 }
             } catch (error) {
@@ -948,6 +1067,102 @@
             }
         }
 
+        // ✅ NUEVA FUNCIÓN: Mostrar selector de máquinas
+        function mostrarSelectorMaquinas(maquinas) {
+            loginScreen.classList.add('hidden');
+            machineSelector.classList.add('active');
+            
+            machineList.innerHTML = '';
+            
+            if (maquinas.length === 0) {
+                machineList.innerHTML = '<p style="text-align:center;color:#6b7280;">No hay máquinas disponibles</p>';
+                return;
+            }
+            
+            maquinas.forEach(maq => {
+                const card = document.createElement('div');
+                card.className = 'machine-card';
+                
+                let statusClass = '';
+                let statusText = '';
+                let clickeable = true;
+                
+                if (!maq.activo) {
+                    card.classList.add('ocupada');
+                    statusClass = 'status-ocupada';
+                    statusText = 'INACTIVA';
+                    clickeable = false;
+                } else if (maq.enUso) {
+                    card.classList.add('ocupada');
+                    statusClass = 'status-ocupada';
+                    statusText = 'EN USO';
+                    clickeable = false;
+                } else if (maq.consultasDisponibles === 0) {
+                    card.classList.add('sin-consultas');
+                    statusClass = 'status-ocupada';
+                    statusText = 'SIN CONSULTAS';
+                    clickeable = false;
+                } else {
+                    card.classList.add('disponible');
+                    statusClass = 'status-disponible';
+                    statusText = 'DISPONIBLE';
+                }
+                
+                card.innerHTML = `
+                    <div class="machine-name">🚌 ${maq.nombre}</div>
+                    <div class="machine-status">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="machine-consultas">
+                        Consultas disponibles: <strong>${maq.consultasDisponibles}/${maq.limiteConsultas}</strong>
+                    </div>
+                `;
+                
+                if (clickeable) {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => asignarMaquinaSeleccionada(maq.id, maq.nombre));
+                }
+                
+                machineList.appendChild(card);
+            });
+        }
+
+        // ✅ NUEVA FUNCIÓN: Asignar máquina seleccionada
+        async function asignarMaquinaSeleccionada(maquinaId, nombreMaquina) {
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        accion: 'asignar_maquina',
+                        codigoEmpresario: codigoEmpresarioActual,
+                        deviceId: deviceId,
+                        maquinaId: maquinaId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.valido) {
+                    maquinaAsignada = data.maquina;
+                    consultasRestantes = data.consultasRestantes;
+                    mostrarApp();
+                } else {
+                    alert(data.error || 'No se pudo asignar la máquina');
+                }
+            } catch (error) {
+                alert('Error de conexión al asignar máquina');
+            }
+        }
+
+        cancelMachineBtn.addEventListener('click', () => {
+            machineSelector.classList.remove('active');
+            loginScreen.classList.remove('hidden');
+            codigoEmpresarioActual = null;
+            empresarioNombre = null;
+            localStorage.removeItem('tne_empresario');
+        });
+
         function mostrarErrorLogin(mensaje) {
             loginError.textContent = mensaje;
             loginError.style.display = 'block';
@@ -956,6 +1171,7 @@
 
         function mostrarApp() {
             loginScreen.classList.add('hidden');
+            machineSelector.classList.remove('active'); // ✅ NUEVO
             appScreen.classList.add('active');
             // ✅ CAMBIO: Mostrar empresario y máquina asignada
             licenseBadge.textContent = `👤 ${empresarioNombre} | 🚌 ${maquinaAsignada}`;
