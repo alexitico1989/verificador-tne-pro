@@ -584,25 +584,25 @@
             <div class="login-title">Acceso Restringido</div>
 
             <div class="input-group">
-                <label class="input-label">Código de Licencia:</label>
+                <label class="input-label">Código de Empresario:</label>
                 <input 
                     type="text" 
                     id="licenseInput" 
                     class="input-field" 
-                    placeholder="DEMO-2025"
-                    maxlength="20"
+                    placeholder="EMP-NOMBRE-2025"
+                    maxlength="30"
                 >
             </div>
 
             <button class="btn" id="loginBtn">
-                <span class="btn-icon">✓</span> Validar Licencia
+                <span class="btn-icon">✓</span> Iniciar Sesión
             </button>
 
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
                 <p style="color: #9ca3af;">Versión Pro 5.0 - OCR Ultra Preciso</p>
-                <p style="margin-top: 4px; color: #9ca3af;">Captura múltiple con estabilización</p>
+                <p style="margin-top: 4px; color: #9ca3af;">Sistema de Empresarios y Máquinas</p>
             </div>
         </div>
 
@@ -787,8 +787,9 @@
         
         // Variables globales
         let stream = null;
-        let licenciaActual = null;
-        let conductorNombre = null;
+        let codigoEmpresarioActual = null; // ✅ CAMBIO: licenciaActual → codigoEmpresarioActual
+        let empresarioNombre = null; // ✅ CAMBIO: conductorNombre → empresarioNombre
+        let maquinaAsignada = null; // ✅ NUEVO: nombre de la máquina asignada
         let verificacionesHoy = 0;
         let rutManualValue = '';
         let capturando = false;
@@ -875,9 +876,9 @@
 
         // Al cargar
         window.addEventListener('load', () => {
-            const savedLicense = localStorage.getItem('tne_license');
-            if (savedLicense) {
-                validarLicencia(savedLicense, true);
+            const savedCode = localStorage.getItem('tne_empresario'); // ✅ CAMBIO
+            if (savedCode) {
+                validarEmpresario(savedCode, true); // ✅ CAMBIO
             }
 
             const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
@@ -888,19 +889,20 @@
 
         // Login
         loginBtn.addEventListener('click', () => {
-            const licencia = licenseInput.value.trim().toUpperCase();
-            if (!licencia) {
-                mostrarErrorLogin('Por favor ingresa un código de licencia');
+            const codigo = licenseInput.value.trim().toUpperCase();
+            if (!codigo) {
+                mostrarErrorLogin('Por favor ingresa un código de empresario');
                 return;
             }
-            validarLicencia(licencia, false);
+            validarEmpresario(codigo, false); // ✅ CAMBIO
         });
 
         licenseInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') loginBtn.click();
         });
 
-        async function validarLicencia(codigo, autoLogin) {
+        // ✅ FUNCIÓN ACTUALIZADA: validarEmpresario (antes validarLicencia)
+        async function validarEmpresario(codigo, autoLogin) {
             if (!autoLogin) {
                 loginBtn.disabled = true;
                 loginBtn.textContent = 'Validando...';
@@ -911,8 +913,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        accion: 'validar_licencia',
-                        licencia: codigo,
+                        accion: 'validar_empresario', // ✅ CAMBIO
+                        codigoEmpresario: codigo, // ✅ CAMBIO
                         deviceId: deviceId
                     })
                 });
@@ -920,17 +922,18 @@
                 const data = await response.json();
 
                 if (data.valida) {
-                    licenciaActual = codigo;
-                    conductorNombre = data.nombre;
+                    codigoEmpresarioActual = codigo; // ✅ CAMBIO
+                    empresarioNombre = data.nombreEmpresario; // ✅ CAMBIO
+                    maquinaAsignada = data.maquina; // ✅ NUEVO
                     consultasRestantes = data.consultasRestantes;
-                    localStorage.setItem('tne_license', codigo);
+                    localStorage.setItem('tne_empresario', codigo); // ✅ CAMBIO
                     mostrarApp();
                 } else {
                     if (!autoLogin) {
-                        mostrarErrorLogin(data.mensaje || 'Licencia inválida');
+                        mostrarErrorLogin(data.mensaje || 'Código inválido');
                         licenseInput.value = '';
                     } else {
-                        localStorage.removeItem('tne_license');
+                        localStorage.removeItem('tne_empresario'); // ✅ CAMBIO
                     }
                 }
             } catch (error) {
@@ -940,7 +943,7 @@
             } finally {
                 if (!autoLogin) {
                     loginBtn.disabled = false;
-                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Validar Licencia';
+                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Iniciar Sesión';
                 }
             }
         }
@@ -954,7 +957,8 @@
         function mostrarApp() {
             loginScreen.classList.add('hidden');
             appScreen.classList.add('active');
-            licenseBadge.textContent = `👤 ${conductorNombre}`;
+            // ✅ CAMBIO: Mostrar empresario y máquina asignada
+            licenseBadge.textContent = `👤 ${empresarioNombre} | 🚌 ${maquinaAsignada}`;
             licenseBadge.style.display = 'inline-block';
             actualizarStats();
         }
@@ -968,9 +972,25 @@
             statsBar.textContent = texto;
         }
 
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Cerrar sesión?')) {
-                localStorage.removeItem('tne_license');
+        // ✅ FUNCIÓN ACTUALIZADA: Cerrar sesión (opcional: liberar máquina)
+        logoutBtn.addEventListener('click', async () => {
+            if (confirm('¿Cerrar sesión? La máquina quedará disponible para otros conductores.')) {
+                // Opcional: Llamar al endpoint de cerrar sesión
+                try {
+                    await fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            accion: 'cerrar_sesion',
+                            codigoEmpresario: codigoEmpresarioActual,
+                            deviceId: deviceId
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error al cerrar sesión:', error);
+                }
+                
+                localStorage.removeItem('tne_empresario'); // ✅ CAMBIO
                 location.reload();
             }
         });
@@ -1421,7 +1441,7 @@
 
         cancelManualBtn.addEventListener('click', resetear);
 
-        // Verificar TNE
+        // ✅ FUNCIÓN ACTUALIZADA: verificarTNE
         async function verificarTNE(rut) {
             loading.style.display = 'block';
             loadingProgress.textContent = 'Consultando JUNAEB...';
@@ -1434,7 +1454,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         accion: 'verificar_tne',
-                        licencia: licenciaActual,
+                        codigoEmpresario: codigoEmpresarioActual, // ✅ CAMBIO
                         deviceId: deviceId,
                         rut: rut
                     })
