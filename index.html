@@ -672,7 +672,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 Verificador TNE</h1>
+            <h1>Verificador TNE</h1>
             <p id="headerSubtitle">Sistema profesional de verificación</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
@@ -707,10 +707,10 @@
 
         <!-- PANTALLA DE SELECCIÓN DE MÁQUINA -->
         <div class="machine-selector" id="machineSelector">
-            <div class="selector-title">🚌 Selecciona tu Máquina</div>
+            <div class="selector-title">Selecciona tu Máquina</div>
             
             <div class="instructions" style="margin-bottom: 20px;">
-                <div class="instructions-title">📋 Instrucciones:</div>
+                <div class="instructions-title">Instrucciones:</div>
                 <p>Elige el bus/máquina que vas a usar hoy. Solo podrás usar esta máquina durante esta sesión.</p>
             </div>
 
@@ -836,7 +836,7 @@
                         
                         <div class="data-section" id="datosEstudiante">
                             <div class="data-section-title">
-                                <span>👤</span> DATOS DEL ESTUDIANTE
+                                <span></span> DATOS DEL ESTUDIANTE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -854,7 +854,7 @@
 
                         <div class="data-section" id="datosInstitucion">
                             <div class="data-section-title">
-                                <span>🏫</span> INSTITUCIÓN
+                                <span></span> INSTITUCIÓN
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -868,7 +868,7 @@
 
                         <div class="data-section" id="estadoTneSection">
                             <div class="data-section-title">
-                                <span>📋</span> ESTADO TNE
+                                <span></span> ESTADO TNE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Estado:</div>
@@ -890,8 +890,8 @@
             </div>
 
             <div class="footer">
-                <p>🚌 Sistema para conductores</p>
-                <p style="margin-top: 4px;">Detección ultra precisa de RUTs</p>
+                <p>Sistema para conductores</p>
+                <p style="margin-top: 4px;">Detección TNE</p>
             </div>
         </div>
     </div>
@@ -1109,7 +1109,7 @@
                 }
                 
                 card.innerHTML = `
-                    <div class="machine-name">🚌 ${maq.nombre}</div>
+                    <div class="machine-name"> ${maq.nombre}</div>
                     <div class="machine-status">
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
