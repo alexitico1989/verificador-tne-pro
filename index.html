@@ -672,7 +672,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 Verificador TNE Pro</h1>
+            <h1>Verificador TNE</h1>
             <p id="headerSubtitle">Sistema profesional de verificación</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
@@ -700,7 +700,7 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">Versión Pro 5.0 - OCR Ultra Preciso</p>
+                <p style="color: #9ca3af;">Versión Pro 5.0 - AMIA SOLUTIONS</p>
                 <p style="margin-top: 4px; color: #9ca3af;">Sistema de Empresarios y Máquinas</p>
             </div>
         </div>
@@ -907,11 +907,11 @@
         let codigoEmpresarioActual = null; // ✅ CAMBIO: licenciaActual → codigoEmpresarioActual
         let empresarioNombre = null; // ✅ CAMBIO: conductorNombre → empresarioNombre
         let maquinaAsignada = null; // ✅ NUEVO: nombre de la máquina asignada
-        let verificacionesHoy = 0;
         let rutManualValue = '';
         let capturando = false;
         let deviceId = null;
         let consultasRestantes = null;
+        let limiteConsultasMaquina = null; // ✅ NUEVO: límite total de la máquina
 
         // ====================================
         // GENERAR DEVICE ID ÚNICO
@@ -999,11 +999,6 @@
             const savedCode = localStorage.getItem('tne_empresario'); // ✅ CAMBIO
             if (savedCode) {
                 validarEmpresario(savedCode, true); // ✅ CAMBIO
-            }
-
-            const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
-            if (savedCount) {
-                verificacionesHoy = parseInt(savedCount);
             }
         });
 
@@ -1120,7 +1115,7 @@
                 
                 if (clickeable) {
                     card.style.cursor = 'pointer';
-                    card.addEventListener('click', () => asignarMaquinaSeleccionada(maq.id, maq.nombre));
+                    card.addEventListener('click', () => asignarMaquinaSeleccionada(maq.id, maq.nombre, maq.limiteConsultas, maq.consultasDisponibles));
                 }
                 
                 machineList.appendChild(card);
@@ -1128,7 +1123,7 @@
         }
 
         // ✅ NUEVA FUNCIÓN: Asignar máquina seleccionada
-        async function asignarMaquinaSeleccionada(maquinaId, nombreMaquina) {
+        async function asignarMaquinaSeleccionada(maquinaId, nombreMaquina, limiteConsultas, consultasDisponibles) {
             try {
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
@@ -1146,6 +1141,7 @@
                 if (data.valido) {
                     maquinaAsignada = data.maquina;
                     consultasRestantes = data.consultasRestantes;
+                    limiteConsultasMaquina = limiteConsultas; // ✅ NUEVO
                     mostrarApp();
                 } else {
                     alert(data.error || 'No se pudo asignar la máquina');
@@ -1179,12 +1175,49 @@
             actualizarStats();
         }
 
+        let limiteConsultasMaquina = null; // ✅ NUEVO: guardar el límite total
+
+        // ✅ NUEVA FUNCIÓN: Actualizar datos de la máquina desde el servidor
+        async function actualizarDatosMaquina() {
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        accion: 'listar_maquinas',
+                        codigoEmpresario: codigoEmpresarioActual
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.valido && data.maquinas) {
+                    // Buscar la máquina actual por nombre
+                    const maquinaActual = data.maquinas.find(m => m.nombre === maquinaAsignada);
+                    
+                    if (maquinaActual) {
+                        consultasRestantes = maquinaActual.consultasDisponibles;
+                        limiteConsultasMaquina = maquinaActual.limiteConsultas;
+                        actualizarStats();
+                    }
+                }
+            } catch (error) {
+                console.error('Error al actualizar datos de máquina:', error);
+            }
+        }
+
         function actualizarStats() {
             const hoy = new Date().toLocaleDateString('es-CL');
-            let texto = `📊 Verificaciones: ${verificacionesHoy} | 📅 ${hoy}`;
-            if (consultasRestantes !== null) {
+            
+            let texto = `🚌 ${maquinaAsignada || 'Máquina'} | 📅 ${hoy}`;
+            
+            if (consultasRestantes !== null && limiteConsultasMaquina !== null) {
+                const consultasRealizadas = limiteConsultasMaquina - consultasRestantes;
+                texto += ` | 📊 Consultas: ${consultasRealizadas}/${limiteConsultasMaquina} | 🔢 Quedan: ${consultasRestantes}`;
+            } else if (consultasRestantes !== null) {
                 texto += ` | 🔢 Quedan: ${consultasRestantes}`;
             }
+            
             statsBar.textContent = texto;
         }
 
@@ -1685,8 +1718,7 @@
                 
                 mostrarResultado(rut, data);
                 
-                verificacionesHoy++;
-                localStorage.setItem('tne_count_' + new Date().toDateString(), verificacionesHoy);
+                // ✅ NUEVO: Actualizar stats inmediatamente después de verificar
                 actualizarStats();
                 
             } catch (err) {
