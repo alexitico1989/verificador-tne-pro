@@ -672,7 +672,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Verificador TNE</h1>
+            <h1>🚍 Verificador TNE Pro</h1>
             <p id="headerSubtitle">Sistema profesional de verificación</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
@@ -729,7 +729,7 @@
                 <div class="stats-bar" id="statsBar">Verificaciones hoy: 0</div>
 
                 <div class="instructions">
-                    <div class="instructions-title">Instrucciones:</div>
+                    <div class="instructions-title">📋 Instrucciones:</div>
                     <p>
                     1. Presiona "Iniciar Cámara"<br>
                     2. Enfoca el RUT en el recuadro verde<br>
@@ -744,7 +744,7 @@
                         <span class="btn-icon">📷</span> Iniciar Cámara
                     </button>
                     <button class="btn btn-logout" id="logoutBtn">
-                        <span class="btn-icon"></span> Cerrar Sesión
+                        <span class="btn-icon">🚪</span> Cerrar Sesión
                     </button>
                 </div>
 
@@ -836,7 +836,7 @@
                         
                         <div class="data-section" id="datosEstudiante">
                             <div class="data-section-title">
-                                <span></span> DATOS DEL ESTUDIANTE
+                                <span>👤</span> DATOS DEL ESTUDIANTE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -854,7 +854,7 @@
 
                         <div class="data-section" id="datosInstitucion">
                             <div class="data-section-title">
-                                <span></span> INSTITUCIÓN
+                                <span>🏫</span> INSTITUCIÓN
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -868,7 +868,7 @@
 
                         <div class="data-section" id="estadoTneSection">
                             <div class="data-section-title">
-                                <span></span> ESTADO TNE
+                                <span>📋</span> ESTADO TNE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Estado:</div>
@@ -891,7 +891,7 @@
 
             <div class="footer">
                 <p>Sistema para conductores</p>
-                <p style="margin-top: 4px;">Detección TNE</p>
+                <p style="margin-top: 4px;">Detección ultra precisa TNE</p>
             </div>
         </div>
     </div>
@@ -900,22 +900,20 @@
     <script>
         // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
-        const NUM_CAPTURAS = 5; // Número de fotos en ráfaga
+        const NUM_CAPTURAS = 5;
         
         // Variables globales
         let stream = null;
-        let codigoEmpresarioActual = null; // ✅ CAMBIO: licenciaActual → codigoEmpresarioActual
-        let empresarioNombre = null; // ✅ CAMBIO: conductorNombre → empresarioNombre
-        let maquinaAsignada = null; // ✅ NUEVO: nombre de la máquina asignada
+        let codigoEmpresarioActual = null;
+        let empresarioNombre = null;
+        let maquinaAsignada = null;
         let verificacionesHoy = 0;
         let rutManualValue = '';
         let capturando = false;
         let deviceId = null;
         let consultasRestantes = null;
 
-        // ====================================
-        // GENERAR DEVICE ID ÚNICO
-        // ====================================
+        // GENERAR DEVICE ID
         function getDeviceId() {
             let id = localStorage.getItem('tne_device_id');
             if (!id) {
@@ -958,13 +956,11 @@
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
 
-        // Canvas para múltiples capturas
         const canvases = [];
         for (let i = 1; i <= NUM_CAPTURAS; i++) {
             canvases.push(document.getElementById(`canvas${i}`));
         }
 
-        // Elementos del DOM
         const loginScreen = document.getElementById('loginScreen');
         const machineSelector = document.getElementById('machineSelector');
         const appScreen = document.getElementById('appScreen');
@@ -994,11 +990,59 @@
         const cancelManualBtn = document.getElementById('cancelManualBtn');
         const emergencyManualBtn = document.getElementById('emergencyManualBtn');
 
-        // Al cargar
-        window.addEventListener('load', () => {
-            const savedCode = localStorage.getItem('tne_empresario'); // ✅ CAMBIO
+        // ═══════════════════════════════════════════════════════════════
+        // ✅ NUEVO: DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO
+        // ═══════════════════════════════════════════════════════════════
+
+        function marcarSesionActiva() {
+            sessionStorage.setItem('sesion_iniciada', 'true');
+            console.log('[SESIÓN] Marcada como activa');
+        }
+
+        function esRecarga() {
+            return sessionStorage.getItem('sesion_iniciada') === 'true';
+        }
+
+        async function cerrarSesionEnServidor() {
+            const codigo = localStorage.getItem('tne_empresario');
+            
+            if (codigo && deviceId) {
+                console.log('[CIERRE] Liberando máquina...');
+                
+                try {
+                    await fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            accion: 'cerrar_sesion',
+                            codigoEmpresario: codigo,
+                            deviceId: deviceId
+                        })
+                    });
+                    console.log('[CIERRE] ✅ Máquina liberada');
+                } catch (error) {
+                    console.error('[CIERRE] ❌ Error:', error);
+                }
+            }
+        }
+
+        // Detectar recarga al cargar
+        window.addEventListener('DOMContentLoaded', async function() {
+            if (esRecarga()) {
+                console.log('[RECARGA] 🔄 Detectada - Cerrando sesión...');
+                
+                await cerrarSesionEnServidor();
+                localStorage.removeItem('tne_empresario');
+                sessionStorage.clear();
+                
+                console.log('[RECARGA] ✅ Sesión cerrada');
+                return; // No cargar sesión previa
+            }
+            
+            // Si no es recarga, intentar cargar sesión previa
+            const savedCode = localStorage.getItem('tne_empresario');
             if (savedCode) {
-                validarEmpresario(savedCode, true); // ✅ CAMBIO
+                validarEmpresario(savedCode, true);
             }
 
             const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
@@ -1007,6 +1051,25 @@
             }
         });
 
+        // Cerrar al cerrar pestaña
+        window.addEventListener('beforeunload', function() {
+            const codigo = localStorage.getItem('tne_empresario');
+            
+            if (codigo && deviceId) {
+                const data = JSON.stringify({
+                    accion: 'cerrar_sesion',
+                    codigoEmpresario: codigo,
+                    deviceId: deviceId
+                });
+                
+                navigator.sendBeacon(WORKER_URL, new Blob([data], { type: 'application/json' }));
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // FIN DE CÓDIGO NUEVO
+        // ═══════════════════════════════════════════════════════════════
+
         // Login
         loginBtn.addEventListener('click', () => {
             const codigo = licenseInput.value.trim().toUpperCase();
@@ -1014,14 +1077,14 @@
                 mostrarErrorLogin('Por favor ingresa un código de empresario');
                 return;
             }
-            validarEmpresario(codigo, false); // ✅ CAMBIO
+            validarEmpresario(codigo, false);
         });
 
         licenseInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') loginBtn.click();
         });
 
-        // ✅ FUNCIÓN ACTUALIZADA: validarEmpresario (ahora lista máquinas)
+        // ✅ MODIFICADO: validarEmpresario (no guarda en localStorage aún)
         async function validarEmpresario(codigo, autoLogin) {
             if (!autoLogin) {
                 loginBtn.disabled = true;
@@ -1033,7 +1096,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        accion: 'listar_maquinas', // ✅ CAMBIO
+                        accion: 'listar_maquinas',
                         codigoEmpresario: codigo,
                     })
                 });
@@ -1043,9 +1106,9 @@
                 if (data.valido) {
                     codigoEmpresarioActual = codigo;
                     empresarioNombre = data.empresario;
-                    localStorage.setItem('tne_empresario', codigo);
+                    // ❌ NO guardar en localStorage aún
+                    // localStorage.setItem('tne_empresario', codigo);
                     
-                    // Mostrar selector de máquinas
                     mostrarSelectorMaquinas(data.maquinas);
                 } else {
                     if (!autoLogin) {
@@ -1067,7 +1130,6 @@
             }
         }
 
-        // ✅ NUEVA FUNCIÓN: Mostrar selector de máquinas
         function mostrarSelectorMaquinas(maquinas) {
             loginScreen.classList.add('hidden');
             machineSelector.classList.add('active');
@@ -1109,7 +1171,7 @@
                 }
                 
                 card.innerHTML = `
-                    <div class="machine-name"> ${maq.nombre}</div>
+                    <div class="machine-name">🚌 ${maq.nombre}</div>
                     <div class="machine-status">
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
@@ -1127,7 +1189,7 @@
             });
         }
 
-        // ✅ NUEVA FUNCIÓN: Asignar máquina seleccionada
+        // ✅ MODIFICADO: asignarMaquinaSeleccionada (ahora SÍ guarda en localStorage)
         async function asignarMaquinaSeleccionada(maquinaId, nombreMaquina) {
             try {
                 const response = await fetch(WORKER_URL, {
@@ -1146,6 +1208,10 @@
                 if (data.valido) {
                     maquinaAsignada = data.maquina;
                     consultasRestantes = data.consultasRestantes;
+                    
+                    // ✅ AHORA SÍ guardar en localStorage (después de asignar máquina)
+                    localStorage.setItem('tne_empresario', codigoEmpresarioActual);
+                    
                     mostrarApp();
                 } else {
                     alert(data.error || 'No se pudo asignar la máquina');
@@ -1160,7 +1226,6 @@
             loginScreen.classList.remove('hidden');
             codigoEmpresarioActual = null;
             empresarioNombre = null;
-            localStorage.removeItem('tne_empresario');
         });
 
         function mostrarErrorLogin(mensaje) {
@@ -1169,14 +1234,17 @@
             setTimeout(() => loginError.style.display = 'none', 5000);
         }
 
+        // ✅ MODIFICADO: mostrarApp (ahora marca sesión activa)
         function mostrarApp() {
             loginScreen.classList.add('hidden');
-            machineSelector.classList.remove('active'); // ✅ NUEVO
+            machineSelector.classList.remove('active');
             appScreen.classList.add('active');
-            // ✅ CAMBIO: Mostrar empresario y máquina asignada
             licenseBadge.textContent = `👤 ${empresarioNombre} | 🚌 ${maquinaAsignada}`;
             licenseBadge.style.display = 'inline-block';
             actualizarStats();
+            
+            // ✅ NUEVO: Marcar sesión activa
+            marcarSesionActiva();
         }
 
         function actualizarStats() {
@@ -1188,10 +1256,8 @@
             statsBar.textContent = texto;
         }
 
-        // ✅ FUNCIÓN ACTUALIZADA: Cerrar sesión (opcional: liberar máquina)
         logoutBtn.addEventListener('click', async () => {
             if (confirm('¿Cerrar sesión? La máquina quedará disponible para otros conductores.')) {
-                // Opcional: Llamar al endpoint de cerrar sesión
                 try {
                     await fetch(WORKER_URL, {
                         method: 'POST',
@@ -1206,12 +1272,20 @@
                     console.error('Error al cerrar sesión:', error);
                 }
                 
-                localStorage.removeItem('tne_empresario'); // ✅ CAMBIO
+                localStorage.removeItem('tne_empresario');
+                sessionStorage.clear();
                 location.reload();
             }
         });
 
-        // Cámara
+        // ═══════════════════════════════════════════════════════════════
+        // RESTO DEL CÓDIGO (Cámara, OCR, Verificación) SIN CAMBIOS
+        // ═══════════════════════════════════════════════════════════════
+        // [El resto del código permanece igual - continúa con las funciones de cámara, OCR, etc.]
+
+        // (Aquí iría todo el código restante de cámara, OCR, teclado manual, etc.
+        //  que ya está en tu archivo. Lo omito aquí por espacio, pero NO ha cambiado)
+
         cameraBtn.addEventListener('click', abrirCamara);
 
         async function abrirCamara() {
@@ -1234,7 +1308,6 @@
             }
         }
 
-        // Captura múltiple al tocar el video
         video.addEventListener('click', capturarMultiple);
 
         async function capturarMultiple() {
@@ -1244,7 +1317,6 @@
             captureCounter.style.display = 'block';
             const capturas = [];
 
-            // Capturar 5 fotos con intervalo de 200ms
             for (let i = 0; i < NUM_CAPTURAS; i++) {
                 captureCounter.textContent = `Capturando ${i + 1}/${NUM_CAPTURAS}...`;
                 
@@ -1266,7 +1338,6 @@
             captureCounter.style.display = 'none';
             cerrarCamara();
 
-            // Seleccionar mejor imagen (la más nítida)
             loadingProgress.textContent = 'Seleccionando mejor imagen...';
             const mejorImagen = await seleccionarMejorImagen(capturas);
             
@@ -1275,12 +1346,10 @@
             
             capturando = false;
             
-            // Mostrar botón de emergencia después de 15 segundos
             const timeoutId = setTimeout(() => {
                 emergencyManualBtn.style.display = 'block';
             }, 15000);
             
-            // Agregar listener al botón de emergencia
             emergencyManualBtn.onclick = () => {
                 clearTimeout(timeoutId);
                 emergencyManualBtn.style.display = 'none';
@@ -1290,12 +1359,10 @@
             
             await procesarImagenMultiple(capturas);
             
-            // Limpiar timeout si terminó antes
             clearTimeout(timeoutId);
             emergencyManualBtn.style.display = 'none';
         }
 
-        // Seleccionar la imagen más nítida (basado en varianza Laplaciana)
         async function seleccionarMejorImagen(imagenes) {
             let mejorScore = -1;
             let mejorIndice = 0;
@@ -1326,13 +1393,11 @@
                     const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                     const data = imageData.data;
                     
-                    // Convertir a escala de grises
                     const gris = [];
                     for (let i = 0; i < data.length; i += 4) {
                         gris.push((data[i] + data[i + 1] + data[i + 2]) / 3);
                     }
                     
-                    // Calcular varianza Laplaciana (medida de nitidez)
                     let suma = 0;
                     const w = tempCanvas.width;
                     for (let i = w; i < gris.length - w; i++) {
@@ -1361,9 +1426,6 @@
             captureCounter.style.display = 'none';
         }
 
-        // ====================================
-        // PREPROCESAMIENTO EXTREMO
-        // ====================================
         function preprocesarImagenExtremo(imageSrc) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -1371,7 +1433,6 @@
                     const tempCanvas = document.createElement('canvas');
                     const tempCtx = tempCanvas.getContext('2d');
                     
-                    // Escala 4x para máxima resolución
                     const scale = 4;
                     tempCanvas.width = img.width * scale;
                     tempCanvas.height = img.height * scale;
@@ -1381,16 +1442,13 @@
                     const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                     const data = imageData.data;
                     
-                    // Convertir a escala de grises con máximo contraste
                     for (let i = 0; i < data.length; i += 4) {
                         const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                         
-                        // Contraste extremo
                         const contrast = 2.5;
                         const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
                         let pixel = factor * (avg - 128) + 128;
                         
-                        // Binarización adaptativa
                         pixel = pixel > 130 ? 255 : 0;
                         
                         data[i] = pixel;
@@ -1405,9 +1463,6 @@
             });
         }
 
-        // ====================================
-        // OCR CON VALIDACIÓN CRUZADA
-        // ====================================
         async function procesarImagenMultiple(imagenes) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -1430,7 +1485,6 @@
                 const resultados = [];
                 let rut = null;
                 
-                // ESTRATEGIA 1: Mejor imagen procesada
                 try {
                     loadingProgress.textContent = 'Estrategia 1: Mejor imagen...';
                     const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
@@ -1446,7 +1500,6 @@
                     console.error('Error Estrategia 1:', err.message);
                 }
                 
-                // ESTRATEGIA 2: Todas las imágenes procesadas
                 if (!rut) {
                     try {
                         for (let i = 0; i < Math.min(3, imagenes.length); i++) {
@@ -1465,7 +1518,6 @@
                     }
                 }
                 
-                // ESTRATEGIA 3: Modo SINGLE_BLOCK
                 if (!rut) {
                     try {
                         loadingProgress.textContent = 'Estrategia 3: Modo block...';
@@ -1482,7 +1534,6 @@
                     }
                 }
                 
-                // ESTRATEGIA 4: Imágenes originales sin procesar
                 if (!rut) {
                     try {
                         loadingProgress.textContent = 'Estrategia 4: Imágenes originales...';
@@ -1507,7 +1558,6 @@
                     await worker.terminate();
                 }
                 
-                // Validación cruzada: si tenemos múltiples resultados, usar el más común
                 if (resultados.length > 0) {
                     const rutFinal = validacionCruzada(resultados);
                     console.log('✓ RUT detectado:', rutFinal);
@@ -1517,7 +1567,6 @@
                     console.log('⚠️ RUT no detectado - Ingreso manual');
                     loading.style.display = 'none';
                     
-                    // Forzar espera para asegurar que loading se oculte
                     await new Promise(resolve => setTimeout(resolve, 100));
                     
                     mostrarIngresoManual();
@@ -1527,14 +1576,12 @@
                 console.error('❌ Error OCR:', err.message);
                 loading.style.display = 'none';
                 
-                // Esperar antes de mostrar teclado manual
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
                 mostrarIngresoManual();
             }
         }
 
-        // Validación cruzada de resultados
         function validacionCruzada(resultados) {
             const frecuencia = {};
             for (const rut of resultados) {
@@ -1614,7 +1661,6 @@
             return rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
         }
 
-        // Teclado Numérico
         function mostrarIngresoManual() {
             loading.style.display = 'none';
             result.style.display = 'none';
@@ -1627,7 +1673,6 @@
             rutManualValue = '';
             actualizarDisplayManual();
             
-            // Forzar reflow
             rutManualSection.offsetHeight;
         }
 
@@ -1657,7 +1702,6 @@
 
         cancelManualBtn.addEventListener('click', resetear);
 
-        // ✅ FUNCIÓN ACTUALIZADA: verificarTNE
         async function verificarTNE(rut) {
             loading.style.display = 'block';
             loadingProgress.textContent = 'Consultando JUNAEB...';
@@ -1670,7 +1714,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         accion: 'verificar_tne',
-                        codigoEmpresario: codigoEmpresarioActual, // ✅ CAMBIO
+                        codigoEmpresario: codigoEmpresarioActual,
                         deviceId: deviceId,
                         rut: rut
                     })
@@ -1678,7 +1722,6 @@
                 
                 const data = await response.json();
                 
-                // Actualizar consultas restantes
                 if (data.consultasRestantes !== undefined) {
                     consultasRestantes = data.consultasRestantes;
                 }
