@@ -1,17 +1,41 @@
 {
-  "name": "Verificador TNE - Conductores",
-  "short_name": "TNE Verificador",
-  "description": "Verifica la vigencia de pases escolares TNE al instante",
+  "name": "TNE Pro - Verificador",
+  "short_name": "TNE Pro",
+  "description": "Sistema profesional de verificación de TNE para conductores",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a56db",
   "orientation": "portrait",
+  "categories": ["business", "productivity"],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231a56db'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='280' fill='white'%3E🎓%3C/text%3E%3C/svg%3E",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Verificar TNE",
+      "short_name": "Verificar",
+      "description": "Iniciar verificación de TNE",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
