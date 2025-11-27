@@ -808,7 +808,6 @@
                 <!-- Las máquinas se cargan dinámicamente aquí -->
             </div>
 
-            <!-- ✅ FOOTER CERRAR SESIÓN -->
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
                     <span class="btn-icon">🚪</span> Cerrar Sesión
@@ -826,8 +825,8 @@
                     <p>
                     1. Presiona "Iniciar Cámara" o "Ingreso Manual"<br>
                     2. Enfoca el RUT en el recuadro verde (cámara)<br>
-                    3. Toca para capturar (automático)<br>
-                    <strong>El sistema procesa la imagen optimizada</strong>
+                    3. Toca para iniciar captura automática (5 fotos)<br>
+                    <strong>El sistema selecciona la mejor imagen</strong>
                     </p>
                 </div>
 
@@ -836,7 +835,6 @@
                     <button class="btn btn-camera" id="cameraBtn">
                         <span class="btn-icon">📷</span> Iniciar Cámara
                     </button>
-                    <!-- ✅ NUEVO: Botón Ingreso Manual -->
                     <button class="btn btn-manual" id="manualBtn">
                         <span class="btn-icon">⌨️</span> Ingreso Manual
                     </button>
@@ -848,8 +846,8 @@
                     <div class="focus-guide">
                         <div class="focus-text">📍 ENFOCAR RUT AQUÍ</div>
                     </div>
-                    <div class="tap-hint">👆 Toca para capturar</div>
-                    <div class="capture-counter" id="captureCounter">Capturando...</div>
+                    <div class="tap-hint">👆 Toca para capturar (5 fotos automáticas)</div>
+                    <div class="capture-counter" id="captureCounter">Capturando 1/5...</div>
                 </div>
 
                 <div id="cameraButtons" style="display: none;">
@@ -860,11 +858,15 @@
 
                 <!-- Preview Capturado -->
                 <div class="preview-container" id="previewContainer">
-                    <img id="imagePreview" alt="Foto capturada">
+                    <img id="imagePreview" alt="Mejor foto seleccionada">
                 </div>
 
                 <canvas id="canvas"></canvas>
                 <canvas id="canvas1"></canvas>
+                <canvas id="canvas2"></canvas>
+                <canvas id="canvas3"></canvas>
+                <canvas id="canvas4"></canvas>
+                <canvas id="canvas5"></canvas>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
@@ -979,7 +981,6 @@
                 <div class="error-msg" id="errorMsg"></div>
             </div>
 
-            <!-- ✅ FOOTER CERRAR SESIÓN -->
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
                     <span class="btn-icon">🚪</span> Cerrar Sesión
@@ -997,7 +998,7 @@
     <script>
         // CONFIGURACIÓN
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
-        const NUM_CAPTURAS = 1;  // ✅ OPTIMIZADO: Solo 1 foto
+        const NUM_CAPTURAS = 5;  // ✅ ORIGINAL: 5 fotos (funcionaba mejor)
         
         // Variables globales
         let stream = null;
@@ -1052,7 +1053,11 @@
         const canvas = document.getElementById('canvas');
         const imagePreview = document.getElementById('imagePreview');
         const ctx = canvas.getContext('2d');
-        const canvas1 = document.getElementById('canvas1');
+
+        const canvases = [];
+        for (let i = 1; i <= NUM_CAPTURAS; i++) {
+            canvases.push(document.getElementById(`canvas${i}`));
+        }
 
         const loginScreen = document.getElementById('loginScreen');
         const machineSelector = document.getElementById('machineSelector');
@@ -1082,10 +1087,7 @@
         const cancelManualBtn = document.getElementById('cancelManualBtn');
         const emergencyManualBtn = document.getElementById('emergencyManualBtn');
 
-        // ═══════════════════════════════════════════════════════════════
-        // ✅ DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO
-        // ═══════════════════════════════════════════════════════════════
-
+        // DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO
         function marcarSesionActiva() {
             sessionStorage.setItem('sesion_iniciada', 'true');
             console.log('[SESIÓN] Marcada como activa');
@@ -1118,7 +1120,6 @@
             }
         }
 
-        // Detectar recarga al cargar
         window.addEventListener('DOMContentLoaded', async function() {
             if (esRecarga()) {
                 console.log('[RECARGA] 🔄 Detectada - Cerrando sesión...');
@@ -1142,7 +1143,6 @@
             }
         });
 
-        // Cerrar al cerrar pestaña
         window.addEventListener('beforeunload', function() {
             const codigo = localStorage.getItem('tne_empresario');
             
@@ -1156,10 +1156,6 @@
                 navigator.sendBeacon(WORKER_URL, new Blob([data], { type: 'application/json' }));
             }
         });
-
-        // ═══════════════════════════════════════════════════════════════
-        // ✅ FUNCIÓN GLOBAL PARA CERRAR SESIÓN (usada en footer)
-        // ═══════════════════════════════════════════════════════════════
 
         async function cerrarSesionGlobal() {
             if (confirm('¿Cerrar sesión? La máquina quedará disponible para otros conductores.')) {
@@ -1355,13 +1351,11 @@
             statsBar.textContent = texto;
         }
 
-        // ✅ NUEVO: Botón Ingreso Manual
         manualBtn.addEventListener('click', () => {
             initialButtons.style.display = 'none';
             mostrarIngresoManual();
         });
 
-        // Cámara
         cameraBtn.addEventListener('click', abrirCamara);
 
         async function abrirCamara() {
@@ -1391,21 +1385,33 @@
             capturando = true;
 
             captureCounter.style.display = 'block';
-            captureCounter.textContent = 'Capturando...';
-            
-            const cnv = canvas1;
-            const context = cnv.getContext('2d');
-            
-            cnv.width = video.videoWidth;
-            cnv.height = video.videoHeight;
-            context.drawImage(video, 0, 0);
-            
-            const imageUrl = cnv.toDataURL('image/jpeg', 1.0);
+            const capturas = [];
+
+            for (let i = 0; i < NUM_CAPTURAS; i++) {
+                captureCounter.textContent = `Capturando ${i + 1}/${NUM_CAPTURAS}...`;
+                
+                const cnv = canvases[i];
+                const context = cnv.getContext('2d');
+                
+                cnv.width = video.videoWidth;
+                cnv.height = video.videoHeight;
+                context.drawImage(video, 0, 0);
+                
+                const imageUrl = cnv.toDataURL('image/jpeg', 1.0);
+                capturas.push(imageUrl);
+                
+                if (i < NUM_CAPTURAS - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
 
             captureCounter.style.display = 'none';
             cerrarCamara();
+
+            loadingProgress.textContent = 'Seleccionando mejor imagen...';
+            const mejorImagen = await seleccionarMejorImagen(capturas);
             
-            imagePreview.src = imageUrl;
+            imagePreview.src = mejorImagen;
             previewContainer.classList.add('active');
             
             capturando = false;
@@ -1421,10 +1427,60 @@
                 mostrarIngresoManual();
             };
             
-            await procesarImagenMultiple([imageUrl]);
+            await procesarImagenMultiple(capturas);
             
             clearTimeout(timeoutId);
             emergencyManualBtn.style.display = 'none';
+        }
+
+        async function seleccionarMejorImagen(imagenes) {
+            let mejorScore = -1;
+            let mejorIndice = 0;
+
+            for (let i = 0; i < imagenes.length; i++) {
+                const score = await calcularNitidez(imagenes[i]);
+                if (score > mejorScore) {
+                    mejorScore = score;
+                    mejorIndice = i;
+                }
+            }
+
+            return imagenes[mejorIndice];
+        }
+
+        function calcularNitidez(imageSrc) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    
+                    const scale = 0.5;
+                    tempCanvas.width = img.width * scale;
+                    tempCanvas.height = img.height * scale;
+                    tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+                    
+                    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                    const data = imageData.data;
+                    
+                    const gris = [];
+                    for (let i = 0; i < data.length; i += 4) {
+                        gris.push((data[i] + data[i + 1] + data[i + 2]) / 3);
+                    }
+                    
+                    let suma = 0;
+                    const w = tempCanvas.width;
+                    for (let i = w; i < gris.length - w; i++) {
+                        const laplacian = Math.abs(
+                            -gris[i - w] - gris[i - 1] + 8 * gris[i] - gris[i + 1] - gris[i + w]
+                        );
+                        suma += laplacian;
+                    }
+                    
+                    resolve(suma / gris.length);
+                };
+                img.src = imageSrc;
+            });
         }
 
         cancelBtn.addEventListener('click', cerrarCamara);
@@ -1438,75 +1494,6 @@
             initialButtons.style.display = 'block';
             cameraButtons.style.display = 'none';
             captureCounter.style.display = 'none';
-        }
-
-        // ✅ NUEVA FUNCIÓN: Detectar zona del RUT
-        function detectarZonaRUT(imagenBase64) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Zona del RUT en TNE (ajustado según foto real)
-                    const x = img.width * 0.50;
-                    const y = img.height * 0.30;
-                    const w = img.width * 0.45;
-                    const h = img.height * 0.25;
-                    
-                    canvas.width = w;
-                    canvas.height = h;
-                    ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
-                    
-                    resolve(canvas.toDataURL());
-                };
-                img.src = imagenBase64;
-            });
-        }
-
-        // ✅ NUEVA FUNCIÓN: Filtrar fondo TNE
-        function aplicarFiltrosTNE(imagenBase64) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const data = imageData.data;
-                    
-                    // Filtrar fondo naranja/amarillo de TNE
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i];
-                        const g = data[i + 1];
-                        const b = data[i + 2];
-                        
-                        // Detectar fondo TNE
-                        const isBackground = (r > 150 && g > 100 && b < 120);
-                        
-                        if (isBackground) {
-                            // Fondo → blanco
-                            data[i] = 255;
-                            data[i + 1] = 255;
-                            data[i + 2] = 255;
-                        } else {
-                            // Texto → blanco/negro
-                            const gray = (r + g + b) / 3;
-                            const newValue = gray < 128 ? 0 : 255;
-                            data[i] = newValue;
-                            data[i + 1] = newValue;
-                            data[i + 2] = newValue;
-                        }
-                    }
-                    
-                    ctx.putImageData(imageData, 0, 0);
-                    resolve(canvas.toDataURL());
-                };
-                img.src = imagenBase64;
-            });
         }
 
         function preprocesarImagenExtremo(imageSrc) {
@@ -1546,7 +1533,7 @@
             });
         }
 
-        // ✅ FUNCIÓN OPTIMIZADA: procesarImagenMultiple
+        // ✅ OCR ORIGINAL QUE FUNCIONABA BIEN
         async function procesarImagenMultiple(imagenes) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -1556,7 +1543,7 @@
             let worker = null;
             
             try {
-                loadingProgress.textContent = 'Iniciando OCR optimizado...';
+                loadingProgress.textContent = 'Iniciando OCR avanzado...';
                 
                 worker = await Tesseract.createWorker('spa', 1, {
                     logger: m => {
@@ -1566,49 +1553,75 @@
                     }
                 });
                 
-                // ✅ OPTIMIZACIÓN: Parámetros mejorados
-                await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789Kk-.',
-                    tessedit_pageseg_mode: '7',
-                    preserve_interword_spaces: '0'
-                });
-                
                 const resultados = [];
                 let rut = null;
                 
-                // ✅ ESTRATEGIA 1: Zona del RUT + Filtros
                 try {
-                    loadingProgress.textContent = 'Detectando zona del RUT...';
-                    let imagenProcesada = imagenes[0];
-                    
-                    imagenProcesada = await detectarZonaRUT(imagenProcesada);
-                    imagenProcesada = await aplicarFiltrosTNE(imagenProcesada);
-                    
-                    const { data: { text } } = await worker.recognize(imagenProcesada);
-                    console.log('Texto detectado:', text);
-                    
+                    loadingProgress.textContent = 'Estrategia 1: Mejor imagen...';
+                    const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
+                    await worker.setParameters({
+                        tessedit_char_whitelist: '0123456789K-.',
+                        tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                        tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
+                    });
+                    let { data: { text } } = await worker.recognize(mejorProcesada);
                     rut = extraerRUT(text);
-                    if (rut) {
-                        resultados.push(rut);
-                        console.log('✓ RUT detectado (Estrategia 1):', rut);
-                    }
+                    if (rut) resultados.push(rut);
                 } catch (err) {
                     console.error('Error Estrategia 1:', err.message);
                 }
                 
-                // ✅ ESTRATEGIA 2: Imagen completa procesada
                 if (!rut) {
                     try {
-                        loadingProgress.textContent = 'Estrategia 2: imagen completa...';
-                        const procesada = await preprocesarImagenExtremo(imagenes[0]);
-                        const { data: { text } } = await worker.recognize(procesada);
-                        rut = extraerRUT(text);
-                        if (rut) {
-                            resultados.push(rut);
-                            console.log('✓ RUT detectado (Estrategia 2):', rut);
+                        for (let i = 0; i < Math.min(3, imagenes.length); i++) {
+                            loadingProgress.textContent = `Estrategia 2: Imagen ${i + 1}/3...`;
+                            const procesada = await preprocesarImagenExtremo(imagenes[i]);
+                            const resultado = await worker.recognize(procesada);
+                            const text = resultado.data.text;
+                            rut = extraerRUT(text);
+                            if (rut) {
+                                resultados.push(rut);
+                                break;
+                            }
                         }
                     } catch (err) {
                         console.error('Error Estrategia 2:', err.message);
+                    }
+                }
+                
+                if (!rut) {
+                    try {
+                        loadingProgress.textContent = 'Estrategia 3: Modo block...';
+                        const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
+                        await worker.setParameters({
+                            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+                        });
+                        const resultado = await worker.recognize(mejorProcesada);
+                        const text = resultado.data.text;
+                        rut = extraerRUT(text);
+                        if (rut) resultados.push(rut);
+                    } catch (err) {
+                        console.error('Error Estrategia 3:', err.message);
+                    }
+                }
+                
+                if (!rut) {
+                    try {
+                        loadingProgress.textContent = 'Estrategia 4: Imágenes originales...';
+                        await worker.setParameters({
+                            tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                        });
+                        for (let i = 0; i < Math.min(2, imagenes.length); i++) {
+                            const resultado = await worker.recognize(imagenes[i]);
+                            const text = resultado.data.text;
+                            rut = extraerRUT(text);
+                            if (rut) {
+                                resultados.push(rut);
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error Estrategia 4:', err.message);
                     }
                 }
                 
@@ -1617,23 +1630,46 @@
                 }
                 
                 if (resultados.length > 0) {
-                    const rutFinal = resultados[0];
-                    console.log('✓ RUT final:', rutFinal);
+                    const rutFinal = validacionCruzada(resultados);
+                    console.log('✓ RUT detectado:', rutFinal);
                     loading.style.display = 'none';
                     await verificarTNE(rutFinal);
                 } else {
                     console.log('⚠️ RUT no detectado - Ingreso manual');
                     loading.style.display = 'none';
+                    
                     await new Promise(resolve => setTimeout(resolve, 100));
+                    
                     mostrarIngresoManual();
                 }
                 
             } catch (err) {
                 console.error('❌ Error OCR:', err.message);
                 loading.style.display = 'none';
+                
                 await new Promise(resolve => setTimeout(resolve, 100));
+                
                 mostrarIngresoManual();
             }
+        }
+
+        function validacionCruzada(resultados) {
+            const frecuencia = {};
+            for (const rut of resultados) {
+                frecuencia[rut] = (frecuencia[rut] || 0) + 1;
+            }
+            
+            let maxFrecuencia = 0;
+            let rutMasFrecuente = resultados[0];
+            
+            for (const [rut, freq] of Object.entries(frecuencia)) {
+                if (freq > maxFrecuencia) {
+                    maxFrecuencia = freq;
+                    rutMasFrecuente = rut;
+                }
+            }
+            
+            return rutMasFrecuente;
         }
 
         function extraerRUT(texto) {
