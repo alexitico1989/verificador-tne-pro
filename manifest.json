@@ -2,8 +2,8 @@
   "name": "TNE Pro Verificador",
   "short_name": "TNE Pro",
   "description": "Sistema profesional de verificación de TNE para conductores",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a56db",
@@ -14,16 +14,16 @@
   ],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -31,12 +31,11 @@
       "name": "Verificar TNE",
       "short_name": "Verificar",
       "description": "Iniciar verificación de TNE",
-      "url": "./",
+      "url": "/",
       "icons": [
         {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "src": "/icon-192.png",
+          "sizes": "192x192"
         }
       ]
     }
