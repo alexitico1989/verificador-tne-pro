@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1a56db">
-    <title>Verificador TNE</title>
+    <title>Verificador TNE - Auto Capture</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon-192.png">
@@ -157,6 +157,45 @@
             line-height: 1.5;
         }
 
+        /* ✨ NUEVO: Estado de detección AUTO-CAPTURE */
+        .detection-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .detection-status.searching {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        .detection-status.detecting {
+            background: rgba(245, 158, 11, 0.9);
+        }
+
+        .detection-status.focusing {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        .detection-status.ready {
+            background: rgba(16, 185, 129, 0.9);
+            animation: pulse-ready 0.8s infinite;
+        }
+
+        @keyframes pulse-ready {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         /* Cámara con guía de enfoque */
         .camera-container {
             position: relative;
@@ -179,7 +218,7 @@
             cursor: pointer;
         }
 
-        /* Guía de enfoque sobre el video */
+        /* ✨ MEJORADO: Guía dinámica según estado */
         .focus-guide {
             position: absolute;
             top: 50%;
@@ -191,6 +230,29 @@
             border-radius: 8px;
             pointer-events: none;
             box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .focus-guide.detecting {
+            border-color: #f59e0b;
+            animation: scan 1.5s infinite;
+        }
+
+        .focus-guide.ready {
+            border-color: #10b981;
+            border-style: solid;
+            border-width: 4px;
+            animation: ready-pulse 0.5s infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { border-color: #f59e0b; }
+            50% { border-color: #fbbf24; }
+        }
+
+        @keyframes ready-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
         }
 
         .focus-text {
@@ -762,8 +824,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>Verificador TNE</h1>
-            <p id="headerSubtitle">Sistema profesional de verificación</p>
+            <h1>🤖 Verificador TNE Pro</h1>
+            <p id="headerSubtitle">Con Auto-Capture Inteligente</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
 
@@ -790,7 +852,7 @@
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">Versión Pro 6.0</p>
+                <p style="color: #9ca3af;">Versión Pro 6.0 + Auto-Capture</p>
                 <p style="margin-top: 4px; color: #9ca3af;">VERIFICACIÓN TNE DESDE JUNAEB.</p>
             </div>
         </div>
@@ -821,32 +883,39 @@
                 <div class="stats-bar" id="statsBar">Verificaciones hoy: 0</div>
 
                 <div class="instructions">
-                    <div class="instructions-title">Instrucciones:</div>
+                    <div class="instructions-title">✨ Modo Auto-Capture:</div>
                     <p>
-                    1. Presiona "Iniciar Cámara" o "Ingreso Manual"<br>
-                    2. Enfoca el RUT en el recuadro verde (cámara)<br>
-                    3. Toca para iniciar captura automática (5 fotos)<br>
-                    <strong>El sistema selecciona la mejor imagen</strong>
+                    1. Presiona "Iniciar Auto-Capture"<br>
+                    2. Enfoca el RUT en el recuadro verde<br>
+                    3. <strong>¡El sistema captura AUTOMÁTICAMENTE!</strong><br>
+                    4. Botón manual disponible como respaldo
                     </p>
                 </div>
 
                 <!-- Botones Iniciales -->
                 <div id="initialButtons">
                     <button class="btn btn-camera" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Iniciar Cámara
+                        <span class="btn-icon">🤖</span> Iniciar Auto-Capture
                     </button>
                     <button class="btn btn-manual" id="manualBtn">
                         <span class="btn-icon">⌨️</span> Ingreso Manual
                     </button>
                 </div>
 
-                <!-- Contenedor de Cámara con Guía -->
+                <!-- ✨ NUEVO: Contenedor de Cámara con Auto-Capture -->
                 <div class="camera-container" id="cameraContainer">
-                    <video id="videoPreview" autoplay playsinline></video>
-                    <div class="focus-guide">
-                        <div class="focus-text">📍 ENFOCAR RUT AQUÍ</div>
+                    <!-- Estado de detección en tiempo real -->
+                    <div class="detection-status searching" id="detectionStatus">
+                        🔍 Buscando RUT...
                     </div>
-                    <div class="tap-hint">👆 Toca para capturar (5 fotos automáticas)</div>
+
+                    <video id="videoPreview" autoplay playsinline></video>
+                    
+                    <div class="focus-guide" id="focusGuide">
+                        <div class="focus-text" id="focusText">📍 POSICIONA RUT AQUÍ</div>
+                    </div>
+                    
+                    <div class="tap-hint">👆 Captura automática o toca para manual</div>
                     <div class="capture-counter" id="captureCounter">Capturando 1/5...</div>
                 </div>
 
@@ -996,11 +1065,25 @@
 
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
-        // CONFIGURACIÓN
+        // ========================================
+        // ✨ CONFIGURACIÓN AUTO-CAPTURE
+        // ========================================
+        const AUTO_CAPTURE_CONFIG = {
+            enabled: true,                // Activar/desactivar auto-capture
+            scanInterval: 600,            // Escanear cada 600ms (ajustable)
+            minConfidence: 0.65,          // Confianza mínima OCR (0-1)
+            readyDelay: 800,              // Esperar antes de capturar (ms)
+            focusThreshold: 45,           // Umbral de nitidez (ajustable)
+            consecutiveDetections: 2,     // Detecciones necesarias antes de capturar
+        };
+
+        // CONFIGURACIÓN ORIGINAL
         const WORKER_URL = 'https://tne-verificador.monardes-luis.workers.dev';
-        const NUM_CAPTURAS = 5;  // ✅ ORIGINAL: 5 fotos (funcionaba mejor)
+        const NUM_CAPTURAS = 5;
         
-        // Variables globales
+        // ========================================
+        // VARIABLES GLOBALES (TU CÓDIGO ORIGINAL)
+        // ========================================
         let stream = null;
         let codigoEmpresarioActual = null;
         let empresarioNombre = null;
@@ -1011,7 +1094,12 @@
         let deviceId = null;
         let consultasRestantes = null;
 
-        // GENERAR DEVICE ID
+        // ✨ NUEVAS VARIABLES PARA AUTO-CAPTURE
+        let autoScanInterval = null;
+        let tesseractWorkerQuick = null;
+        let consecutiveDetections = 0;
+
+        // GENERAR DEVICE ID (TU CÓDIGO ORIGINAL)
         function getDeviceId() {
             let id = localStorage.getItem('tne_device_id');
             if (!id) {
@@ -1049,6 +1137,7 @@
         deviceId = getDeviceId();
         console.log('[DEVICE] ID actual:', deviceId);
 
+        // ELEMENTOS DOM (TU CÓDIGO ORIGINAL)
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
         const imagePreview = document.getElementById('imagePreview');
@@ -1087,7 +1176,148 @@
         const cancelManualBtn = document.getElementById('cancelManualBtn');
         const emergencyManualBtn = document.getElementById('emergencyManualBtn');
 
-        // DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO
+        // ✨ NUEVOS ELEMENTOS PARA AUTO-CAPTURE
+        const detectionStatus = document.getElementById('detectionStatus');
+        const focusGuide = document.getElementById('focusGuide');
+        const focusText = document.getElementById('focusText');
+
+        // ========================================
+        // ✨ FUNCIONES DE AUTO-CAPTURE
+        // ========================================
+
+        /**
+         * Actualiza el estado visual de la detección
+         */
+        function updateDetectionStatus(state, message) {
+            detectionStatus.className = `detection-status ${state}`;
+            detectionStatus.textContent = message;
+            
+            focusGuide.className = `focus-guide ${state}`;
+            focusText.textContent = message;
+        }
+
+        /**
+         * Calcula nitidez del frame actual
+         */
+        function calculateSharpness() {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Escalar para performance
+            tempCanvas.width = video.videoWidth * 0.3;
+            tempCanvas.height = video.videoHeight * 0.3;
+            tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const data = imageData.data;
+            
+            // Convertir a escala de grises
+            const gray = [];
+            for (let i = 0; i < data.length; i += 4) {
+                gray.push((data[i] + data[i + 1] + data[i + 2]) / 3);
+            }
+            
+            // Calcular varianza de Laplacian
+            let sum = 0;
+            const w = tempCanvas.width;
+            for (let i = w; i < gray.length - w; i++) {
+                const laplacian = Math.abs(
+                    -gray[i - w] - gray[i - 1] + 8 * gray[i] - gray[i + 1] - gray[i + w]
+                );
+                sum += laplacian;
+            }
+            
+            return sum / gray.length;
+        }
+
+        /**
+         * Loop principal de auto-detección
+         */
+        async function autoDetectionLoop() {
+            if (!AUTO_CAPTURE_CONFIG.enabled || capturando || !tesseractWorkerQuick) return;
+
+            try {
+                // 1. Verificar nitidez
+                const sharpness = calculateSharpness();
+                const isFocused = sharpness > AUTO_CAPTURE_CONFIG.focusThreshold;
+                
+                if (!isFocused) {
+                    updateDetectionStatus('searching', '🔍 Enfocando...');
+                    consecutiveDetections = 0;
+                    return;
+                }
+                
+                // 2. Capturar frame actual
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                const imageData = canvas.toDataURL('image/jpeg', 0.7);
+                
+                // 3. OCR rápido
+                updateDetectionStatus('detecting', '🔎 Detectando...');
+                const { data: { text, confidence } } = await tesseractWorkerQuick.recognize(imageData);
+                
+                // 4. Buscar patrón de RUT
+                const rutMatch = text.match(/\d{7,9}/);
+                
+                if (rutMatch && confidence > AUTO_CAPTURE_CONFIG.minConfidence * 100) {
+                    consecutiveDetections++;
+                    console.log(`[AUTO] Detección ${consecutiveDetections}/${AUTO_CAPTURE_CONFIG.consecutiveDetections} - Conf: ${confidence}%`);
+                    
+                    // Si detectamos RUT suficientes veces consecutivas
+                    if (consecutiveDetections >= AUTO_CAPTURE_CONFIG.consecutiveDetections) {
+                        updateDetectionStatus('ready', '✓ RUT DETECTADO - Capturando...');
+                        
+                        // Vibración de feedback
+                        if (navigator.vibrate) {
+                            navigator.vibrate(200);
+                        }
+                        
+                        // Esperar para estabilizar
+                        await new Promise(resolve => setTimeout(resolve, AUTO_CAPTURE_CONFIG.readyDelay));
+                        
+                        // CAPTURA AUTOMÁTICA
+                        await capturarMultiple();
+                        
+                        consecutiveDetections = 0;
+                    } else {
+                        updateDetectionStatus('detecting', `🎯 RUT visible (${consecutiveDetections}/${AUTO_CAPTURE_CONFIG.consecutiveDetections})`);
+                    }
+                } else {
+                    consecutiveDetections = 0;
+                    updateDetectionStatus('searching', '🔍 Buscando RUT...');
+                }
+                
+            } catch (error) {
+                console.error('[AUTO] Error en loop:', error);
+                updateDetectionStatus('searching', '⚠️ Error - Reintentando...');
+            }
+        }
+
+        /**
+         * Inicializa el worker de Tesseract para detección rápida
+         */
+        async function initQuickTesseract() {
+            if (!tesseractWorkerQuick && AUTO_CAPTURE_CONFIG.enabled) {
+                console.log('[AUTO] Inicializando Tesseract rápido...');
+                try {
+                    tesseractWorkerQuick = await Tesseract.createWorker('spa', 1);
+                    await tesseractWorkerQuick.setParameters({
+                        tessedit_char_whitelist: '0123456789K-.',
+                        tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                    });
+                    console.log('[AUTO] ✓ Tesseract rápido listo');
+                } catch (error) {
+                    console.error('[AUTO] Error inicializando Tesseract:', error);
+                }
+            }
+        }
+
+        // ========================================
+        // TU CÓDIGO ORIGINAL CON MODIFICACIONES MÍNIMAS
+        // ========================================
+
+        // DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO (TU CÓDIGO)
         function marcarSesionActiva() {
             sessionStorage.setItem('sesion_iniciada', 'true');
             console.log('[SESIÓN] Marcada como activa');
@@ -1179,7 +1409,7 @@
             }
         }
 
-        // Login
+        // Login (TU CÓDIGO)
         loginBtn.addEventListener('click', () => {
             const codigo = licenseInput.value.trim().toUpperCase();
             if (!codigo) {
@@ -1356,10 +1586,13 @@
             mostrarIngresoManual();
         });
 
+        // ✨ MODIFICADO: Abrir cámara con auto-capture
         cameraBtn.addEventListener('click', abrirCamara);
 
         async function abrirCamara() {
             try {
+                updateDetectionStatus('searching', '📷 Iniciando cámara...');
+                
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
@@ -1368,21 +1601,41 @@
                     } 
                 });
                 video.srcObject = stream;
+                
+                // Esperar a que video esté listo
+                await new Promise(resolve => video.onloadedmetadata = resolve);
+                
                 cameraContainer.classList.add('active');
                 initialButtons.style.display = 'none';
                 cameraButtons.style.display = 'block';
                 result.style.display = 'none';
                 errorMsg.style.display = 'none';
+                
+                // ✨ NUEVO: Iniciar auto-capture
+                if (AUTO_CAPTURE_CONFIG.enabled) {
+                    await initQuickTesseract();
+                    updateDetectionStatus('searching', '🔍 Buscando RUT...');
+                    autoScanInterval = setInterval(autoDetectionLoop, AUTO_CAPTURE_CONFIG.scanInterval);
+                    console.log('[AUTO] ✓ Auto-Capture activado');
+                }
+                
             } catch (err) {
                 mostrarError('No se pudo acceder a la cámara');
             }
         }
 
+        // ✨ MODIFICADO: Click en video ahora también funciona para captura manual
         video.addEventListener('click', capturarMultiple);
 
         async function capturarMultiple() {
             if (capturando) return;
             capturando = true;
+
+            // ✨ NUEVO: Detener auto-scan durante captura
+            if (autoScanInterval) {
+                clearInterval(autoScanInterval);
+                autoScanInterval = null;
+            }
 
             captureCounter.style.display = 'block';
             const capturas = [];
@@ -1399,6 +1652,11 @@
                 
                 const imageUrl = cnv.toDataURL('image/jpeg', 1.0);
                 capturas.push(imageUrl);
+                
+                // Vibración de feedback
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
                 
                 if (i < NUM_CAPTURAS - 1) {
                     await new Promise(resolve => setTimeout(resolve, 200));
@@ -1433,6 +1691,7 @@
             emergencyManualBtn.style.display = 'none';
         }
 
+        // TU CÓDIGO ORIGINAL DE PROCESAMIENTO (SIN CAMBIOS)
         async function seleccionarMejorImagen(imagenes) {
             let mejorScore = -1;
             let mejorIndice = 0;
@@ -1483,6 +1742,7 @@
             });
         }
 
+        // ✨ MODIFICADO: Cerrar cámara también limpia auto-capture
         cancelBtn.addEventListener('click', cerrarCamara);
 
         function cerrarCamara() {
@@ -1490,10 +1750,23 @@
                 stream.getTracks().forEach(track => track.stop());
                 stream = null;
             }
+            
+            // ✨ NUEVO: Limpiar auto-scan
+            if (autoScanInterval) {
+                clearInterval(autoScanInterval);
+                autoScanInterval = null;
+            }
+            
+            if (tesseractWorkerQuick) {
+                tesseractWorkerQuick.terminate();
+                tesseractWorkerQuick = null;
+            }
+            
             cameraContainer.classList.remove('active');
             initialButtons.style.display = 'block';
             cameraButtons.style.display = 'none';
             captureCounter.style.display = 'none';
+            consecutiveDetections = 0;
         }
 
         function preprocesarImagenExtremo(imageSrc) {
@@ -1533,7 +1806,7 @@
             });
         }
 
-        // ✅ OCR ORIGINAL QUE FUNCIONABA BIEN
+        // TU OCR ORIGINAL (SIN CAMBIOS)
         async function procesarImagenMultiple(imagenes) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -1732,6 +2005,7 @@
             return rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
         }
 
+        // RESTO DE TU CÓDIGO ORIGINAL (SIN CAMBIOS)
         function mostrarIngresoManual() {
             loading.style.display = 'none';
             result.style.display = 'none';
@@ -1895,7 +2169,11 @@
             cameraButtons.style.display = 'none';
             rutManualValue = '';
             capturando = false;
+            consecutiveDetections = 0;
         }
+
+        console.log('✨ Verificador TNE Pro con Auto-Capture iniciado');
+        console.log('[CONFIG Auto-Capture]', AUTO_CAPTURE_CONFIG);
     </script>
 </body>
 </html>
