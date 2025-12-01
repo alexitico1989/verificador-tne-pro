@@ -1,7 +1,7 @@
 {
-  "name": "TNE Pro Verificador",
+  "name": "Verificador TNE Pro - Sistema Seguro",
   "short_name": "TNE Pro",
-  "description": "Sistema profesional de verificación de TNE para conductores",
+  "description": "Sistema profesional de verificación TNE con seguridad enterprise. Rate limiting, logs de auditoría y validación estricta. Preparado para integración con JUNAEB.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,8 +10,11 @@
   "orientation": "portrait",
   "categories": [
     "business",
-    "productivity"
+    "productivity",
+    "utilities"
   ],
+  "lang": "es-CL",
+  "dir": "ltr",
   "icons": [
     {
       "src": "icon-192.png",
@@ -30,7 +33,7 @@
     {
       "name": "Verificar TNE",
       "short_name": "Verificar",
-      "description": "Iniciar verificación de TNE",
+      "description": "Iniciar verificación de TNE con sistema seguro",
       "url": "./",
       "icons": [
         {
@@ -40,5 +43,16 @@
         }
       ]
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "label": "Pantalla principal del Verificador TNE Pro"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "iarc_rating_id": ""
 }
