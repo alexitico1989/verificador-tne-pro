@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1a56db">
-    <title>Verificador TNE - Auto Capture</title>
+    
+    <!-- ✅ SECURITY HEADERS -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://estadotne.cl https://tne-verificador.monardes-luis.workers.dev;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <title>Verificador TNE Pro - Sistema Seguro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon-192.png">
@@ -38,6 +45,7 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
         }
 
         .header h1 {
@@ -49,6 +57,23 @@
         .header p {
             font-size: 12px;
             opacity: 0.9;
+        }
+
+        /* ✅ NUEVO: Badge de seguridad */
+        .security-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .license-badge {
@@ -87,6 +112,14 @@
             margin-bottom: 8px;
         }
 
+        /* ✅ MEJORADO: Subtítulo de seguridad */
+        .login-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
         .input-group {
             margin-bottom: 15px;
         }
@@ -110,11 +143,22 @@
             letter-spacing: 2px;
             font-weight: 600;
             text-transform: uppercase;
+            transition: border-color 0.2s;
         }
 
         .input-field:focus {
             outline: none;
             border-color: #1a56db;
+            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+        }
+
+        /* ✅ NUEVO: Indicador de validación */
+        .input-field.valid {
+            border-color: #10b981;
+        }
+
+        .input-field.invalid {
+            border-color: #ef4444;
         }
 
         /* App Principal */
@@ -157,7 +201,7 @@
             line-height: 1.5;
         }
 
-        /* ✨ NUEVO: Estado de detección AUTO-CAPTURE */
+        /* ✅ Estado de detección AUTO-CAPTURE */
         .detection-status {
             position: absolute;
             top: 10px;
@@ -218,7 +262,7 @@
             cursor: pointer;
         }
 
-        /* ✨ MEJORADO: Guía dinámica según estado */
+        /* Guía dinámica según estado */
         .focus-guide {
             position: absolute;
             top: 50%;
@@ -299,7 +343,7 @@
             display: none;
         }
 
-        /* Preview capturado (más pequeño) */
+        /* Preview capturado */
         .preview-container {
             display: none;
             margin-bottom: 15px;
@@ -343,6 +387,11 @@
 
         .btn:active {
             transform: scale(0.97);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .btn-camera {
@@ -481,6 +530,7 @@
             align-items: center;
             justify-content: center;
             min-height: 60px;
+            user-select: none;
         }
 
         .key:active {
@@ -751,10 +801,31 @@
         .machine-consultas strong {
             color: #1f2937;
         }
+
+        /* ✅ NUEVO: Responsive mejorado */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .login-icon {
+                font-size: 50px;
+            }
+            
+            .key {
+                padding: 15px;
+                font-size: 20px;
+                min-height: 50px;
+            }
+            
+            .rut-display-input {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- ✅ SPLASH SCREEN PERSONALIZADO -->
+<!-- ✅ SPLASH SCREEN PERSONALIZADO -->
     <div id="splash-screen" style="
         position: fixed;
         top: 0;
@@ -790,7 +861,7 @@
             font-size: 14px;
             font-weight: 600;
             opacity: 0.9;
-        ">Cargando Verificador TNE...</p>
+        ">Cargando Sistema Seguro...</p>
     </div>
 
     <style>
@@ -824,15 +895,25 @@
 
     <div class="container">
         <div class="header">
-            <h1>🤖 Verificador TNE Pro</h1>
-            <p id="headerSubtitle">Con Auto-Capture Inteligente</p>
+            <!-- ✅ NUEVO: Indicador de seguridad -->
+            <div class="security-indicator">
+                <span>🔒</span>
+                <span>SEGURO</span>
+            </div>
+            
+            <h1>🔐 Verificador TNE Pro</h1>
+            <p id="headerSubtitle">Sistema de Seguridad Enterprise</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
 
         <!-- PANTALLA DE LOGIN -->
         <div class="login-screen" id="loginScreen">
             <div class="login-icon">🔐</div>
-            <div class="login-title">Acceso Restringido</div>
+            <div class="login-title">Acceso Empresarial</div>
+            <p class="login-subtitle">
+                Sistema protegido con cifrado y auditoría completa.<br>
+                Preparado para integración con JUNAEB.
+            </p>
 
             <div class="input-group">
                 <label class="input-label">Código de Empresario:</label>
@@ -842,18 +923,19 @@
                     class="input-field" 
                     placeholder="EMP-NOMBRE-2025"
                     maxlength="30"
+                    autocomplete="off"
                 >
             </div>
 
             <button class="btn" id="loginBtn">
-                <span class="btn-icon">✓</span> Iniciar Sesión
+                <span class="btn-icon">✓</span> Iniciar Sesión Segura
             </button>
 
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">Versión Pro 6.0 + Auto-Capture</p>
-                <p style="margin-top: 4px; color: #9ca3af;">VERIFICACIÓN TNE DESDE JUNAEB.</p>
+                <p style="color: #9ca3af;">✅ Versión Enterprise 2.0</p>
+                <p style="margin-top: 4px; color: #9ca3af;">Sistema con Rate Limiting, Logs y Validación Estricta</p>
             </div>
         </div>
 
@@ -862,8 +944,8 @@
             <div class="selector-title">Selecciona tu Máquina</div>
             
             <div class="instructions" style="margin-bottom: 20px;">
-                <div class="instructions-title">Instrucciones:</div>
-                <p>Elige el bus/máquina que vas a usar hoy. Solo podrás usar esta máquina durante esta sesión.</p>
+                <div class="instructions-title">📋 Instrucciones:</div>
+                <p>Elige el bus/máquina que vas a usar hoy. Solo podrás usar esta máquina durante esta sesión. Tu actividad será registrada para auditoría.</p>
             </div>
 
             <div class="machine-list" id="machineList">
@@ -902,7 +984,7 @@
                     </button>
                 </div>
 
-                <!-- ✨ NUEVO: Contenedor de Cámara con Auto-Capture -->
+                <!-- Contenedor de Cámara con Auto-Capture -->
                 <div class="camera-container" id="cameraContainer">
                     <!-- Estado de detección en tiempo real -->
                     <div class="detection-status searching" id="detectionStatus">
@@ -950,7 +1032,7 @@
                 <div id="rutManualSection">
                     <div class="manual-alert">
                         <strong>Ingreso Manual</strong>
-                        <p>Ingresa el RUT manualmente:</p>
+                        <p>Ingresa el RUT manualmente (será validado):</p>
                     </div>
                     
                     <div class="rut-display-input">
@@ -1057,24 +1139,81 @@
             </div>
 
             <div class="footer">
-                <p>Sistema para conductores</p>
-                <p style="margin-top: 4px;">DATOS EN LINEA DE JUNAEB</p>
+                <p>🔒 Sistema para conductores con auditoría completa</p>
+                <p style="margin-top: 4px;">DATOS EN TIEMPO REAL DESDE JUNAEB</p>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
+        // ========================================
+        // ✅ CONFIGURACIÓN SEGURA
+        // ========================================
+        
+        // ✅ Sanitización de inputs (prevención XSS)
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return input;
+            return input
+                .replace(/[<>]/g, '')
+                .replace(/javascript:/gi, '')
+                .replace(/on\w+=/gi, '')
+                .trim()
+                .substring(0, 100);
+        }
+
+        // ✅ Validación de formato RUT
+        function validarFormatoRUT(rut) {
+            const rutRegex = /^\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]$/;
+            return rutRegex.test(rut);
+        }
+
+        // ✅ Generación de deviceId más seguro
+        function generarDeviceIdSeguro() {
+            // Usar crypto API si está disponible
+            if (window.crypto && window.crypto.randomUUID) {
+                return 'DEV-' + crypto.randomUUID();
+            }
+            
+            // Fallback al método anterior mejorado
+            const nav = navigator;
+            const screen = window.screen;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('TNE-PRO', 2, 2);
+            
+            const fingerprint = [
+                nav.userAgent,
+                nav.language,
+                screen.width + 'x' + screen.height,
+                screen.colorDepth,
+                new Date().getTimezoneOffset(),
+                canvas.toDataURL(),
+                Date.now().toString()
+            ].join('|');
+            
+            let hash = 0;
+            for (let i = 0; i < fingerprint.length; i++) {
+                const char = fingerprint.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return 'DEV-' + Math.abs(hash).toString(36) + '-' + Date.now().toString(36);
+        }
+
         // ========================================
         // ✨ CONFIGURACIÓN AUTO-CAPTURE
         // ========================================
         const AUTO_CAPTURE_CONFIG = {
-            enabled: true,                // Activar/desactivar auto-capture
-            scanInterval: 600,            // Escanear cada 600ms (ajustable)
-            minConfidence: 0.65,          // Confianza mínima OCR (0-1)
-            readyDelay: 800,              // Esperar antes de capturar (ms)
-            focusThreshold: 45,           // Umbral de nitidez (ajustable)
-            consecutiveDetections: 2,     // Detecciones necesarias antes de capturar
+            enabled: true,
+            scanInterval: 600,
+            minConfidence: 0.65,
+            readyDelay: 800,
+            focusThreshold: 45,
+            consecutiveDetections: 2,
         };
 
         // CONFIGURACIÓN ORIGINAL
@@ -1082,7 +1221,7 @@
         const NUM_CAPTURAS = 5;
         
         // ========================================
-        // VARIABLES GLOBALES (TU CÓDIGO ORIGINAL)
+        // VARIABLES GLOBALES
         // ========================================
         let stream = null;
         let codigoEmpresarioActual = null;
@@ -1094,50 +1233,16 @@
         let deviceId = null;
         let consultasRestantes = null;
 
-        // ✨ NUEVAS VARIABLES PARA AUTO-CAPTURE
+        // ✨ VARIABLES PARA AUTO-CAPTURE
         let autoScanInterval = null;
         let tesseractWorkerQuick = null;
         let consecutiveDetections = 0;
 
-        // GENERAR DEVICE ID (TU CÓDIGO ORIGINAL)
-        function getDeviceId() {
-            let id = localStorage.getItem('tne_device_id');
-            if (!id) {
-                const nav = navigator;
-                const screen = window.screen;
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.textBaseline = 'top';
-                ctx.font = '14px Arial';
-                ctx.fillText('TNE', 2, 2);
-                
-                const fingerprint = [
-                    nav.userAgent,
-                    nav.language,
-                    screen.width + 'x' + screen.height,
-                    screen.colorDepth,
-                    new Date().getTimezoneOffset(),
-                    canvas.toDataURL()
-                ].join('|');
-                
-                let hash = 0;
-                for (let i = 0; i < fingerprint.length; i++) {
-                    const char = fingerprint.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash;
-                }
-                
-                id = 'DEV-' + Math.abs(hash).toString(36) + '-' + Date.now().toString(36);
-                localStorage.setItem('tne_device_id', id);
-                console.log('[DEVICE] Nuevo ID generado:', id);
-            }
-            return id;
-        }
+        // ✅ GENERAR DEVICE ID SEGURO
+        deviceId = generarDeviceIdSeguro();
+        console.log('[DEVICE] ID seguro generado:', deviceId);
 
-        deviceId = getDeviceId();
-        console.log('[DEVICE] ID actual:', deviceId);
-
-        // ELEMENTOS DOM (TU CÓDIGO ORIGINAL)
+        // ELEMENTOS DOM
         const video = document.getElementById('videoPreview');
         const canvas = document.getElementById('canvas');
         const imagePreview = document.getElementById('imagePreview');
@@ -1176,7 +1281,7 @@
         const cancelManualBtn = document.getElementById('cancelManualBtn');
         const emergencyManualBtn = document.getElementById('emergencyManualBtn');
 
-        // ✨ NUEVOS ELEMENTOS PARA AUTO-CAPTURE
+        // ✨ ELEMENTOS PARA AUTO-CAPTURE
         const detectionStatus = document.getElementById('detectionStatus');
         const focusGuide = document.getElementById('focusGuide');
         const focusText = document.getElementById('focusText');
@@ -1185,9 +1290,6 @@
         // ✨ FUNCIONES DE AUTO-CAPTURE
         // ========================================
 
-        /**
-         * Actualiza el estado visual de la detección
-         */
         function updateDetectionStatus(state, message) {
             detectionStatus.className = `detection-status ${state}`;
             detectionStatus.textContent = message;
@@ -1196,14 +1298,10 @@
             focusText.textContent = message;
         }
 
-        /**
-         * Calcula nitidez del frame actual
-         */
         function calculateSharpness() {
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
-            // Escalar para performance
             tempCanvas.width = video.videoWidth * 0.3;
             tempCanvas.height = video.videoHeight * 0.3;
             tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
@@ -1211,13 +1309,11 @@
             const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
             const data = imageData.data;
             
-            // Convertir a escala de grises
             const gray = [];
             for (let i = 0; i < data.length; i += 4) {
                 gray.push((data[i] + data[i + 1] + data[i + 2]) / 3);
             }
             
-            // Calcular varianza de Laplacian
             let sum = 0;
             const w = tempCanvas.width;
             for (let i = w; i < gray.length - w; i++) {
@@ -1230,14 +1326,10 @@
             return sum / gray.length;
         }
 
-        /**
-         * Loop principal de auto-detección
-         */
         async function autoDetectionLoop() {
             if (!AUTO_CAPTURE_CONFIG.enabled || capturando || !tesseractWorkerQuick) return;
 
             try {
-                // 1. Verificar nitidez
                 const sharpness = calculateSharpness();
                 const isFocused = sharpness > AUTO_CAPTURE_CONFIG.focusThreshold;
                 
@@ -1247,36 +1339,29 @@
                     return;
                 }
                 
-                // 2. Capturar frame actual
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 ctx.drawImage(video, 0, 0);
                 const imageData = canvas.toDataURL('image/jpeg', 0.7);
                 
-                // 3. OCR rápido
                 updateDetectionStatus('detecting', '🔎 Detectando...');
                 const { data: { text, confidence } } = await tesseractWorkerQuick.recognize(imageData);
                 
-                // 4. Buscar patrón de RUT
                 const rutMatch = text.match(/\d{7,9}/);
                 
                 if (rutMatch && confidence > AUTO_CAPTURE_CONFIG.minConfidence * 100) {
                     consecutiveDetections++;
                     console.log(`[AUTO] Detección ${consecutiveDetections}/${AUTO_CAPTURE_CONFIG.consecutiveDetections} - Conf: ${confidence}%`);
                     
-                    // Si detectamos RUT suficientes veces consecutivas
                     if (consecutiveDetections >= AUTO_CAPTURE_CONFIG.consecutiveDetections) {
                         updateDetectionStatus('ready', '✓ RUT DETECTADO - Capturando...');
                         
-                        // Vibración de feedback
                         if (navigator.vibrate) {
                             navigator.vibrate(200);
                         }
                         
-                        // Esperar para estabilizar
                         await new Promise(resolve => setTimeout(resolve, AUTO_CAPTURE_CONFIG.readyDelay));
                         
-                        // CAPTURA AUTOMÁTICA
                         await capturarMultiple();
                         
                         consecutiveDetections = 0;
@@ -1294,9 +1379,6 @@
             }
         }
 
-        /**
-         * Inicializa el worker de Tesseract para detección rápida
-         */
         async function initQuickTesseract() {
             if (!tesseractWorkerQuick && AUTO_CAPTURE_CONFIG.enabled) {
                 console.log('[AUTO] Inicializando Tesseract rápido...');
@@ -1314,10 +1396,9 @@
         }
 
         // ========================================
-        // TU CÓDIGO ORIGINAL CON MODIFICACIONES MÍNIMAS
+        // 🔒 DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO
         // ========================================
 
-        // DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO (TU CÓDIGO)
         function marcarSesionActiva() {
             sessionStorage.setItem('sesion_iniciada', 'true');
             console.log('[SESIÓN] Marcada como activa');
@@ -1409,11 +1490,18 @@
             }
         }
 
-        // Login (TU CÓDIGO)
+    // ========================================
+        // 🔐 LOGIN Y VALIDACIÓN
+        // ========================================
+
         loginBtn.addEventListener('click', () => {
-            const codigo = licenseInput.value.trim().toUpperCase();
+            const codigo = sanitizeInput(licenseInput.value.trim().toUpperCase());
             if (!codigo) {
                 mostrarErrorLogin('Por favor ingresa un código de empresario');
+                return;
+            }
+            if (codigo.length < 5) {
+                mostrarErrorLogin('Código muy corto (mínimo 5 caracteres)');
                 return;
             }
             validarEmpresario(codigo, false);
@@ -1423,10 +1511,26 @@
             if (e.key === 'Enter') loginBtn.click();
         });
 
+        // ✅ Validación en tiempo real del input
+        licenseInput.addEventListener('input', (e) => {
+            const valor = e.target.value.trim();
+            if (valor.length > 0) {
+                if (valor.length >= 5) {
+                    e.target.classList.add('valid');
+                    e.target.classList.remove('invalid');
+                } else {
+                    e.target.classList.remove('valid');
+                    e.target.classList.add('invalid');
+                }
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+            }
+        });
+
         async function validarEmpresario(codigo, autoLogin) {
             if (!autoLogin) {
                 loginBtn.disabled = true;
-                loginBtn.textContent = 'Validando...';
+                loginBtn.textContent = 'Validando de forma segura...';
             }
 
             try {
@@ -1448,20 +1552,23 @@
                     mostrarSelectorMaquinas(data.maquinas);
                 } else {
                     if (!autoLogin) {
-                        mostrarErrorLogin(data.error || 'Código inválido');
+                        mostrarErrorLogin(data.error || 'Código inválido o bloqueado por seguridad');
                         licenseInput.value = '';
+                        licenseInput.classList.remove('valid');
+                        licenseInput.classList.add('invalid');
                     } else {
                         localStorage.removeItem('tne_empresario');
                     }
                 }
             } catch (error) {
                 if (!autoLogin) {
-                    mostrarErrorLogin('Error de conexión');
+                    mostrarErrorLogin('Error de conexión. Intenta nuevamente.');
                 }
+                console.error('[LOGIN ERROR]', error);
             } finally {
                 if (!autoLogin) {
                     loginBtn.disabled = false;
-                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Iniciar Sesión';
+                    loginBtn.innerHTML = '<span class="btn-icon">✓</span> Iniciar Sesión Segura';
                 }
             }
         }
@@ -1473,7 +1580,7 @@
             machineList.innerHTML = '';
             
             if (maquinas.length === 0) {
-                machineList.innerHTML = '<p style="text-align:center;color:#6b7280;">No hay máquinas disponibles</p>';
+                machineList.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px;">No hay máquinas disponibles</p>';
                 return;
             }
             
@@ -1548,15 +1655,16 @@
                     
                     mostrarApp();
                 } else {
-                    alert(data.error || 'No se pudo asignar la máquina');
+                    alert('⚠️ ' + (data.error || 'No se pudo asignar la máquina'));
                 }
             } catch (error) {
-                alert('Error de conexión al asignar máquina');
+                alert('❌ Error de conexión al asignar máquina');
+                console.error('[ASIGNAR ERROR]', error);
             }
         }
 
         function mostrarErrorLogin(mensaje) {
-            loginError.textContent = mensaje;
+            loginError.textContent = '⚠️ ' + mensaje;
             loginError.style.display = 'block';
             setTimeout(() => loginError.style.display = 'none', 5000);
         }
@@ -1581,12 +1689,15 @@
             statsBar.textContent = texto;
         }
 
+        // ========================================
+        // 📷 FUNCIONES DE CÁMARA
+        // ========================================
+
         manualBtn.addEventListener('click', () => {
             initialButtons.style.display = 'none';
             mostrarIngresoManual();
         });
 
-        // ✨ MODIFICADO: Abrir cámara con auto-capture
         cameraBtn.addEventListener('click', abrirCamara);
 
         async function abrirCamara() {
@@ -1602,7 +1713,6 @@
                 });
                 video.srcObject = stream;
                 
-                // Esperar a que video esté listo
                 await new Promise(resolve => video.onloadedmetadata = resolve);
                 
                 cameraContainer.classList.add('active');
@@ -1611,7 +1721,6 @@
                 result.style.display = 'none';
                 errorMsg.style.display = 'none';
                 
-                // ✨ NUEVO: Iniciar auto-capture
                 if (AUTO_CAPTURE_CONFIG.enabled) {
                     await initQuickTesseract();
                     updateDetectionStatus('searching', '🔍 Buscando RUT...');
@@ -1620,18 +1729,17 @@
                 }
                 
             } catch (err) {
-                mostrarError('No se pudo acceder a la cámara');
+                mostrarError('No se pudo acceder a la cámara. Verifica los permisos.');
+                console.error('[CAMERA ERROR]', err);
             }
         }
 
-        // ✨ MODIFICADO: Click en video ahora también funciona para captura manual
         video.addEventListener('click', capturarMultiple);
 
         async function capturarMultiple() {
             if (capturando) return;
             capturando = true;
 
-            // ✨ NUEVO: Detener auto-scan durante captura
             if (autoScanInterval) {
                 clearInterval(autoScanInterval);
                 autoScanInterval = null;
@@ -1653,7 +1761,6 @@
                 const imageUrl = cnv.toDataURL('image/jpeg', 1.0);
                 capturas.push(imageUrl);
                 
-                // Vibración de feedback
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
                 }
@@ -1691,7 +1798,6 @@
             emergencyManualBtn.style.display = 'none';
         }
 
-        // TU CÓDIGO ORIGINAL DE PROCESAMIENTO (SIN CAMBIOS)
         async function seleccionarMejorImagen(imagenes) {
             let mejorScore = -1;
             let mejorIndice = 0;
@@ -1742,7 +1848,6 @@
             });
         }
 
-        // ✨ MODIFICADO: Cerrar cámara también limpia auto-capture
         cancelBtn.addEventListener('click', cerrarCamara);
 
         function cerrarCamara() {
@@ -1751,7 +1856,6 @@
                 stream = null;
             }
             
-            // ✨ NUEVO: Limpiar auto-scan
             if (autoScanInterval) {
                 clearInterval(autoScanInterval);
                 autoScanInterval = null;
@@ -1805,8 +1909,10 @@
                 img.src = imageSrc;
             });
         }
+        // ========================================
+        // 🔍 PROCESAMIENTO OCR Y VERIFICACIÓN
+        // ========================================
 
-        // TU OCR ORIGINAL (SIN CAMBIOS)
         async function procesarImagenMultiple(imagenes) {
             loading.style.display = 'block';
             result.style.display = 'none';
@@ -1910,18 +2016,14 @@
                 } else {
                     console.log('⚠️ RUT no detectado - Ingreso manual');
                     loading.style.display = 'none';
-                    
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    
                     mostrarIngresoManual();
                 }
                 
             } catch (err) {
                 console.error('❌ Error OCR:', err.message);
                 loading.style.display = 'none';
-                
                 await new Promise(resolve => setTimeout(resolve, 100));
-                
                 mostrarIngresoManual();
             }
         }
@@ -2005,7 +2107,10 @@
             return rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
         }
 
-        // RESTO DE TU CÓDIGO ORIGINAL (SIN CAMBIOS)
+        // ========================================
+        // ⌨️ INGRESO MANUAL
+        // ========================================
+
         function mostrarIngresoManual() {
             loading.style.display = 'none';
             result.style.display = 'none';
@@ -2042,14 +2147,25 @@
                 mostrarError('RUT incompleto. Mínimo 8 dígitos.');
                 return;
             }
+            
+            // ✅ Validar formato antes de enviar
+            if (!validarFormatoRUT(rutManualValue)) {
+                mostrarError('Formato de RUT inválido. Usa: 12345678-9');
+                return;
+            }
+            
             verificarTNE(rutManualValue);
         });
 
         cancelManualBtn.addEventListener('click', resetear);
 
+        // ========================================
+        // 🔍 VERIFICACIÓN TNE EN SERVIDOR
+        // ========================================
+
         async function verificarTNE(rut) {
             loading.style.display = 'block';
-            loadingProgress.textContent = 'Consultando JUNAEB...';
+            loadingProgress.textContent = 'Consultando JUNAEB de forma segura...';
             result.style.display = 'none';
             rutManualSection.style.display = 'none';
             
@@ -2061,11 +2177,25 @@
                         accion: 'verificar_tne',
                         codigoEmpresario: codigoEmpresarioActual,
                         deviceId: deviceId,
-                        rut: rut
+                        rut: sanitizeInput(rut)
                     })
                 });
                 
                 const data = await response.json();
+                
+                // ✅ Manejar errores de seguridad
+                if (response.status === 429) {
+                    mostrarError('⚠️ Límite de consultas alcanzado. Intenta más tarde.');
+                    resetear();
+                    return;
+                }
+                
+                if (response.status === 403) {
+                    mostrarError('⚠️ Acceso no autorizado. Inicia sesión nuevamente.');
+                    localStorage.removeItem('tne_empresario');
+                    setTimeout(() => location.reload(), 2000);
+                    return;
+                }
                 
                 if (data.consultasRestantes !== undefined) {
                     consultasRestantes = data.consultasRestantes;
@@ -2078,7 +2208,8 @@
                 actualizarStats();
                 
             } catch (err) {
-                mostrarError('Error al verificar');
+                console.error('[VERIFY ERROR]', err);
+                mostrarError('Error al verificar. Intenta nuevamente.');
                 resetear();
             } finally {
                 loading.style.display = 'none';
@@ -2172,8 +2303,9 @@
             consecutiveDetections = 0;
         }
 
-        console.log('✨ Verificador TNE Pro con Auto-Capture iniciado');
-        console.log('[CONFIG Auto-Capture]', AUTO_CAPTURE_CONFIG);
+        console.log('✅ Verificador TNE Pro - Sistema Seguro Iniciado');
+        console.log('[CONFIG]', AUTO_CAPTURE_CONFIG);
+        console.log('[SECURITY] Rate limiting, validación y logs activos');
     </script>
 </body>
 </html>
