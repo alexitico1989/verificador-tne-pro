@@ -12,7 +12,7 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     
-    <title>Verificador TNE Pro - Sistema Seguro</title>
+    <title>Verificador TNE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon-192.png">
@@ -861,7 +861,7 @@
             font-size: 14px;
             font-weight: 600;
             opacity: 0.9;
-        ">Cargando Sistema Seguro...</p>
+        ">Cargando Sistema...</p>
     </div>
 
     <style>
@@ -895,14 +895,9 @@
 
     <div class="container">
         <div class="header">
-            <!-- ✅ NUEVO: Indicador de seguridad -->
-            <div class="security-indicator">
-                <span>🔒</span>
-                <span>SEGURO</span>
-            </div>
             
-            <h1>🔐 Verificador TNE Pro</h1>
-            <p id="headerSubtitle">Sistema de Seguridad Enterprise</p>
+            <h1>🔐 Verificador TNE</h1>
+            <p id="headerSubtitle">Sistema Enterprise</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
 
@@ -911,7 +906,7 @@
             <div class="login-icon">🔐</div>
             <div class="login-title">Acceso Empresarial</div>
             <p class="login-subtitle">
-                Sistema protegido con cifrado y auditoría completa.<br>
+                Sistema de verificación de tarjetas estudiantiles.<br>
                 Preparado para integración con JUNAEB.
             </p>
 
@@ -921,21 +916,21 @@
                     type="text" 
                     id="licenseInput" 
                     class="input-field" 
-                    placeholder="EMP-NOMBRE-2025"
+                    placeholder="CÓDIGO EMPRESARIO"
                     maxlength="30"
                     autocomplete="off"
                 >
             </div>
 
             <button class="btn" id="loginBtn">
-                <span class="btn-icon">✓</span> Iniciar Sesión Segura
+                <span class="btn-icon">✓</span> Iniciar Sesión
             </button>
 
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
                 <p style="color: #9ca3af;">✅ Versión Enterprise 2.0</p>
-                <p style="margin-top: 4px; color: #9ca3af;">Sistema con Rate Limiting, Logs y Validación Estricta</p>
+                <p style="margin-top: 4px; color: #9ca3af;">Sistema consulta datos en tiempo real.</p>
             </div>
         </div>
 
@@ -944,8 +939,8 @@
             <div class="selector-title">Selecciona tu Máquina</div>
             
             <div class="instructions" style="margin-bottom: 20px;">
-                <div class="instructions-title">📋 Instrucciones:</div>
-                <p>Elige el bus/máquina que vas a usar hoy. Solo podrás usar esta máquina durante esta sesión. Tu actividad será registrada para auditoría.</p>
+                <div class="instructions-title">Instrucciones:</div>
+                <p>Elige el bus/máquina que vas a usar hoy. Solo podrás usar esta máquina durante esta sesión.</p>
             </div>
 
             <div class="machine-list" id="machineList">
@@ -954,7 +949,7 @@
 
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
-                    <span class="btn-icon">🚪</span> Cerrar Sesión
+                    <span class="btn-icon"></span> Cerrar Sesión
                 </button>
             </div>
         </div>
@@ -965,7 +960,7 @@
                 <div class="stats-bar" id="statsBar">Verificaciones hoy: 0</div>
 
                 <div class="instructions">
-                    <div class="instructions-title">✨ Modo Auto-Capture:</div>
+                    <div class="instructions-title">Modo Auto-Capture:</div>
                     <p>
                     1. Presiona "Iniciar Auto-Capture"<br>
                     2. Enfoca el RUT en el recuadro verde<br>
@@ -977,10 +972,10 @@
                 <!-- Botones Iniciales -->
                 <div id="initialButtons">
                     <button class="btn btn-camera" id="cameraBtn">
-                        <span class="btn-icon">🤖</span> Iniciar Auto-Capture
+                        <span class="btn-icon"></span> Iniciar Auto-Capture
                     </button>
                     <button class="btn btn-manual" id="manualBtn">
-                        <span class="btn-icon">⌨️</span> Ingreso Manual
+                        <span class="btn-icon"></span> Ingreso Manual
                     </button>
                 </div>
 
@@ -997,7 +992,7 @@
                         <div class="focus-text" id="focusText">📍 POSICIONA RUT AQUÍ</div>
                     </div>
                     
-                    <div class="tap-hint">👆 Captura automática o toca para manual</div>
+                    <div class="tap-hint">Captura automática o toca para manual</div>
                     <div class="capture-counter" id="captureCounter">Capturando 1/5...</div>
                 </div>
 
@@ -1024,7 +1019,7 @@
                     <div class="loading-text">Analizando RUT...</div>
                     <div class="loading-progress" id="loadingProgress"></div>
                     <button class="btn btn-cancel" id="emergencyManualBtn" style="display: none; margin-top: 20px;">
-                        <span class="btn-icon">⌨️</span> Ingreso Manual
+                        <span class="btn-icon"></span> Ingreso Manual
                     </button>
                 </div>
 
@@ -1134,12 +1129,12 @@
 
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
-                    <span class="btn-icon">🚪</span> Cerrar Sesión
+                    <span class="btn-icon"></span> Cerrar Sesión
                 </button>
             </div>
 
             <div class="footer">
-                <p>🔒 Sistema para conductores con auditoría completa</p>
+                <p>🔒 Sistema para conductores.</p>
                 <p style="margin-top: 4px;">DATOS EN TIEMPO REAL DESDE JUNAEB</p>
             </div>
         </div>
