@@ -949,10 +949,10 @@
                 <div class="stats-bar" id="statsBar">Verificaciones hoy: 0</div>
 
                 <div class="instructions">
-                    <div class="instructions-title">Captura el rut:</div>
+                    <div class="instructions-title">Captura el RUN:</div>
                     <p>
                     1. Presiona "Capturar Imagen"<br>
-                    2. Enfoca el RUT en el recuadro verde<br>
+                    2. Enfoca el RUN en el recuadro verde<br>
                     3. ¡Sistema captura AUTOMÁTICAMENTE!<br>
                     4. Botón manual disponible como respaldo
                     </p>
@@ -975,7 +975,7 @@
                     <video id="videoPreview" autoplay playsinline></video>
                     
                     <div class="focus-guide" id="focusGuide">
-                        <div class="focus-text" id="focusText">POSICIONA RUT AQUÍ</div>
+                        <div class="focus-text" id="focusText">POSICIONA RUN AQUÍ</div>
                     </div>
                     
                     <div class="tap-hint">Captura automática o toca para manual</div>
@@ -1001,7 +1001,7 @@
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Analizando RUT...</div>
+                    <div class="loading-text">Analizando RUN...</div>
                     <div class="loading-progress" id="loadingProgress"></div>
                     <button class="btn btn-cancel" id="emergencyManualBtn" style="display: none; margin-top: 20px;">
                         <span class="btn-icon"></span> Digita el RUN
@@ -1403,7 +1403,7 @@
                     console.log(`[AUTO] Detección ${consecutiveDetections}/${AUTO_CAPTURE_CONFIG.consecutiveDetections} - Conf: ${confidence}%`);
                     
                     if (consecutiveDetections >= AUTO_CAPTURE_CONFIG.consecutiveDetections) {
-                        updateDetectionStatus('ready', '✓ RUT DETECTADO - Capturando...');
+                        updateDetectionStatus('ready', '✓ RUN DETECTADO - Capturando...');
                         
                         if (navigator.vibrate) {
                             navigator.vibrate(200);
@@ -1415,11 +1415,11 @@
                         
                         consecutiveDetections = 0;
                     } else {
-                        updateDetectionStatus('detecting', `🎯 RUT visible (${consecutiveDetections}/${AUTO_CAPTURE_CONFIG.consecutiveDetections})`);
+                        updateDetectionStatus('detecting', `🎯 RUN visible (${consecutiveDetections}/${AUTO_CAPTURE_CONFIG.consecutiveDetections})`);
                     }
                 } else {
                     consecutiveDetections = 0;
-                    updateDetectionStatus('searching', '🔍 Buscando RUT...');
+                    updateDetectionStatus('searching', '🔍 Buscando RUN...');
                 }
                 
             } catch (error) {
@@ -1758,7 +1758,7 @@
                 
                 if (AUTO_CAPTURE_CONFIG.enabled) {
                     await initQuickTesseract();
-                    updateDetectionStatus('searching', 'Buscando RUT...');
+                    updateDetectionStatus('searching', 'Buscando RUN...');
                     autoScanInterval = setInterval(autoDetectionLoop, AUTO_CAPTURE_CONFIG.scanInterval);
                     console.log('[AUTO] ✓ Auto-Capture activado');
                 }
@@ -1971,7 +1971,7 @@
                 let rut = null;
                 
                 try {
-                    loadingProgress.textContent = 'Estrategia 1...';
+                    loadingProgress.textContent = '';
                     const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
                     await worker.setParameters({
                         tessedit_char_whitelist: '0123456789K-.',
@@ -1982,13 +1982,13 @@
                     rut = extraerRUT(text);
                     if (rut) resultados.push(rut);
                 } catch (err) {
-                    console.error('Error Estrategia 1:', err.message);
+                    console.error('', err.message);
                 }
                 
                 if (!rut) {
                     try {
                         for (let i = 0; i < Math.min(3, imagenes.length); i++) {
-                            loadingProgress.textContent = `Estrategia 2: ${i + 1}/3...`;
+                            loadingProgress.textContent = ``;
                             const procesada = await preprocesarImagenExtremo(imagenes[i]);
                             const resultado = await worker.recognize(procesada);
                             const text = resultado.data.text;
@@ -1999,13 +1999,13 @@
                             }
                         }
                     } catch (err) {
-                        console.error('Error Estrategia 2:', err.message);
+                        console.error('', err.message);
                     }
                 }
                 
                 if (!rut) {
                     try {
-                        loadingProgress.textContent = 'Estrategia 3...';
+                        loadingProgress.textContent = '';
                         const mejorProcesada = await preprocesarImagenExtremo(imagenes[0]);
                         await worker.setParameters({
                             tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
@@ -2015,13 +2015,13 @@
                         rut = extraerRUT(text);
                         if (rut) resultados.push(rut);
                     } catch (err) {
-                        console.error('Error Estrategia 3:', err.message);
+                        console.error('', err.message);
                     }
                 }
                 
                 if (!rut) {
                     try {
-                        loadingProgress.textContent = 'Estrategia 4...';
+                        loadingProgress.textContent = '';
                         await worker.setParameters({
                             tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
                         });
@@ -2035,7 +2035,7 @@
                             }
                         }
                     } catch (err) {
-                        console.error('Error Estrategia 4:', err.message);
+                        console.error('', err.message);
                     }
                 }
                 
@@ -2045,11 +2045,11 @@
                 
                 if (resultados.length > 0) {
                     const rutFinal = validacionCruzada(resultados);
-                    console.log('✓ RUT:', rutFinal);
+                    console.log('✓ RUN:', rutFinal);
                     loading.style.display = 'none';
                     await verificarTNE(rutFinal);
                 } else {
-                    console.log('RUT no detectado');
+                    console.log('RUN no detectado');
                     loading.style.display = 'none';
                     await new Promise(resolve => setTimeout(resolve, 100));
                     mostrarIngresoManual();
@@ -2175,7 +2175,7 @@
 
         verificarManualBtn.addEventListener('click', () => {
             if (rutManualValue.length < 8) {
-                mostrarError('RUT incompleto.');
+                mostrarError('RUN incompleto.');
                 return;
             }
             
@@ -2269,7 +2269,7 @@
                 resultSubtitle.textContent = data.instrucciones || data.mensaje;
             }
             
-            document.getElementById('rutDisplay').textContent = `RUT: ${rut}`;
+            document.getElementById('rutDisplay').textContent = `RUN: ${rut}`;
             
             if (data.nombreCompleto) {
                 document.getElementById('nombreCompleto').textContent = data.nombreCompleto;
