@@ -81,23 +81,6 @@
             opacity: 0.9;
         }
 
-        /* ✅ NUEVO: Badge de seguridad */
-        .security-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #10b981;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
         .license-badge {
             background: rgba(255,255,255,0.2);
             padding: 6px 12px;
@@ -134,7 +117,6 @@
             margin-bottom: 8px;
         }
 
-        /* ✅ MEJORADO: Subtítulo de seguridad */
         .login-subtitle {
             font-size: 13px;
             color: #6b7280;
@@ -174,7 +156,6 @@
             box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
         }
 
-        /* ✅ NUEVO: Indicador de validación */
         .input-field.valid {
             border-color: #10b981;
         }
@@ -223,7 +204,6 @@
             line-height: 1.5;
         }
 
-        /* ✅ Estado de detección AUTO-CAPTURE */
         .detection-status {
             position: absolute;
             top: 10px;
@@ -262,7 +242,6 @@
             50% { transform: scale(1.05); }
         }
 
-        /* Cámara con guía de enfoque */
         .camera-container {
             position: relative;
             width: 100%;
@@ -284,7 +263,6 @@
             cursor: pointer;
         }
 
-        /* Guía dinámica según estado */
         .focus-guide {
             position: absolute;
             top: 50%;
@@ -351,7 +329,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* Contador de captura */
         .capture-counter {
             position: absolute;
             top: 10px;
@@ -365,7 +342,6 @@
             display: none;
         }
 
-        /* Preview capturado */
         .preview-container {
             display: none;
             margin-bottom: 15px;
@@ -435,7 +411,6 @@
             box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
-        /* Footer con botón cerrar sesión */
         .footer-logout {
             padding: 15px;
             text-align: center;
@@ -488,7 +463,6 @@
             margin-top: 8px;
         }
 
-        /* Ingreso Manual con Teclado Grande */
         #rutManualSection {
             display: none;
         }
@@ -530,7 +504,6 @@
             color: #1e40af;
         }
 
-        /* Teclado Numérico Grande */
         .custom-keyboard {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -578,7 +551,6 @@
             border-color: #059669;
         }
 
-        /* Resultado */
         .result {
             display: none;
             animation: slideUp 0.4s ease;
@@ -725,7 +697,6 @@
             display: none !important;
         }
 
-        /* Selector de Máquinas */
         .machine-selector {
             display: none;
             padding: 20px;
@@ -824,7 +795,6 @@
             color: #1f2937;
         }
 
-        /* ✅ NUEVO: Responsive mejorado */
         @media (max-width: 480px) {
             .header h1 {
                 font-size: 20px;
@@ -847,7 +817,6 @@
     </style>
 </head>
 <body>
-<!-- ✅ SPLASH SCREEN PERSONALIZADO -->
     <div id="splash-screen" style="
         position: fixed;
         top: 0;
@@ -900,7 +869,6 @@
     </style>
 
     <script>
-    // Ocultar splash después de 1.5 segundos
     window.addEventListener('load', () => {
         setTimeout(() => {
             const splash = document.getElementById('splash-screen');
@@ -917,7 +885,6 @@
 
     <div class="container">
         <div class="header">
-            
             <h1>🔐 Verificador TNE</h1>
             <p id="headerSubtitle">Sistema Enterprise</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
@@ -991,7 +958,6 @@
                     </p>
                 </div>
 
-                <!-- Botones Iniciales -->
                 <div id="initialButtons">
                     <button class="btn btn-camera" id="cameraBtn">
                         <span class="btn-icon">📷</span> Iniciar Auto-Capture
@@ -1001,9 +967,7 @@
                     </button>
                 </div>
 
-                <!-- Contenedor de Cámara con Auto-Capture -->
                 <div class="camera-container" id="cameraContainer">
-                    <!-- Estado de detección en tiempo real -->
                     <div class="detection-status searching" id="detectionStatus">
                         🔍 Buscando RUT...
                     </div>
@@ -1024,7 +988,6 @@
                     </button>
                 </div>
 
-                <!-- Preview Capturado -->
                 <div class="preview-container" id="previewContainer">
                     <img id="imagePreview" alt="Mejor foto seleccionada">
                 </div>
@@ -1045,7 +1008,6 @@
                     </button>
                 </div>
 
-                <!-- Ingreso Manual -->
                 <div id="rutManualSection">
                     <div class="manual-alert">
                         <strong>Ingreso Manual</strong>
@@ -1083,7 +1045,6 @@
                     </button>
                 </div>
 
-                <!-- RESULTADO -->
                 <div class="result" id="result">
                     <div class="result-header" id="resultHeader">
                         <div class="result-icon" id="resultIcon">✅</div>
@@ -1168,7 +1129,6 @@
         // ✅ CONFIGURACIÓN SEGURA
         // ========================================
         
-        // ✅ Sanitización de inputs (prevención XSS)
         function sanitizeInput(input) {
             if (typeof input !== 'string') return input;
             return input
@@ -1179,20 +1139,16 @@
                 .substring(0, 100);
         }
 
-        // ✅ Validación de formato RUT
         function validarFormatoRUT(rut) {
             const rutRegex = /^\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]$/;
             return rutRegex.test(rut);
         }
 
-        // ✅ Generación de deviceId más seguro
         function generarDeviceIdSeguro() {
-            // Usar crypto API si está disponible
             if (window.crypto && window.crypto.randomUUID) {
                 return 'DEV-' + crypto.randomUUID();
             }
             
-            // Fallback al método anterior mejorado
             const nav = navigator;
             const screen = window.screen;
             const canvas = document.createElement('canvas');
@@ -1233,7 +1189,6 @@
             consecutiveDetections: 2,
         };
 
-       // CONFIGURACIÓN ORIGINAL - URL Ofuscada
         const WORKER_URL = atob('aHR0cHM6Ly90bmUtdmVyaWZpY2Fkb3IubW9uYXJkZXMtbHVpcy53b3JrZXJzLmRldg==');
         const NUM_CAPTURAS = 5;
         
@@ -1250,12 +1205,11 @@
         let deviceId = null;
         let consultasRestantes = null;
 
-        // ✨ VARIABLES PARA AUTO-CAPTURE
         let autoScanInterval = null;
         let tesseractWorkerQuick = null;
         let consecutiveDetections = 0;
 
-        // ✅ GENERAR DEVICE ID SEGURO
+        // ✅ GENERAR DEVICE ID INMEDIATAMENTE
         deviceId = generarDeviceIdSeguro();
         console.log('[DEVICE] ID seguro generado:', deviceId);
 
@@ -1298,7 +1252,6 @@
         const cancelManualBtn = document.getElementById('cancelManualBtn');
         const emergencyManualBtn = document.getElementById('emergencyManualBtn');
 
-        // ✨ ELEMENTOS PARA AUTO-CAPTURE
         const detectionStatus = document.getElementById('detectionStatus');
         const focusGuide = document.getElementById('focusGuide');
         const focusText = document.getElementById('focusText');
@@ -1416,33 +1369,33 @@
         // 🔧 DETECCIÓN DE CIERRE Y CAMBIO DE PESTAÑA
         // ========================================
         
-        // 1. Detectar cuando el usuario minimiza o cambia de pestaña
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                // Usuario salió de la pestaña/app
                 console.log('[VISIBILITY] Usuario salió de la app');
                 liberarMaquinaInmediata();
             }
         });
         
-        // 2. Detectar cuando cierra la pestaña/navegador
         window.addEventListener('beforeunload', function(e) {
             console.log('[BEFOREUNLOAD] Usuario cerrando app');
             liberarMaquinaInmediata();
         });
         
-        // 3. Detectar cuando la página se oculta (iOS Safari)
         window.addEventListener('pagehide', function(e) {
             console.log('[PAGEHIDE] Página ocultándose');
             liberarMaquinaInmediata();
         });
         
-        // Función unificada para liberar máquina
         function liberarMaquinaInmediata() {
             const codigo = localStorage.getItem('tne_empresario');
             
+            console.log('[LIBERAR] Iniciando liberación...');
+            console.log('[LIBERAR] Código:', codigo);
+            console.log('[LIBERAR] DeviceID:', deviceId);
+            console.log('[LIBERAR] Máquina:', maquinaAsignada);
+            
             if (codigo && deviceId && maquinaAsignada) {
-                console.log('[LIBERAR] Liberando máquina:', maquinaAsignada);
+                console.log('[LIBERAR] 🔓 Liberando máquina:', maquinaAsignada);
                 
                 const data = JSON.stringify({
                     accion: 'cerrar_sesion',
@@ -1450,55 +1403,73 @@
                     deviceId: deviceId
                 });
                 
-                // Usar sendBeacon para garantizar que se envíe incluso al cerrar
+                console.log('[LIBERAR] Datos a enviar:', data);
+                
                 if (navigator.sendBeacon) {
-                    navigator.sendBeacon(WORKER_URL, new Blob([data], { type: 'application/json' }));
-                    console.log('[LIBERAR] ✅ Beacon enviado');
+                    const enviado = navigator.sendBeacon(WORKER_URL, new Blob([data], { type: 'application/json' }));
+                    console.log('[LIBERAR] Beacon enviado:', enviado);
                 } else {
-                    // Fallback para navegadores antiguos
+                    console.log('[LIBERAR] sendBeacon no disponible, usando fetch...');
                     fetch(WORKER_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: data,
                         keepalive: true
-                    }).catch(err => console.error('[LIBERAR] Error:', err));
+                    }).then(() => {
+                        console.log('[LIBERAR] Fetch exitoso');
+                    }).catch(err => {
+                        console.error('[LIBERAR] Error en fetch:', err);
+                    });
                 }
                 
-                // Limpiar localStorage INMEDIATAMENTE
                 localStorage.removeItem('tne_empresario');
                 sessionStorage.clear();
                 
                 console.log('[LIBERAR] ✅ Sesión local limpiada');
+            } else {
+                console.log('[LIBERAR] ⚠️ Condiciones no cumplidas para liberar');
+                console.log('[LIBERAR] - Tiene código?', !!codigo);
+                console.log('[LIBERAR] - Tiene deviceId?', !!deviceId);
+                console.log('[LIBERAR] - Tiene máquina?', !!maquinaAsignada);
             }
         }
 
         window.addEventListener('DOMContentLoaded', async function() {
-            // SIEMPRE limpiar al cargar la página
-            // Esto garantiza que nunca quede una sesión "zombie"
+            console.log('[INICIO] Página cargada - Verificando sesión...');
+            console.log('[INICIO] DeviceID:', deviceId);
+            
             const codigo = localStorage.getItem('tne_empresario');
+            console.log('[INICIO] Código guardado:', codigo);
             
             if (codigo && deviceId) {
-                console.log('[INICIO] Limpiando sesión anterior si existe...');
+                console.log('[INICIO] 🔄 Limpiando sesión anterior...');
                 
-                // Liberar máquina anterior
-                await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        accion: 'cerrar_sesion',
-                        codigoEmpresario: codigo,
-                        deviceId: deviceId
-                    })
-                }).catch(err => console.error('[INICIO] Error limpiando:', err));
+                try {
+                    const response = await fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            accion: 'cerrar_sesion',
+                            codigoEmpresario: codigo,
+                            deviceId: deviceId
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    console.log('[INICIO] Respuesta del Worker:', data);
+                    
+                } catch (err) {
+                    console.error('[INICIO] Error limpiando:', err);
+                }
                 
-                // Limpiar local
                 localStorage.removeItem('tne_empresario');
                 sessionStorage.clear();
                 
                 console.log('[INICIO] ✅ Sesión anterior limpiada');
+            } else {
+                console.log('[INICIO] ℹ️ No hay sesión previa para limpiar');
             }
             
-            // Mostrar pantalla de login siempre
             loginScreen.classList.remove('hidden');
 
             const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
@@ -1529,7 +1500,7 @@
             }
         }
 
-    // ========================================
+        // ========================================
         // 🔐 LOGIN Y VALIDACIÓN
         // ========================================
 
@@ -1550,7 +1521,6 @@
             if (e.key === 'Enter') loginBtn.click();
         });
 
-        // ✅ Validación en tiempo real del input
         licenseInput.addEventListener('input', (e) => {
             const valor = e.target.value.trim();
             if (valor.length > 0) {
@@ -1946,6 +1916,7 @@
                 img.src = imageSrc;
             });
         }
+        
         // ========================================
         // 🔍 PROCESAMIENTO OCR Y VERIFICACIÓN
         // ========================================
@@ -2185,7 +2156,6 @@
                 return;
             }
             
-            // ✅ Validar formato antes de enviar
             if (!validarFormatoRUT(rutManualValue)) {
                 mostrarError('Formato de RUT inválido. Usa: 12345678-9');
                 return;
@@ -2220,7 +2190,6 @@
                 
                 const data = await response.json();
                 
-                // ✅ Manejar errores de seguridad
                 if (response.status === 429) {
                     mostrarError('⚠️ Límite de consultas alcanzado. Intenta más tarde.');
                     resetear();
@@ -2375,3 +2344,30 @@
     </script>
 </body>
 </html>
+```
+
+---
+
+## 💾 **GUARDAR Y PROBAR:**
+
+1. **Copia TODO el código**
+2. **Reemplaza tu `index.html` en GitHub**
+3. **Commit:**
+```
+Debug: Agregar logs completos de liberación de máquina
+```
+4. **Recarga con Ctrl+Shift+R**
+5. **Abre consola (F12)**
+6. **Inicia sesión, selecciona máquina**
+7. **Recarga la página**
+
+---
+
+## 📊 **DEBERÍAS VER ESTOS LOGS:**
+```
+[INICIO] Página cargada - Verificando sesión...
+[INICIO] DeviceID: DEV-xxx...
+[INICIO] Código guardado: TU-CODIGO
+[INICIO] 🔄 Limpiando sesión anterior...
+[INICIO] Respuesta del Worker: {success: true, mensaje: "..."}
+[INICIO] ✅ Sesión anterior limpiada
