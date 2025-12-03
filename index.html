@@ -971,7 +971,7 @@
 
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
-                    <span class="btn-icon"></span> Cerrar Sesión
+                    <span class="btn-icon">🚪</span> Cerrar Sesión
                 </button>
             </div>
         </div>
@@ -994,10 +994,10 @@
                 <!-- Botones Iniciales -->
                 <div id="initialButtons">
                     <button class="btn btn-camera" id="cameraBtn">
-                        <span class="btn-icon"></span> Iniciar Auto-Capture
+                        <span class="btn-icon">📷</span> Iniciar Auto-Capture
                     </button>
                     <button class="btn btn-manual" id="manualBtn">
-                        <span class="btn-icon"></span> Ingreso Manual
+                        <span class="btn-icon">⌨️</span> Ingreso Manual
                     </button>
                 </div>
 
@@ -1041,7 +1041,7 @@
                     <div class="loading-text">Analizando RUT...</div>
                     <div class="loading-progress" id="loadingProgress"></div>
                     <button class="btn btn-cancel" id="emergencyManualBtn" style="display: none; margin-top: 20px;">
-                        <span class="btn-icon"></span> Ingreso Manual
+                        <span class="btn-icon">⌨️</span> Ingreso Manual
                     </button>
                 </div>
 
@@ -1151,7 +1151,7 @@
 
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
-                    <span class="btn-icon"></span> Cerrar Sesión
+                    <span class="btn-icon">🚪</span> Cerrar Sesión
                 </button>
             </div>
 
@@ -1413,75 +1413,97 @@
         }
 
         // ========================================
-        // 🔒 DETECCIÓN DE RECARGA Y CIERRE AUTOMÁTICO
+        // 🔧 DETECCIÓN DE CIERRE Y CAMBIO DE PESTAÑA
         // ========================================
-
-        function marcarSesionActiva() {
-            sessionStorage.setItem('sesion_iniciada', 'true');
-            console.log('[SESIÓN] Marcada como activa');
-        }
-
-        function esRecarga() {
-            return sessionStorage.getItem('sesion_iniciada') === 'true';
-        }
-
-        async function cerrarSesionEnServidor() {
-            const codigo = localStorage.getItem('tne_empresario');
-            
-            if (codigo && deviceId) {
-                console.log('[CIERRE] Liberando máquina...');
-                
-                try {
-                    await fetch(WORKER_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            accion: 'cerrar_sesion',
-                            codigoEmpresario: codigo,
-                            deviceId: deviceId
-                        })
-                    });
-                    console.log('[CIERRE] ✅ Máquina liberada');
-                } catch (error) {
-                    console.error('[CIERRE] ❌ Error:', error);
-                }
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', async function() {
-            if (esRecarga()) {
-                console.log('[RECARGA] 🔄 Detectada - Cerrando sesión...');
-                
-                await cerrarSesionEnServidor();
-                localStorage.removeItem('tne_empresario');
-                sessionStorage.clear();
-                
-                console.log('[RECARGA] ✅ Sesión cerrada');
-                return;
-            }
-            
-            const savedCode = localStorage.getItem('tne_empresario');
-            if (savedCode) {
-                validarEmpresario(savedCode, true);
-            }
-
-            const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
-            if (savedCount) {
-                verificacionesHoy = parseInt(savedCount);
+        
+        // 1. Detectar cuando el usuario minimiza o cambia de pestaña
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Usuario salió de la pestaña/app
+                console.log('[VISIBILITY] Usuario salió de la app');
+                liberarMaquinaInmediata();
             }
         });
-
-        window.addEventListener('beforeunload', function() {
+        
+        // 2. Detectar cuando cierra la pestaña/navegador
+        window.addEventListener('beforeunload', function(e) {
+            console.log('[BEFOREUNLOAD] Usuario cerrando app');
+            liberarMaquinaInmediata();
+        });
+        
+        // 3. Detectar cuando la página se oculta (iOS Safari)
+        window.addEventListener('pagehide', function(e) {
+            console.log('[PAGEHIDE] Página ocultándose');
+            liberarMaquinaInmediata();
+        });
+        
+        // Función unificada para liberar máquina
+        function liberarMaquinaInmediata() {
             const codigo = localStorage.getItem('tne_empresario');
             
-            if (codigo && deviceId) {
+            if (codigo && deviceId && maquinaAsignada) {
+                console.log('[LIBERAR] Liberando máquina:', maquinaAsignada);
+                
                 const data = JSON.stringify({
                     accion: 'cerrar_sesion',
                     codigoEmpresario: codigo,
                     deviceId: deviceId
                 });
                 
-                navigator.sendBeacon(WORKER_URL, new Blob([data], { type: 'application/json' }));
+                // Usar sendBeacon para garantizar que se envíe incluso al cerrar
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(WORKER_URL, new Blob([data], { type: 'application/json' }));
+                    console.log('[LIBERAR] ✅ Beacon enviado');
+                } else {
+                    // Fallback para navegadores antiguos
+                    fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: data,
+                        keepalive: true
+                    }).catch(err => console.error('[LIBERAR] Error:', err));
+                }
+                
+                // Limpiar localStorage INMEDIATAMENTE
+                localStorage.removeItem('tne_empresario');
+                sessionStorage.clear();
+                
+                console.log('[LIBERAR] ✅ Sesión local limpiada');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async function() {
+            // SIEMPRE limpiar al cargar la página
+            // Esto garantiza que nunca quede una sesión "zombie"
+            const codigo = localStorage.getItem('tne_empresario');
+            
+            if (codigo && deviceId) {
+                console.log('[INICIO] Limpiando sesión anterior si existe...');
+                
+                // Liberar máquina anterior
+                await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        accion: 'cerrar_sesion',
+                        codigoEmpresario: codigo,
+                        deviceId: deviceId
+                    })
+                }).catch(err => console.error('[INICIO] Error limpiando:', err));
+                
+                // Limpiar local
+                localStorage.removeItem('tne_empresario');
+                sessionStorage.clear();
+                
+                console.log('[INICIO] ✅ Sesión anterior limpiada');
+            }
+            
+            // Mostrar pantalla de login siempre
+            loginScreen.classList.remove('hidden');
+
+            const savedCount = localStorage.getItem('tne_count_' + new Date().toDateString());
+            if (savedCount) {
+                verificacionesHoy = parseInt(savedCount);
             }
         });
 
@@ -1693,8 +1715,6 @@
             licenseBadge.textContent = `👤 ${empresarioNombre} | 🚌 ${maquinaAsignada}`;
             licenseBadge.style.display = 'inline-block';
             actualizarStats();
-            
-            marcarSesionActiva();
         }
 
         function actualizarStats() {
