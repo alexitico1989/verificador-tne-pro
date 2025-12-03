@@ -2,7 +2,7 @@
 <!--
 ╔════════════════════════════════════════════════════════════════════════╗
 ║                                                                        ║
-║  VERIFICADOR TNE PRO - SISTEMA PROPIETARIO                            ║
+║  VERIFICADOR TNE - SISTEMA PROPIETARIO                            ║
 ║                                                                        ║
 ║  Copyright © 2025 Luis Alexis Monardes Rojas - Amia Solutions SPA    ║
 ║  Todos los derechos reservados                                        ║
@@ -885,41 +885,41 @@
 
     <div class="container">
         <div class="header">
-            <h1>🔐 Verificador TNE Pro</h1>
-            <p id="headerSubtitle">Sistema Enterprise con Seguridad</p>
+            <h1>Verificador TNE</h1>
+            <p id="headerSubtitle">Sistema Empresarial</p>
             <div class="license-badge" id="licenseBadge" style="display: none;"></div>
         </div>
 
         <!-- PANTALLA DE LOGIN -->
         <div class="login-screen" id="loginScreen">
-            <div class="login-icon">🔐</div>
-            <div class="login-title">Acceso Empresarial Seguro</div>
+            <div class="login-icon"></div>
+            <div class="login-title">Acceso Empresarial</div>
             <p class="login-subtitle">
-                Sistema de verificación con autenticación.<br>
-                Integrado con base de datos en tiempo real.
+                Ingresa el código proporcionado por tu empleador.<br>
+                El código es único e intransferible.
             </p>
 
             <div class="input-group">
-                <label class="input-label">Código de Empresario:</label>
+                <label class="input-label">Código de Empleador:</label>
                 <input 
                     type="text" 
                     id="licenseInput" 
                     class="input-field" 
-                    placeholder="CÓDIGO EMPRESARIO"
+                    placeholder="CÓDIGO EMPLEADOR"
                     maxlength="30"
                     autocomplete="off"
                 >
             </div>
 
             <button class="btn" id="loginBtn">
-                <span class="btn-icon">✓</span> Iniciar Sesión Segura
+                <span class="btn-icon">✓</span> Iniciar Sesión
             </button>
 
             <div class="error-msg" id="loginError"></div>
 
             <div class="footer" style="border-top: none; margin-top: 30px;">
-                <p style="color: #9ca3af;">🔒 Sistema Seguro v2.0</p>
-                <p style="margin-top: 4px; color: #9ca3af;">Rate limiting, validación y logs activos</p>
+                <p style="color: #9ca3af;">Sistema TNE v2.0</p>
+                <p style="margin-top: 4px; color: #9ca3af;">Consulta estado, validez y datos TNE.</p>
             </div>
         </div>
 
@@ -938,7 +938,7 @@
 
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
-                    <span class="btn-icon">🚪</span> Cerrar Sesión
+                    <span class="btn-icon"></span> Cerrar Sesión
                 </button>
             </div>
         </div>
@@ -949,33 +949,33 @@
                 <div class="stats-bar" id="statsBar">Verificaciones hoy: 0</div>
 
                 <div class="instructions">
-                    <div class="instructions-title">🤖 Modo Auto-Capture:</div>
+                    <div class="instructions-title">Captura el rut:</div>
                     <p>
-                    1. Presiona "Iniciar Auto-Capture"<br>
+                    1. Presiona "Capturar Imagen"<br>
                     2. Enfoca el RUT en el recuadro verde<br>
-                    3. <strong>¡Sistema captura AUTOMÁTICAMENTE!</strong><br>
+                    3. ¡Sistema captura AUTOMÁTICAMENTE!<br>
                     4. Botón manual disponible como respaldo
                     </p>
                 </div>
 
                 <div id="initialButtons">
                     <button class="btn btn-camera" id="cameraBtn">
-                        <span class="btn-icon">📷</span> Iniciar Auto-Capture
+                        <span class="btn-icon"></span> Capturar Imagen
                     </button>
                     <button class="btn btn-manual" id="manualBtn">
-                        <span class="btn-icon">⌨️</span> Ingreso Manual
+                        <span class="btn-icon"></span> Digita el RUN
                     </button>
                 </div>
 
                 <div class="camera-container" id="cameraContainer">
                     <div class="detection-status searching" id="detectionStatus">
-                        🔍 Buscando RUT...
+                        Buscando RUN...
                     </div>
 
                     <video id="videoPreview" autoplay playsinline></video>
                     
                     <div class="focus-guide" id="focusGuide">
-                        <div class="focus-text" id="focusText">📍 POSICIONA RUT AQUÍ</div>
+                        <div class="focus-text" id="focusText">POSICIONA RUT AQUÍ</div>
                     </div>
                     
                     <div class="tap-hint">Captura automática o toca para manual</div>
@@ -984,7 +984,7 @@
 
                 <div id="cameraButtons" style="display: none;">
                     <button class="btn btn-cancel" id="cancelBtn">
-                        <span class="btn-icon">❌</span> Cancelar
+                        <span class="btn-icon"></span> Cancelar
                     </button>
                 </div>
 
@@ -1004,14 +1004,14 @@
                     <div class="loading-text">Analizando RUT...</div>
                     <div class="loading-progress" id="loadingProgress"></div>
                     <button class="btn btn-cancel" id="emergencyManualBtn" style="display: none; margin-top: 20px;">
-                        <span class="btn-icon">⌨️</span> Ingreso Manual
+                        <span class="btn-icon"></span> Digita el RUN
                     </button>
                 </div>
 
                 <div id="rutManualSection">
                     <div class="manual-alert">
-                        <strong>Ingreso Manual</strong>
-                        <p>Ingresa el RUT manualmente (será validado):</p>
+                        <strong>Digita el RUN</strong>
+                        <p>Ingresa el RUN manualmente:</p>
                     </div>
                     
                     <div class="rut-display-input">
@@ -1038,7 +1038,7 @@
                     </div>
                     
                     <button class="btn btn-camera" id="verificarManualBtn" style="margin-top: 15px;">
-                        <span class="btn-icon">✓</span> Verificar RUT
+                        <span class="btn-icon">✓</span> Verificar RUN
                     </button>
                     <button class="btn btn-cancel" id="cancelManualBtn">
                         <span class="btn-icon">↩️</span> Nueva Captura
@@ -1053,11 +1053,11 @@
                     </div>
                     
                     <div class="result-body" id="resultBody">
-                        <div class="rut-display" id="rutDisplay">RUT: 12.345.678-9</div>
+                        <div class="rut-display" id="rutDisplay">RUN: 12.345.678-9</div>
                         
                         <div class="data-section" id="datosEstudiante">
                             <div class="data-section-title">
-                                <span>👤</span> DATOS DEL ESTUDIANTE
+                                <span></span> DATOS DEL ESTUDIANTE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -1075,7 +1075,7 @@
 
                         <div class="data-section" id="datosInstitucion">
                             <div class="data-section-title">
-                                <span>🏫</span> INSTITUCIÓN
+                                <span></span> INSTITUCIÓN
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Nombre:</div>
@@ -1089,7 +1089,7 @@
 
                         <div class="data-section" id="estadoTneSection">
                             <div class="data-section-title">
-                                <span>📋</span> ESTADO TNE
+                                <span></span> ESTADO TNE
                             </div>
                             <div class="data-row">
                                 <div class="data-label">Estado:</div>
@@ -1112,12 +1112,12 @@
 
             <div class="footer-logout visible">
                 <button class="btn btn-footer-logout" onclick="cerrarSesionGlobal()">
-                    <span class="btn-icon">🚪</span> Cerrar Sesión
+                    <span class="btn-icon"></span> Cerrar Sesión
                 </button>
             </div>
 
             <div class="footer">
-                <p>🔒 Sistema Enterprise con Rate Limiting</p>
+                <p>Sistema Empresarial verificador de TNE</p>
                 <p style="margin-top: 4px;">Datos en tiempo real desde JUNAEB</p>
             </div>
         </div>
@@ -1393,7 +1393,7 @@
                 ctx.drawImage(video, 0, 0);
                 const imageData = canvas.toDataURL('image/jpeg', 0.7);
                 
-                updateDetectionStatus('detecting', '🔎 Detectando...');
+                updateDetectionStatus('detecting', 'Detectando...');
                 const { data: { text, confidence } } = await tesseractWorkerQuick.recognize(imageData);
                 
                 const rutMatch = text.match(/\d{7,9}/);
@@ -1424,7 +1424,7 @@
                 
             } catch (error) {
                 console.error('[AUTO] Error en loop:', error);
-                updateDetectionStatus('searching', '⚠️ Error - Reintentando...');
+                updateDetectionStatus('searching', 'Error - Reintentando...');
             }
         }
 
@@ -1450,7 +1450,7 @@
         
         document.addEventListener('visibilitychange', function() {
             if (document.hidden && codigoEmpresarioActual) {
-                console.log('[VISIBILITY] 👋 Usuario salió - Guardando estado...');
+                console.log('[VISIBILITY] Usuario salió - Guardando estado...');
                 guardarSesion({
                     codigoEmpresario: codigoEmpresarioActual,
                     maquina: maquinaAsignada
@@ -1460,7 +1460,7 @@
         
         window.addEventListener('beforeunload', function(e) {
             if (codigoEmpresarioActual) {
-                console.log('[BEFOREUNLOAD] 🚪 Cerrando - Guardando estado...');
+                console.log('[BEFOREUNLOAD] Cerrando - Guardando estado...');
                 guardarSesion({
                     codigoEmpresario: codigoEmpresarioActual,
                     maquina: maquinaAsignada
@@ -1485,7 +1485,7 @@
         
         window.addEventListener('DOMContentLoaded', async function() {
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('[INIT] 🚀 Aplicación iniciada');
+            console.log('[INIT] Aplicación iniciada');
             console.log('[INIT] DeviceID:', deviceId);
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             
@@ -1504,7 +1504,7 @@
 
         async function cerrarSesionGlobal() {
             if (confirm('¿Cerrar sesión? La máquina quedará disponible.')) {
-                console.log('[LOGOUT] 👋 Cerrando sesión manualmente...');
+                console.log('[LOGOUT] Cerrando sesión manualmente...');
                 
                 try {
                     await fetch(WORKER_URL, {
@@ -1646,7 +1646,7 @@
                 }
                 
                 card.innerHTML = `
-                    <div class="machine-name">🚌 ${maq.nombre}</div>
+                    <div class="machine-name">${maq.nombre}</div>
                     <div class="machine-status">
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
@@ -1709,16 +1709,16 @@
             loginScreen.classList.add('hidden');
             machineSelector.classList.remove('active');
             appScreen.classList.add('active');
-            licenseBadge.textContent = `👤 ${empresarioNombre} | 🚌 ${maquinaAsignada}`;
+            licenseBadge.textContent = `${empresarioNombre} | ${maquinaAsignada}`;
             licenseBadge.style.display = 'inline-block';
             actualizarStats();
         }
 
         function actualizarStats() {
             const hoy = new Date().toLocaleDateString('es-CL');
-            let texto = `📊 Verificaciones: ${verificacionesHoy} | 📅 ${hoy}`;
+            let texto = `Verificaciones: ${verificacionesHoy} | ${hoy}`;
             if (consultasRestantes !== null) {
-                texto += ` | 🔢 Quedan: ${consultasRestantes}`;
+                texto += ` | Quedan: ${consultasRestantes}`;
             }
             statsBar.textContent = texto;
         }
@@ -1758,7 +1758,7 @@
                 
                 if (AUTO_CAPTURE_CONFIG.enabled) {
                     await initQuickTesseract();
-                    updateDetectionStatus('searching', '🔍 Buscando RUT...');
+                    updateDetectionStatus('searching', 'Buscando RUT...');
                     autoScanInterval = setInterval(autoDetectionLoop, AUTO_CAPTURE_CONFIG.scanInterval);
                     console.log('[AUTO] ✓ Auto-Capture activado');
                 }
@@ -2049,14 +2049,14 @@
                     loading.style.display = 'none';
                     await verificarTNE(rutFinal);
                 } else {
-                    console.log('⚠️ RUT no detectado');
+                    console.log('RUT no detectado');
                     loading.style.display = 'none';
                     await new Promise(resolve => setTimeout(resolve, 100));
                     mostrarIngresoManual();
                 }
                 
             } catch (err) {
-                console.error('❌ Error OCR:', err.message);
+                console.error('Error OCR:', err.message);
                 loading.style.display = 'none';
                 await new Promise(resolve => setTimeout(resolve, 100));
                 mostrarIngresoManual();
@@ -2210,13 +2210,13 @@
                 const data = await response.json();
                 
                 if (response.status === 429) {
-                    mostrarError('⚠️ Límite alcanzado.');
+                    mostrarError('Límite alcanzado.');
                     resetear();
                     return;
                 }
                 
                 if (response.status === 403) {
-                    mostrarError('⚠️ No autorizado.');
+                    mostrarError('No autorizado.');
                     limpiarSesion();
                     setTimeout(() => location.reload(), 2000);
                     return;
